@@ -1437,7 +1437,7 @@ ${extra?'ADDITIONAL REQUIREMENTS: '+extra:''}
 
 Write every section fully. Present measurements in tables. Number and prioritise all recommendations (CRITICAL / HIGH / MEDIUM / LOW). The report must be complete, polished, and ready to submit.`;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]})});
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]})});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Error generating report.';
     rptLast=text;
@@ -1482,7 +1482,7 @@ async function refine(instruction){
   if(!rptLast){toast('Generate a report first');return;}
   setLoad('rpt',true,'Refining your report…');
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:'You are a senior engineering report editor. Revise as instructed, keeping all existing content and Markdown formatting. Return the complete revised report.',messages:[{role:'user',content:`REPORT:\n\n${rptLast}\n\n---\nINSTRUCTION: ${instruction}\n\nReturn the complete revised report.`}]})});
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:'You are a senior engineering report editor. Revise as instructed, keeping all existing content and Markdown formatting. Return the complete revised report.',messages:[{role:'user',content:`REPORT:\n\n${rptLast}\n\n---\nINSTRUCTION: ${instruction}\n\nReturn the complete revised report.`}]})});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||rptLast;
     rptLast=text;
@@ -1537,7 +1537,7 @@ Flags: "max"=absolute max, "crit"=warning/critical, "ok"=normal`,
     application:`Provide detailed application notes: recommended topologies, layout considerations, thermal management, decoupling requirements, protection circuitry, and common design mistakes.`,
   };
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:`You are an expert ${type} application engineer. Analyze precisely, cite specific values. Use ## for sections, **bold** for critical values, tables for structured data.`,messages:[{role:'user',content:`DATASHEET:\n\n${content}\n\n---\n${modeP[mode]}`}]})});
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:`You are an expert ${type} application engineer. Analyze precisely, cite specific values. Use ## for sections, **bold** for critical values, tables for structured data.`,messages:[{role:'user',content:`DATASHEET:\n\n${content}\n\n---\n${modeP[mode]}`}]})});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
     qaHist=[{role:'user',content:`Datasheet:\n${content}`},{role:'assistant',content:text}];
@@ -1591,7 +1591,7 @@ async function qsend(){
   qaHist.push({role:'user',content:q});
   const tid=addQTyping();
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:'You are an expert component/datasheet engineer. Answer precisely based on the provided datasheet. Cite specific values. Use tables where helpful. Be concise but complete.',messages:qaHist.slice(-14)})});
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:'You are an expert component/datasheet engineer. Answer precisely based on the provided datasheet. Cite specific values. Use tables where helpful. Be concise but complete.',messages:qaHist.slice(-14)})});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'No response.';
     qaHist.push({role:'assistant',content:text});
@@ -1623,7 +1623,7 @@ async function cmpDS(){
   const app=document.getElementById('cmp-app').value;
   setLoad('cmp',true,'Comparing both datasheets…');
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:'You are a senior engineer specialising in component and design option selection. Compare rigorously with specific values and give a clear, justified recommendation.',messages:[{role:'user',content:`Compare for application: "${app||'general engineering use'}"\n\n## ${an}:\n${a}\n\n## ${bn}:\n${b}\n\n---\nProvide:\n1. **Side-by-Side Comparison Table** (Parameter | ${an} | ${bn} | Winner)\n2. **Key Differences** for this specific application\n3. **${an}: Pros & Cons**\n4. **${bn}: Pros & Cons**\n5. **Overall Recommendation** with specific values justifying the choice\n6. **Risk Factors** to watch with the recommended option`}]})});
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:'You are a senior engineer specialising in component and design option selection. Compare rigorously with specific values and give a clear, justified recommendation.',messages:[{role:'user',content:`Compare for application: "${app||'general engineering use'}"\n\n## ${an}:\n${a}\n\n## ${bn}:\n${b}\n\n---\nProvide:\n1. **Side-by-Side Comparison Table** (Parameter | ${an} | ${bn} | Winner)\n2. **Key Differences** for this specific application\n3. **${an}: Pros & Cons**\n4. **${bn}: Pros & Cons**\n5. **Overall Recommendation** with specific values justifying the choice\n6. **Risk Factors** to watch with the recommended option`}]})});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
     setLoad('cmp',false);
