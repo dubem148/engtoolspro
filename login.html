@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sign In — EngTools Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --void:#050608;--navy:#0d1018;--surface:#111520;--raised:#161d2e;
+  --teal:#14f0cc;--teal-lo:rgba(20,240,204,0.07);--teal-glow:0 0 32px rgba(20,240,204,0.3);
+  --gold:#f5a623;--lime:#7eed6a;--rose:#ff5c7a;
+  --text:#dde6f5;--muted:#5c7090;--faint:#253040;
+  --edge:rgba(20,240,204,0.08);--edge2:rgba(20,240,204,0.18);
+  --display:'Fraunces',serif;--body:'DM Sans',sans-serif;--mono:'Fira Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--body);background:var(--void);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 20%,rgba(20,240,204,0.09) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 70%,rgba(245,166,35,0.07) 0%,transparent 60%);
+}
+/* grid texture */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,240,204,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(20,240,204,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+}
+.card{
+  position:relative;z-index:1;
+  background:var(--surface);border:1px solid var(--edge2);
+  border-radius:20px;padding:48px 44px;width:100%;max-width:440px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(20,240,204,0.04);
+}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:36px;text-decoration:none}
+.logo-gem{
+  width:36px;height:36px;border-radius:9px;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:900;font-size:15px;color:#000;
+  box-shadow:0 0 0 1px rgba(20,240,204,0.5),0 4px 16px rgba(20,240,204,0.2);
+  letter-spacing:-1px;position:relative;overflow:hidden;
+}
+.logo-gem::after{content:'';position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(rgba(255,255,255,0.3),transparent)}
+.logo-text{font-family:var(--display);font-size:17px;font-weight:700}
+h1{font-family:var(--display);font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+h1 em{font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:14px;color:var(--muted);margin-bottom:32px}
+.field{margin-bottom:16px}
+label{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+input{
+  width:100%;background:var(--navy);border:1px solid var(--edge2);
+  border-radius:8px;color:var(--text);font-family:var(--body);font-size:14px;
+  padding:12px 14px;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,240,204,0.1)}
+input::placeholder{color:var(--faint)}
+.forgot{text-align:right;margin-top:-8px;margin-bottom:24px}
+.forgot a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .15s}
+.forgot a:hover{color:var(--teal)}
+.btn{
+  width:100%;padding:13px;border-radius:9px;
+  background:var(--teal);color:#000;border:none;
+  font-family:var(--body);font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
+}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.28) 0%,transparent 55%)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--teal-glow)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+.divider{display:flex;align-items:center;gap:12px;margin:22px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--edge)}
+.divider span{font-size:11px;font-family:var(--mono);color:var(--faint)}
+.switch{text-align:center;font-size:13px;color:var(--muted)}
+.switch a{color:var(--teal);text-decoration:none;font-weight:500}
+.switch a:hover{text-decoration:underline}
+.error-msg{
+  background:rgba(255,92,122,0.1);border:1px solid rgba(255,92,122,0.25);
+  border-radius:7px;padding:10px 14px;font-size:13px;color:var(--rose);
+  margin-bottom:16px;display:none;
+}
+.error-msg.show{display:block}
+.success-msg{
+  background:rgba(20,240,204,0.08);border:1px solid var(--edge2);
+  border-radius:7px;padding:10px 14px;font-size:13px;color:var(--teal);
+  margin-bottom:16px;display:none;
+}
+.success-msg.show{display:block}
+</style>
+</head>
+<body>
+<div class="card">
+  <a class="logo" href="index.html">
+    <div class="logo-gem">E</div>
+    <div class="logo-text">EngTools Pro</div>
+  </a>
+
+  <h1>Welcome <em>back.</em></h1>
+  <p class="subtitle">Sign in to your account to continue</p>
+
+  <div class="error-msg" id="error-msg"></div>
+  <div class="success-msg" id="success-msg"></div>
+
+  <form id="login-form" onsubmit="handleLogin(event)">
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="email" placeholder="you@company.com" required autocomplete="email"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
+    </div>
+    <div class="forgot"><a href="#">Forgot password?</a></div>
+    <button class="btn" id="submit-btn" type="submit">Sign in →</button>
+  </form>
+
+  <div class="divider"><span>NEW HERE?</span></div>
+  <div class="switch">
+    Don't have an account? <a href="signup.html">Create one free →</a>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const supabase = createClient(
+    'https://jykqcothsmogauvfnuvh.supabase.co',
+    'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J'
+  );
+
+  // If already logged in → go to dashboard
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) window.location.href = 'dashboard.html';
+
+  window.handleLogin = async function(e) {
+    e.preventDefault();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('submit-btn');
+    const errEl    = document.getElementById('error-msg');
+    const okEl     = document.getElementById('success-msg');
+
+    errEl.classList.remove('show');
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      errEl.textContent = error.message === 'Invalid login credentials'
+        ? 'Incorrect email or password. Please try again.'
+        : error.message;
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Sign in →';
+      return;
+    }
+
+    okEl.textContent = 'Signed in! Taking you to your dashboard…';
+    okEl.classList.add('show');
+
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect') || 'dashboard.html';
+    setTimeout(() => window.location.href = redirect, 800);
+  };
+</script>
+</body>
+</html>

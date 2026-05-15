@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EngTools Pro — AI Engineering Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --black:   #060810;
+  --deep:    #090c14;
+  --navy:    #0d1220;
+  --surface: #121929;
+  --raised:  #172032;
+  --hover:   #1e2940;
+  --edge:    rgba(99,179,237,0.10);
+  --edge2:   rgba(99,179,237,0.18);
+  --edge3:   rgba(99,179,237,0.30);
+
+  --teal:    #2dd4bf;
+  --teal-lo: rgba(45,212,191,0.08);
+  --teal-mid:rgba(45,212,191,0.18);
+  --teal-glow:0 0 24px rgba(45,212,191,0.30);
+
+  --blue:    #60a5fa;
+  --violet:  #a78bfa;
+  --amber:   #fbbf24;
+  --rose:    #fb7185;
+  --lime:    #a3e635;
+
+  --text:    #e2e8f8;
+  --muted:   #7c8faa;
+  --faint:   #3a4a62;
+  --ghost:   #1e2a3d;
+
+  --mono: 'JetBrains Mono', monospace;
+  --ui:   'Outfit', sans-serif;
+  --r: 12px; --r2: 8px; --r3: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--ui);
+  background: var(--black);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Subtle grid texture */
+  background-image:
+    linear-gradient(rgba(45,212,191,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,212,191,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+::selection { background: var(--teal-mid); color: #fff; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--raised); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════ */
+.topbar {
+  height: 60px;
+  background: rgba(6,8,16,0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--edge);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 300;
+}
+
+/* Logo */
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-right: 32px; flex-shrink: 0; }
+.logo-gem {
+  width: 34px; height: 34px;
+  background: var(--teal);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.logo-gem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%);
+}
+.logo-gem span { font-family: var(--mono); font-weight: 500; font-size: 13px; color: #000; position: relative; z-index: 1; letter-spacing: -1px; }
+.logo-text { line-height: 1.15; }
+.logo-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.logo-tag { font-size: 9px; font-family: var(--mono); color: var(--teal); letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+
+/* Nav tabs */
+.nav { display: flex; gap: 2px; flex: 1; }
+.ntab {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  padding: 7px 15px; border-radius: var(--r3);
+  border: 1px solid transparent;
+  cursor: pointer; background: none;
+  transition: color .15s, background .15s, border-color .15s;
+  font-family: var(--ui);
+  white-space: nowrap;
+}
+.ntab:hover { color: var(--text); background: var(--surface); }
+.ntab.on {
+  color: var(--teal);
+  background: var(--teal-lo);
+  border-color: var(--edge2);
+}
+.ntab-icon { font-size: 14px; line-height: 1; }
+
+.bar-end { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.plan-tag {
+  font-size: 10px; font-family: var(--mono); padding: 4px 10px;
+  border-radius: 4px; background: rgba(163,230,53,0.1);
+  border: 1px solid rgba(163,230,53,0.2); color: var(--lime);
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.cta-upgrade {
+  font-size: 12px; font-weight: 600; padding: 8px 18px;
+  border-radius: var(--r3); background: var(--teal); color: #000;
+  border: none; cursor: pointer; transition: all .15s;
+  font-family: var(--ui); letter-spacing: 0.2px;
+  position: relative; overflow: hidden;
+}
+.cta-upgrade::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+}
+.cta-upgrade:hover { transform: translateY(-1px); box-shadow: var(--teal-glow); }
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.shell { display: flex; min-height: calc(100vh - 60px); }
+
+/* Sidebar */
+.sidebar {
+  width: 228px; flex-shrink: 0;
+  background: var(--deep);
+  border-right: 1px solid var(--edge);
+  padding: 20px 0 100px;
+  position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+}
+.sb-label {
+  font-size: 9px; font-family: var(--mono); color: var(--faint);
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 12px 20px 5px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  border-left: 2px solid transparent;
+  transition: all .12s;
+  position: relative;
+}
+.sb-item:hover { color: var(--text); background: var(--surface); }
+.sb-item.on {
+  color: var(--teal);
+  border-left-color: var(--teal);
+  background: var(--teal-lo);
+}
+.sb-item.on::after {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+}
+.sb-icon { font-size: 14px; }
+.sb-divider { height: 1px; background: var(--edge); margin: 10px 20px; }
+
+.sb-usage {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 14px 20px; background: var(--deep);
+  border-top: 1px solid var(--edge);
+}
+.sb-usage-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 7px; }
+.sb-usage-row span:last-child { color: var(--teal); font-family: var(--mono); }
+.sb-track { height: 3px; background: var(--surface); border-radius: 2px; overflow: hidden; }
+.sb-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue)); border-radius: 2px; transition: width .4s ease; }
+.sb-note { font-size: 10px; color: var(--faint); margin-top: 6px; font-family: var(--mono); }
+
+/* Main content */
+.main { flex: 1; padding: 32px 36px; max-width: 1080px; }
+.page { display: none; }
+.page.on { display: block; }
+
+/* ═══════════════════════════════════════════════
+   PAGE HEADERS
+═══════════════════════════════════════════════ */
+.ph {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 28px;
+}
+.ph h1 {
+  font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
+  line-height: 1.2; margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--text) 40%, var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.ph p { font-size: 13px; color: var(--muted); line-height: 1.65; max-width: 500px; }
+.ph-badge {
+  font-size: 9px; font-family: var(--mono); padding: 5px 11px;
+  border-radius: 4px; background: var(--teal-lo);
+  border: 1px solid var(--edge2); color: var(--teal);
+  white-space: nowrap; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-top: 4px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+}
+.ph-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+
+/* ═══════════════════════════════════════════════
+   CARDS / PANELS
+═══════════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 16px;
+  transition: border-color .15s;
+}
+.card:hover { border-color: var(--edge2); }
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 22px;
+  background: var(--navy);
+  border-bottom: 1px solid var(--edge);
+}
+.card-title {
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 9px; color: var(--text);
+}
+.card-title-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.card-body { padding: 22px; }
+
+/* Badges */
+.badge {
+  font-size: 9px; font-family: var(--mono); padding: 3px 8px;
+  border-radius: 3px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500;
+}
+.badge-teal { background: var(--teal-lo); color: var(--teal); border: 1px solid var(--edge2); }
+.badge-amber { background: rgba(251,191,36,.08); color: var(--amber); border: 1px solid rgba(251,191,36,.2); }
+.badge-lime { background: rgba(163,230,53,.08); color: var(--lime); border: 1px solid rgba(163,230,53,.2); }
+.badge-violet { background: rgba(167,139,250,.08); color: var(--violet); border: 1px solid rgba(167,139,250,.2); }
+.badge-blue { background: rgba(96,165,250,.08); color: var(--blue); border: 1px solid rgba(96,165,250,.2); }
+
+/* ═══════════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════════ */
+.field { margin-bottom: 14px; }
+.label {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-family: var(--mono); color: var(--muted);
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 7px;
+}
+.label .req { color: var(--teal); }
+.label .tip { color: var(--faint); font-size: 9px; margin-left: auto; text-transform: none; letter-spacing: 0; }
+
+input[type=text], textarea, select {
+  width: 100%;
+  background: var(--navy);
+  border: 1px solid var(--edge);
+  border-radius: var(--r2);
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none;
+}
+input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(45,212,191,0.1);
+}
+input[type=text]:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
+  border-color: var(--edge2);
+}
+input::placeholder, textarea::placeholder { color: var(--faint); }
+textarea { resize: vertical; min-height: 90px; line-height: 1.65; }
+select { cursor: pointer; }
+select option { background: var(--navy); color: var(--text); }
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+/* ═══════════════════════════════════════════════
+   TEMPLATE PICKER
+═══════════════════════════════════════════════ */
+.tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px; margin-bottom: 18px;
+}
+.tpl-card {
+  background: var(--navy);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.tpl-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(45,212,191,0) 0%, rgba(45,212,191,0.04) 100%);
+  opacity: 0; transition: opacity .15s;
+}
+.tpl-card:hover { border-color: var(--edge2); transform: translateY(-1px); }
+.tpl-card:hover::before { opacity: 1; }
+.tpl-card.on {
+  border-color: var(--teal);
+  background: var(--teal-lo);
+  box-shadow: 0 0 0 1px var(--teal), inset 0 0 20px rgba(45,212,191,0.05);
+}
+.tpl-card.on::before { opacity: 1; }
+.tpl-em { font-size: 22px; margin-bottom: 8px; display: block; line-height: 1; }
+.tpl-name { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.tpl-sub { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.tpl-check {
+  position: absolute; top: 7px; right: 7px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--teal); color: #000;
+  font-size: 9px; font-weight: 700;
+  display: none; align-items: center; justify-content: center;
+}
+.tpl-card.on .tpl-check { display: flex; }
+
+/* ═══════════════════════════════════════════════
+   STANDARDS CHIPS
+═══════════════════════════════════════════════ */
+.stds-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.std-chip {
+  font-size: 11px; font-family: var(--mono);
+  padding: 5px 11px; border-radius: 5px;
+  background: var(--navy); border: 1px solid var(--edge);
+  color: var(--muted); cursor: pointer;
+  transition: all .12s; user-select: none;
+}
+.std-chip:hover { border-color: var(--amber); color: var(--amber); }
+.std-chip.on {
+  background: rgba(251,191,36,.1);
+  border-color: rgba(251,191,36,.35);
+  color: var(--amber);
+}
+
+/* ═══════════════════════════════════════════════
+   SECTIONS CHECKLIST
+═══════════════════════════════════════════════ */
+.sec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sec-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--r2);
+  background: var(--navy); border: 1px solid var(--edge);
+  cursor: pointer; transition: all .12s;
+}
+.sec-item:hover { border-color: var(--edge2); }
+.sec-item.on { border-color: rgba(163,230,53,.25); background: rgba(163,230,53,.06); }
+.sec-box {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1px solid var(--faint); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; transition: all .12s; color: transparent;
+}
+.sec-item.on .sec-box { background: var(--lime); border-color: var(--lime); color: #000; }
+.sec-text { font-size: 12px; font-weight: 500; flex: 1; }
+.sec-num { font-size: 10px; font-family: var(--mono); color: var(--faint); }
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: var(--r2);
+  font-family: var(--ui); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s; border: none;
+  letter-spacing: 0.2px; white-space: nowrap;
+}
+.btn-teal {
+  background: var(--teal); color: #000;
+  position: relative; overflow: hidden;
+}
+.btn-teal::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+}
+.btn-teal:hover { transform: translateY(-1px); box-shadow: var(--teal-glow); }
+.btn-teal:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-lime { background: var(--lime); color: #000; }
+.btn-lime:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(163,230,53,0.3); }
+.btn-lime:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--edge2);
+  color: var(--muted);
+  font-size: 12px; padding: 8px 14px;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--edge3); background: var(--surface); }
+
+.btn-outline {
+  background: transparent; border: 1px solid var(--edge2); color: var(--text);
+}
+.btn-outline:hover { background: var(--surface); border-color: var(--edge3); }
+
+.btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+
+/* ═══════════════════════════════════════════════
+   PROGRESS TRACK
+═══════════════════════════════════════════════ */
+.progress-wrap {
+  background: var(--navy); border: 1px solid var(--edge);
+  border-radius: var(--r); margin-top: 16px; overflow: hidden;
+  display: none;
+}
+.progress-wrap.on { display: block; }
+.progress-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; border-bottom: 1px solid var(--edge);
+}
+.progress-title { font-size: 11px; font-family: var(--mono); color: var(--teal); display: flex; align-items: center; gap: 7px; }
+.progress-count { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+.progress-list { padding: 4px 0; }
+.prog-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 18px; font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--edge); transition: background .15s;
+}
+.prog-row:last-child { border-bottom: none; }
+.prog-row.working { background: rgba(45,212,191,0.04); color: var(--text); }
+.prog-row.done { color: var(--faint); }
+.prog-icon {
+  width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-family: var(--mono);
+}
+.prog-icon.wait { background: var(--raised); color: var(--faint); }
+.prog-icon.working {
+  background: var(--teal-lo); color: var(--teal);
+  border: 1px solid var(--edge2);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.prog-icon.done { background: rgba(163,230,53,.12); color: var(--lime); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ═══════════════════════════════════════════════
+   REPORT OUTPUT
+═══════════════════════════════════════════════ */
+.output {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: var(--r); margin-top: 16px; overflow: hidden;
+  display: none;
+  animation: slideUp .3s ease;
+}
+.output.on { display: block; }
+@keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+.output-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 22px; background: var(--navy);
+  border-bottom: 1px solid var(--edge); gap: 12px; flex-wrap: wrap;
+}
+.output-bar-label { font-size: 11px; font-family: var(--mono); color: var(--muted); display: flex; align-items: center; gap: 7px; }
+.output-bar-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px var(--teal); flex-shrink: 0; }
+.output-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Refine strip */
+.refine-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 22px; background: rgba(6,8,16,0.6);
+  border-bottom: 1px solid var(--edge);
+  overflow-x: auto; flex-wrap: wrap;
+}
+.refine-label { font-size: 9px; font-family: var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: 1.5px; flex-shrink: 0; margin-right: 4px; }
+.refine-btn {
+  font-size: 11px; padding: 5px 12px; border-radius: 4px;
+  background: var(--raised); border: 1px solid var(--edge);
+  color: var(--muted); cursor: pointer;
+  transition: all .12s; white-space: nowrap; font-family: var(--ui);
+}
+.refine-btn:hover {
+  background: var(--teal-lo); border-color: var(--edge2); color: var(--teal);
+}
+
+/* Output body */
+.output-body {
+  padding: 32px 36px; font-size: 14px; line-height: 1.85;
+  max-height: 700px; overflow-y: auto;
+  font-family: var(--ui);
+}
+.output-body h1 { font-size: 20px; font-weight: 800; letter-spacing: -.4px; margin-bottom: 6px; color: var(--text); }
+.output-body h2 {
+  font-size: 14px; font-weight: 700; color: var(--teal);
+  margin: 26px 0 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--edge);
+  letter-spacing: 0.3px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.output-body h2::before { content: ''; width: 3px; height: 14px; background: var(--teal); border-radius: 2px; box-shadow: 0 0 8px var(--teal); }
+.output-body h3 { font-size: 13px; font-weight: 700; color: var(--amber); margin: 16px 0 7px; }
+.output-body p { margin-bottom: 10px; color: var(--text); }
+.output-body strong { color: #fff; font-weight: 700; }
+.output-body em { font-style: normal; color: var(--lime); font-family: var(--mono); font-size: 12px; background: rgba(163,230,53,.1); padding: 1px 6px; border-radius: 3px; }
+.output-body ul, .output-body ol { padding-left: 22px; margin: 8px 0; }
+.output-body li { margin-bottom: 5px; }
+.output-body code { font-family: var(--mono); background: var(--raised); padding: 2px 7px; border-radius: 3px; font-size: 12px; color: var(--violet); }
+.output-body blockquote {
+  border-left: 3px solid var(--teal); padding: 10px 16px;
+  background: var(--teal-lo); border-radius: 0 var(--r2) var(--r2) 0;
+  margin: 10px 0; font-size: 13px; color: var(--muted);
+}
+.output-body table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+.output-body th {
+  background: var(--raised); padding: 10px 14px; text-align: left;
+  font-size: 10px; font-family: var(--mono); color: var(--teal);
+  border-bottom: 1px solid var(--edge2); letter-spacing: 0.8px; text-transform: uppercase;
+}
+.output-body td { padding: 10px 14px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+.output-body tr:hover td { background: rgba(45,212,191,0.02); }
+.output-body .warn { color: var(--amber); }
+.output-body .crit { color: var(--rose); }
+
+/* Meta footer */
+.output-foot {
+  display: flex; gap: 20px; padding: 12px 22px;
+  border-top: 1px solid var(--edge); background: var(--navy); flex-wrap: wrap;
+}
+.meta-chip { font-size: 10px; font-family: var(--mono); color: var(--faint); }
+.meta-chip span { color: var(--muted); }
+
+/* ═══════════════════════════════════════════════
+   LOADING
+═══════════════════════════════════════════════ */
+.lbar { height: 2px; background: var(--raised); overflow: hidden; display: none; margin-top: 12px; border-radius: 1px; }
+.lbar.on { display: block; }
+.lbar-fill {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, transparent, var(--teal), var(--violet), var(--teal), transparent);
+  background-size: 200% 100%;
+  animation: sweep 1.8s linear infinite;
+}
+@keyframes sweep { 0%{background-position:200%} 100%{background-position:-200%} }
+.lmsg { font-size: 11px; font-family: var(--mono); color: var(--muted); margin-top: 8px; display: none; }
+.lmsg.on { display: block; }
+.lmsg::before { content: '▶ '; color: var(--teal); }
+
+/* ═══════════════════════════════════════════════
+   UPLOAD ZONE
+═══════════════════════════════════════════════ */
+.drop-zone {
+  border: 1.5px dashed var(--edge2); border-radius: var(--r);
+  padding: 28px; text-align: center; cursor: pointer;
+  transition: all .15s; background: var(--navy); margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.drop-zone::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(45,212,191,0) 30%, rgba(45,212,191,0.04) 100%);
+  opacity: 0; transition: opacity .2s;
+}
+.drop-zone:hover, .drop-zone.drag { border-color: var(--teal); }
+.drop-zone:hover::before, .drop-zone.drag::before { opacity: 1; }
+.drop-zone input { display: none; }
+.drop-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.drop-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.drop-hint { font-size: 12px; color: var(--muted); }
+.fpill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--raised); border: 1px solid var(--edge2);
+  border-radius: 5px; padding: 5px 10px; font-size: 11px;
+  font-family: var(--mono); margin: 4px 3px;
+}
+.fpill-x { cursor: pointer; color: var(--faint); transition: color .12s; }
+.fpill-x:hover { color: var(--rose); }
+
+/* ═══════════════════════════════════════════════
+   PARAM CARDS
+═══════════════════════════════════════════════ */
+.param-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; margin: 12px 0; }
+.param-card {
+  background: var(--raised); border: 1px solid var(--edge);
+  border-radius: var(--r2); padding: 14px 14px 12px;
+  transition: border-color .15s, transform .15s;
+  position: relative; overflow: hidden;
+}
+.param-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--teal); transform: scaleX(0); transition: transform .2s;
+}
+.param-card:hover { border-color: var(--edge2); transform: translateY(-2px); }
+.param-card:hover::after { transform: scaleX(1); }
+.param-nm { font-size: 9px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.param-v { font-size: 20px; font-weight: 700; font-family: var(--mono); line-height: 1.1; }
+.param-v.sky { color: var(--teal); }
+.param-v.amber { color: var(--amber); }
+.param-v.rose { color: var(--rose); }
+.param-u { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.param-f { font-size: 10px; margin-top: 5px; font-family: var(--mono); }
+
+/* ═══════════════════════════════════════════════
+   COMPARE
+═══════════════════════════════════════════════ */
+.cmp-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.cmp-col {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: var(--r); overflow: hidden;
+}
+.cmp-col-head {
+  padding: 12px 18px; background: var(--navy);
+  border-bottom: 1px solid var(--edge);
+  font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 1.5px;
+  display: flex; align-items: center; gap: 7px;
+}
+.cmp-col-head .dot { width: 6px; height: 6px; border-radius: 50%; }
+.dot-a { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+.dot-b { background: var(--violet); box-shadow: 0 0 6px var(--violet); }
+.cmp-col-body { padding: 16px 18px; }
+
+/* ═══════════════════════════════════════════════
+   QA CHAT
+═══════════════════════════════════════════════ */
+.chat-wrap {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: var(--r); overflow: hidden; margin-top: 16px;
+}
+.chat-head {
+  padding: 12px 18px; background: var(--navy);
+  border-bottom: 1px solid var(--edge);
+  font-size: 11px; font-family: var(--mono); color: var(--teal);
+  display: flex; align-items: center; gap: 7px;
+}
+.chat-head::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+.quick-chips { display: flex; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--edge); flex-wrap: wrap; background: rgba(6,8,16,.4); }
+.qchip {
+  font-size: 11px; padding: 5px 12px; border-radius: 4px;
+  background: var(--raised); border: 1px solid var(--edge);
+  color: var(--muted); cursor: pointer; transition: all .12s; font-family: var(--ui);
+}
+.qchip:hover { color: var(--teal); border-color: var(--edge2); background: var(--teal-lo); }
+.chat-msgs { max-height: 380px; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.cmsg { display: flex; gap: 10px; }
+.cav {
+  width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-family: var(--mono);
+}
+.cav.ai { background: var(--teal-lo); color: var(--teal); border: 1px solid var(--edge2); }
+.cav.you { background: rgba(167,139,250,.1); color: var(--violet); border: 1px solid rgba(167,139,250,.2); }
+.cbub {
+  background: var(--raised); border: 1px solid var(--edge);
+  border-radius: 9px; padding: 10px 14px;
+  font-size: 13px; line-height: 1.65; max-width: 88%;
+}
+.cbub.ai { border-color: rgba(45,212,191,.12); }
+.chat-input-row {
+  display: flex; gap: 8px; padding: 12px 14px;
+  background: var(--navy); border-top: 1px solid var(--edge);
+}
+.chat-in {
+  flex: 1; background: var(--raised); border: 1px solid var(--edge2);
+  border-radius: var(--r2); color: var(--text); font-family: var(--ui);
+  font-size: 13px; padding: 10px 14px; outline: none; transition: border-color .15s;
+}
+.chat-in:focus { border-color: var(--teal); }
+.chat-send {
+  background: var(--teal); color: #000; border: none;
+  border-radius: var(--r2); padding: 10px 18px;
+  font-weight: 700; font-size: 12px; cursor: pointer; transition: all .15s; font-family: var(--ui);
+}
+.chat-send:hover { box-shadow: var(--teal-glow); }
+.chat-send:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+
+/* Typing */
+@keyframes tdot { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+.td { display:inline-block;width:5px;height:5px;background:var(--teal);border-radius:50%;animation:tdot 1.2s ease infinite;margin:0 2px; }
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+
+/* ═══════════════════════════════════════════════
+   PRICING
+═══════════════════════════════════════════════ */
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 24px; }
+.pricing-card {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: var(--r); padding: 24px; position: relative;
+  transition: border-color .15s, transform .15s;
+}
+.pricing-card:hover { transform: translateY(-2px); }
+.pricing-card.featured {
+  border-color: var(--teal);
+  background: linear-gradient(180deg, rgba(45,212,191,0.06) 0%, var(--surface) 100%);
+}
+.pricing-card.featured:hover { box-shadow: 0 0 30px rgba(45,212,191,0.12); }
+.pricing-pop {
+  position: absolute; top: -1px; right: 18px;
+  font-size: 9px; font-family: var(--mono); font-weight: 700;
+  background: var(--teal); color: #000;
+  padding: 4px 10px; border-radius: 0 0 6px 6px;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.pricing-tier { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+.pricing-price { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; margin-bottom: 5px; }
+.pricing-price sub { font-size: 13px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+.pricing-desc { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.pricing-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 22px; }
+.pricing-features li { font-size: 12px; display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
+.pricing-features li::before { content: '✓'; color: var(--lime); font-size: 11px; margin-top: 1px; flex-shrink: 0; font-weight: 700; }
+.pricing-cta {
+  width: 100%; padding: 11px; border-radius: var(--r2);
+  font-family: var(--ui); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all .15s;
+}
+.pricing-cta.ghost { background: transparent; border: 1px solid var(--edge2); color: var(--text); }
+.pricing-cta.ghost:hover { background: var(--raised); }
+.pricing-cta.fill { background: var(--teal); border: none; color: #000; }
+.pricing-cta.fill:hover { box-shadow: var(--teal-glow); }
+
+/* ═══════════════════════════════════════════════
+   VS BANNER
+═══════════════════════════════════════════════ */
+.vs-banner {
+  background: var(--navy); border: 1px solid var(--edge);
+  border-radius: var(--r); padding: 16px 22px; margin-bottom: 22px;
+  display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;
+}
+.vs-title { font-size: 10px; font-family: var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: 1.5px; flex-shrink: 0; padding-top: 2px; }
+.vs-items { display: flex; flex-wrap: wrap; gap: 10px; flex: 1; }
+.vs-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.vs-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════
+   STEP TRACK
+═══════════════════════════════════════════════ */
+.step-track {
+  display: flex; align-items: center;
+  background: var(--navy); border: 1px solid var(--edge);
+  border-radius: var(--r); padding: 14px 22px; margin-bottom: 22px; gap: 0;
+}
+.stp { display: flex; align-items: center; gap: 10px; flex: 1; }
+.stp-n {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-family: var(--mono); font-weight: 600;
+  transition: all .2s;
+  background: var(--raised); border: 1px solid var(--edge); color: var(--faint);
+}
+.stp-n.active { background: var(--teal-lo); border-color: var(--teal); color: var(--teal); box-shadow: 0 0 0 3px rgba(45,212,191,0.1); }
+.stp-n.done { background: rgba(163,230,53,.15); border-color: var(--lime); color: var(--lime); }
+.stp-info { flex: 1; }
+.stp-label { font-size: 12px; font-weight: 600; color: var(--muted); transition: color .2s; }
+.stp-label.active { color: var(--text); }
+.stp-hint { font-size: 10px; font-family: var(--mono); color: var(--faint); margin-top: 1px; }
+.stp-sep { width: 28px; height: 1px; background: var(--edge2); flex-shrink: 0; margin: 0 6px; }
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 22px; right: 22px;
+  background: var(--raised); border: 1px solid var(--edge2);
+  border-radius: var(--r2); padding: 11px 18px;
+  font-size: 13px; font-weight: 500; color: var(--text);
+  z-index: 1000; opacity: 0; transform: translateY(8px);
+  transition: all .22s; pointer-events: none;
+  display: flex; align-items: center; gap: 8px;
+  max-width: 320px;
+}
+.toast.on { opacity: 1; transform: none; }
+.toast::before { content: '●'; color: var(--teal); font-size: 8px; }
+
+/* ═══════════════════════════════════════════════
+   VALUE STRIP
+═══════════════════════════════════════════════ */
+.value-strip {
+  background: rgba(45,212,191,.04); border: 1px solid rgba(45,212,191,.12);
+  border-radius: var(--r); padding: 18px 22px; margin-bottom: 22px;
+}
+.value-strip h3 { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 12px; }
+.value-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.vi { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
+.vi::before { content: '→'; color: var(--teal); flex-shrink: 0; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { padding: 16px 18px; }
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .sec-grid, .cmp-cols { grid-template-columns: 1fr; }
+  .nav { gap: 1px; }
+  .ntab { font-size: 11px; padding: 6px 10px; }
+  .tpl-grid { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); }
+}
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  TOPBAR                                  ║
+     ╚══════════════════════════════════════════╝ -->
+<header class="topbar">
+  <a class="logo" href="#">
+    <div class="logo-gem"><span>EP</span></div>
+    <div class="logo-text">
+      <div class="logo-name">EngTools Pro</div>
+      <div class="logo-tag">AI Suite</div>
+    </div>
+  </a>
+  <nav class="nav">
+    <button class="ntab on" onclick="goPage('report')"><span class="ntab-icon">📄</span>Report Generator</button>
+    <button class="ntab" onclick="goPage('datasheet')"><span class="ntab-icon">🔍</span>Datasheet Analyzer</button>
+    <button class="ntab" onclick="goPage('compare')"><span class="ntab-icon">⚖️</span>Compare</button>
+    <button class="ntab" onclick="goPage('pricing')"><span class="ntab-icon">💳</span>Pricing</button>
+  </nav>
+  <div class="bar-end">
+    <div class="plan-tag">Free Plan</div>
+    <button class="cta-upgrade" onclick="goPage('pricing')">Upgrade →</button>
+  </div>
+</header>
+
+<div class="shell">
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  SIDEBAR                                 ║
+     ╚══════════════════════════════════════════╝ -->
+<aside class="sidebar">
+  <div class="sb-label">AI Tools</div>
+  <div class="sb-item on" onclick="goPage('report')"><span class="sb-icon">📄</span> Report Generator</div>
+  <div class="sb-item" onclick="goPage('datasheet')"><span class="sb-icon">🔍</span> Datasheet Analyzer</div>
+  <div class="sb-item" onclick="goPage('compare')"><span class="sb-icon">⚖️</span> Compare Datasheets</div>
+  <div class="sb-divider"></div>
+  <div class="sb-label">Account</div>
+  <div class="sb-item" onclick="goPage('pricing')"><span class="sb-icon">💳</span> Plans & Pricing</div>
+  <div class="sb-usage">
+    <div class="sb-usage-row"><span>Daily queries</span><span id="u-count">3 / 10</span></div>
+    <div class="sb-track"><div class="sb-fill" id="u-bar" style="width:30%"></div></div>
+    <div class="sb-note">Upgrade for unlimited</div>
+  </div>
+</aside>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  MAIN                                    ║
+     ╚══════════════════════════════════════════╝ -->
+<main class="main">
+
+<!-- ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     REPORT GENERATOR
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ -->
+<div id="pg-report" class="page on">
+  <div class="ph">
+    <div>
+      <h1>AI Report Generator</h1>
+      <p>Domain-specific templates, auto-referenced standards, structured output ready to submit. Not a blank chat — a professional engineering workflow.</p>
+    </div>
+    <div class="ph-badge">STEP-BY-STEP WIZARD</div>
+  </div>
+
+  <div class="vs-banner">
+    <span class="vs-title">Why this beats ChatGPT</span>
+    <div class="vs-items">
+      <div class="vs-item"><div class="vs-dot"></div>10 engineering report templates pre-loaded</div>
+      <div class="vs-item"><div class="vs-dot"></div>Standards auto-referenced (IEC, BS, ASTM…)</div>
+      <div class="vs-item"><div class="vs-dot"></div>One-click refine any section</div>
+      <div class="vs-item"><div class="vs-dot"></div>Formatted output, ready to submit</div>
+    </div>
+  </div>
+
+  <!-- Step track -->
+  <div class="step-track">
+    <div class="stp"><div class="stp-n active" id="sn1">1</div><div class="stp-info"><div class="stp-label active">Template</div><div class="stp-hint">report type</div></div></div>
+    <div class="stp-sep"></div>
+    <div class="stp"><div class="stp-n" id="sn2">2</div><div class="stp-info"><div class="stp-label">Standards</div><div class="stp-hint">codes & refs</div></div></div>
+    <div class="stp-sep"></div>
+    <div class="stp"><div class="stp-n" id="sn3">3</div><div class="stp-info"><div class="stp-label">Content</div><div class="stp-hint">your data</div></div></div>
+    <div class="stp-sep"></div>
+    <div class="stp"><div class="stp-n" id="sn4">4</div><div class="stp-info"><div class="stp-label">Generate</div><div class="stp-hint">AI writes it</div></div></div>
+  </div>
+
+  <!-- STEP 1: Template -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="card-title-icon" style="background:var(--teal-lo)">①</div>Choose Report Template<span class="badge badge-teal">Step 1</span></div>
+    </div>
+    <div class="card-body">
+      <div class="tpl-grid" id="tpl-grid"></div>
+      <div class="g3">
+        <div class="field"><label class="label">Engineering Field <span class="req">*</span></label>
+          <select id="rpt-field" onchange="onFieldChange()">
+            <option value="electrical">Electrical / Electronics</option>
+            <option value="mechanical">Mechanical Engineering</option>
+            <option value="civil">Civil / Structural</option>
+            <option value="software">Software / Systems</option>
+            <option value="chemical">Chemical / Process</option>
+            <option value="petroleum">Petroleum / Oil & Gas</option>
+            <option value="aerospace">Aerospace</option>
+            <option value="telecoms">Telecommunications</option>
+          </select>
+        </div>
+        <div class="field"><label class="label">Audience / Tone <span class="req">*</span></label>
+          <select id="rpt-tone">
+            <option value="formal">Formal — Client / Management</option>
+            <option value="technical">Technical — Engineering Peers</option>
+            <option value="regulatory">Regulatory / Compliance</option>
+            <option value="academic">Academic / Research</option>
+          </select>
+        </div>
+        <div class="field"><label class="label">Language</label>
+          <select id="rpt-lang">
+            <option value="uk">British English (UK)</option>
+            <option value="us">American English (US)</option>
+            <option value="ng">Engineering English (Nigeria)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Standards -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="card-title-icon" style="background:var(--gold2,rgba(251,191,36,.08))">②</div>Applicable Standards &amp; Codes<span class="badge badge-amber">Makes it professional</span></div>
+    </div>
+    <div class="card-body">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Click to select — these are auto-referenced in your report. <span style="color:var(--amber)">This is what separates EngTools from generic AI.</span></p>
+      <div class="stds-wrap" id="stds-wrap"></div>
+      <div class="field" style="margin-top:14px"><label class="label">Custom standards / codes <span class="label"><span class="tip">comma separated</span></span></label>
+        <input type="text" id="rpt-custom-std" placeholder="e.g. NFPA 70, Client Spec XYZ-001, Local Building Code 2023…"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Content -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="card-title-icon" style="background:rgba(96,165,250,.08)">③</div>Project Details &amp; Your Data<span class="badge badge-blue">Step 3</span></div>
+    </div>
+    <div class="card-body">
+      <div class="g2">
+        <div class="field"><label class="label">Project / System Name <span class="req">*</span></label>
+          <input type="text" id="rpt-proj" placeholder="e.g. 11kV Ring Main Unit Replacement — Phase 1"/>
+        </div>
+        <div class="field"><label class="label">Prepared By / Organisation</label>
+          <input type="text" id="rpt-org" placeholder="e.g. EngTools Ltd — Eng. D. Okafor"/>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="field"><label class="label">Location / Site</label>
+          <input type="text" id="rpt-site" placeholder="e.g. Lagos, Nigeria"/>
+        </div>
+        <div class="field"><label class="label">Document Reference</label>
+          <input type="text" id="rpt-ref" placeholder="e.g. DOC-2025-034-R2"/>
+        </div>
+        <div class="field"><label class="label">Date</label>
+          <input type="text" id="rpt-date"/>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Notes, Measurements &amp; Findings <span class="req">*</span><span class="tip">More detail = better report</span></label>
+        <textarea id="rpt-notes" rows="9" placeholder="Paste everything — bullet points, measurements, observations, test results, issues found. The AI structures it for you.&#10;&#10;Good example:&#10;• Transformer T1: IR test 650MΩ @ 1kV (marginal — min 500MΩ)&#10;• Busbar joint at B3: oxidation + discolouration, IR scan 94°C (ΔT=66°C — critical)&#10;• Panel DB-A earth continuity: 0.12Ω ✓&#10;• Cable tray Zone C: ~6m active corrosion, load-bearing integrity questionable&#10;• Protection relay P1: settings last updated March 2019 — needs review&#10;• 3× MCBs with scorch marks at DB-B2 — investigate overload"></textarea>
+      </div>
+      <div class="field"><label class="label">Sections to Include</label>
+        <div class="sec-grid" id="sec-grid"></div>
+      </div>
+      <div class="field" style="margin-top:12px"><label class="label">Special Instructions <span class="tip">optional</span></label>
+        <input type="text" id="rpt-extra" placeholder="e.g. Add a risk matrix scored 1–5, highlight safety-critical items, include cost estimates for recommendations…"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-teal" id="rpt-btn" onclick="genReport()">✦ Generate Full Report</button>
+    <button class="btn btn-outline" onclick="clearReport()">Clear</button>
+    <span id="rpt-stat" style="font-size:11px;color:var(--muted);font-family:var(--mono)"></span>
+  </div>
+  <div class="lbar" id="rpt-lb"><div class="lbar-fill"></div></div>
+  <div class="lmsg" id="rpt-lm">AI is writing your report…</div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="rpt-prog">
+    <div class="progress-head">
+      <div class="progress-title">✦ Generating sections…</div>
+      <div class="progress-count" id="rpt-prog-count">0 / 0</div>
+    </div>
+    <div class="progress-list" id="rpt-prog-list"></div>
+  </div>
+
+  <!-- Output -->
+  <div class="output" id="rpt-out">
+    <div class="output-bar">
+      <div class="output-bar-label">Report complete — ready to use</div>
+      <div class="output-actions">
+        <button class="btn btn-ghost" onclick="copyEl('rpt-body')">Copy</button>
+        <button class="btn btn-ghost" onclick="dlTxt('rpt-body','report')">Download .txt</button>
+        <button class="btn btn-ghost" onclick="window.print()">Print / PDF</button>
+      </div>
+    </div>
+    <div class="refine-bar">
+      <span class="refine-label">Refine:</span>
+      <button class="refine-btn" onclick="refine('Make the recommendations stronger and more specific with priority ratings (Critical/High/Medium/Low)')">Stronger recommendations</button>
+      <button class="refine-btn" onclick="refine('Add a full risk matrix table with Likelihood, Severity, and Risk Rating columns')">Add risk matrix</button>
+      <button class="refine-btn" onclick="refine('Make language more technical and precise throughout, using correct engineering terminology')">More technical</button>
+      <button class="refine-btn" onclick="refine('Simplify language for a non-technical executive/management audience')">Simplify for management</button>
+      <button class="refine-btn" onclick="refine('Add estimated cost and budget implications for each recommendation')">Add cost estimates</button>
+      <button class="refine-btn" onclick="refine('Expand the conclusion with a clear prioritised action plan and timeline')">Expand conclusions</button>
+    </div>
+    <div class="output-body" id="rpt-body"></div>
+    <div class="output-foot">
+      <div class="meta-chip">Generated: <span id="m-date">—</span></div>
+      <div class="meta-chip">Words: <span id="m-words">—</span></div>
+      <div class="meta-chip">Template: <span id="m-tpl">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     DATASHEET ANALYZER
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ -->
+<div id="pg-datasheet" class="page">
+  <div class="ph">
+    <div>
+      <h1>Datasheet Analyzer</h1>
+      <p>Upload or paste any component, material, or equipment spec. Get visual parameter extraction, suitability checks, and expert Q&amp;A — all staying in context.</p>
+    </div>
+    <div class="ph-badge">VISUAL + CONVERSATIONAL</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="card-title-icon" style="background:rgba(163,230,53,.08)">📂</div>Load Datasheet<span class="badge badge-lime">Paste · Upload</span></div>
+    </div>
+    <div class="card-body">
+      <div class="drop-zone" id="ds-drop" onclick="document.getElementById('ds-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dsDrop(event)">
+        <input type="file" id="ds-file" accept=".pdf,.txt,.csv" onchange="dsPickFile(event)"/>
+        <span class="drop-icon">📂</span>
+        <div class="drop-title">Drop datasheet file or click to browse</div>
+        <div class="drop-hint">PDF, TXT, CSV — or paste content below</div>
+      </div>
+      <div id="ds-pills"></div>
+      <div class="field" style="margin-top:12px">
+        <label class="label">Or paste datasheet content <span class="tip">works with any format</span></label>
+        <textarea id="ds-paste" rows="7" placeholder="Paste raw spec text, parameter tables, or component details…&#10;&#10;Example:&#10;STM32F407VGT6 — ARM Cortex-M4 MCU&#10;CPU: 168 MHz · Flash: 1024 KB · RAM: 192 KB&#10;ADC: 3× 12-bit, 2.4 MSPS · GPIOs: 82&#10;VCC: 1.8V–3.6V · Temp: -40°C to +85°C"></textarea>
+      </div>
+      <div class="g3">
+        <div class="field"><label class="label">Component / Doc Type</label>
+          <select id="ds-type">
+            <option value="ic">IC / Microcontroller</option>
+            <option value="mosfet">MOSFET / Transistor</option>
+            <option value="sensor">Sensor / Transducer</option>
+            <option value="power">Power Supply / Converter</option>
+            <option value="motor">Motor / Drive</option>
+            <option value="cable">Cable / Wire</option>
+            <option value="material">Material / Metal</option>
+            <option value="equipment">Industrial Equipment</option>
+            <option value="standard">Standard / Code Document</option>
+          </select>
+        </div>
+        <div class="field"><label class="label">Analysis Mode</label>
+          <select id="ds-mode" onchange="toggleAppField()">
+            <option value="extract">Extract all parameters (visual cards)</option>
+            <option value="summary">Plain-English summary</option>
+            <option value="suitability">Suitability check for my application</option>
+            <option value="risks">Risks &amp; failure modes</option>
+            <option value="application">Application notes &amp; design guidance</option>
+          </select>
+        </div>
+        <div class="field" id="ds-app-f">
+          <label class="label">My Application <span class="tip">for suitability check</span></label>
+          <input type="text" id="ds-app" placeholder="e.g. 12V motor driver, 20kHz, 15A peak"/>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-lime" id="ds-btn" onclick="analyzeDS()">🔍 Analyze Datasheet</button>
+        <button class="btn btn-outline" onclick="clearDS()">Clear</button>
+      </div>
+      <div class="lbar" id="ds-lb"><div class="lbar-fill"></div></div>
+      <div class="lmsg" id="ds-lm">Extracting parameters &amp; analyzing…</div>
+    </div>
+  </div>
+
+  <div id="ds-params-wrap" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title"><div class="card-title-icon" style="background:rgba(96,165,250,.08)">📊</div>Key Parameters<span class="badge badge-teal">Auto-extracted</span></div></div>
+      <div class="card-body"><div class="param-grid" id="ds-params"></div></div>
+    </div>
+  </div>
+
+  <div class="output" id="ds-out">
+    <div class="output-bar">
+      <div class="output-bar-label">Analysis complete</div>
+      <div class="output-actions">
+        <button class="btn btn-ghost" onclick="copyEl('ds-body')">Copy</button>
+        <button class="btn btn-ghost" onclick="dlTxt('ds-body','datasheet-analysis')">Download</button>
+      </div>
+    </div>
+    <div class="output-body" id="ds-body"></div>
+  </div>
+
+  <div id="ds-qa" style="display:none">
+    <div class="chat-wrap">
+      <div class="chat-head">Ask questions about this datasheet — AI has full context</div>
+      <div class="quick-chips">
+        <button class="qchip" onclick="qask('What is the maximum operating temperature?')">Max temperature?</button>
+        <button class="qchip" onclick="qask('What are the main failure modes or limitations?')">Failure modes?</button>
+        <button class="qchip" onclick="qask('Summarise all key electrical parameters in a table')">Parameter table</button>
+        <button class="qchip" onclick="qask('What derating should I apply in my design?')">Derating guidance</button>
+        <button class="qchip" onclick="qask('What are common alternatives or pin-compatible replacements?')">Alternatives?</button>
+        <button class="qchip" onclick="qask('Describe the thermal management requirements')">Thermal management</button>
+      </div>
+      <div class="chat-msgs" id="qa-msgs"></div>
+      <div class="chat-input-row">
+        <input class="chat-in" id="qa-in" placeholder="Ask anything about this datasheet…" onkeydown="if(event.key==='Enter')qsend()"/>
+        <button class="chat-send" id="qa-go" onclick="qsend()">Ask →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     COMPARE
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ -->
+<div id="pg-compare" class="page">
+  <div class="ph">
+    <div>
+      <h1>Compare Datasheets</h1>
+      <p>Paste two components or options — get an AI side-by-side comparison table and a clear winner recommendation with specific justification.</p>
+    </div>
+    <div class="ph-badge">UNIQUE TO ENGTOOLS PRO</div>
+  </div>
+  <div class="cmp-cols">
+    <div class="cmp-col">
+      <div class="cmp-col-head"><div class="dot dot-a"></div>Option A</div>
+      <div class="cmp-col-body">
+        <div class="field"><label class="label">Name</label><input type="text" id="cmp-a-name" placeholder="e.g. IRLZ44N MOSFET"/></div>
+        <div class="field"><label class="label">Specs / Datasheet</label><textarea id="cmp-a" rows="10" placeholder="Paste Option A specs here…"></textarea></div>
+      </div>
+    </div>
+    <div class="cmp-col">
+      <div class="cmp-col-head"><div class="dot dot-b"></div>Option B</div>
+      <div class="cmp-col-body">
+        <div class="field"><label class="label">Name</label><input type="text" id="cmp-b-name" placeholder="e.g. IRF540N MOSFET"/></div>
+        <div class="field"><label class="label">Specs / Datasheet</label><textarea id="cmp-b" rows="10" placeholder="Paste Option B specs here…"></textarea></div>
+      </div>
+    </div>
+  </div>
+  <div class="field" style="margin-top:12px">
+    <label class="label">My Application — what will I use it for?</label>
+    <input type="text" id="cmp-app" placeholder="e.g. PWM motor controller, 24V, 10A continuous, 50kHz, ambient 45°C"/>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-teal" id="cmp-btn" onclick="cmpDS()">⚖️ Compare &amp; Recommend</button>
+    <button class="btn btn-outline" onclick="clearCmp()">Clear</button>
+  </div>
+  <div class="lbar" id="cmp-lb"><div class="lbar-fill"></div></div>
+  <div class="lmsg" id="cmp-lm">Comparing both datasheets…</div>
+  <div class="output" id="cmp-out">
+    <div class="output-bar">
+      <div class="output-bar-label">Comparison complete</div>
+      <div class="output-actions"><button class="btn btn-ghost" onclick="copyEl('cmp-body')">Copy</button></div>
+    </div>
+    <div class="output-body" id="cmp-body"></div>
+  </div>
+</div>
+
+<!-- ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     PRICING
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ -->
+<div id="pg-pricing" class="page">
+  <div class="ph"><div><h1>Simple, honest pricing</h1><p>Built for engineers. No per-token billing surprises. Flat monthly rate. Cancel any time.</p></div></div>
+  <div class="value-strip">
+    <h3>Why engineers pay instead of using free AI</h3>
+    <div class="value-items">
+      <div class="vi">Engineering templates pre-loaded — not a blank prompt</div>
+      <div class="vi">Standards auto-referenced (IEC, BS, ASTM, IEEE, API…)</div>
+      <div class="vi">Visual parameter extraction from datasheets</div>
+      <div class="vi">Side-by-side comparison with clear winner recommendation</div>
+      <div class="vi">One-click refine — no re-prompting skills needed</div>
+      <div class="vi">Output formatted & ready to submit, not raw chat text</div>
+      <div class="vi">Q&A stays in context of your document throughout</div>
+      <div class="vi">Saves 2–4 hours per report vs doing it manually</div>
+    </div>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-tier">Free</div>
+      <div class="pricing-price">$0<sub>/month</sub></div>
+      <div class="pricing-desc">Try it — no card needed</div>
+      <ul class="pricing-features">
+        <li>10 AI queries per day</li>
+        <li>3 report templates</li>
+        <li>Datasheet analyzer (text only)</li>
+        <li>Copy output to clipboard</li>
+        <li>3 saved reports</li>
+      </ul>
+      <button class="pricing-cta ghost">Current plan</button>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-pop">MOST POPULAR</div>
+      <div class="pricing-tier">Professional</div>
+      <div class="pricing-price">$19<sub>/month</sub></div>
+      <div class="pricing-desc">For engineers who submit reports regularly</div>
+      <ul class="pricing-features">
+        <li>Unlimited AI queries</li>
+        <li>All 10 report templates</li>
+        <li>PDF upload & extraction</li>
+        <li>Visual parameter cards</li>
+        <li>Datasheet comparison tool</li>
+        <li>One-click refine & revise</li>
+        <li>Download & print outputs</li>
+        <li>Unlimited saved reports</li>
+        <li>Priority response speed</li>
+        <li>Email support</li>
+      </ul>
+      <button class="pricing-cta fill" onclick="toast('Payment integration launching soon!')">Get Professional →</button>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-tier">Student</div>
+      <div class="pricing-price">$9<sub>/month</sub></div>
+      <div class="pricing-desc">For engineering students & graduates</div>
+      <ul class="pricing-features">
+        <li>100 AI queries per month</li>
+        <li>All report templates</li>
+        <li>Datasheet analyzer</li>
+        <li>Download outputs</li>
+        <li>20 saved reports</li>
+        <li>Verify with .edu email</li>
+      </ul>
+      <button class="pricing-cta ghost" onclick="toast('Coming soon!')">Get Student Plan</button>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-tier">Team</div>
+      <div class="pricing-price">$49<sub>/month</sub></div>
+      <div class="pricing-desc">For engineering firms & teams</div>
+      <ul class="pricing-features">
+        <li>5 seats (+$8/extra seat)</li>
+        <li>Shared report library</li>
+        <li>Company branding on reports</li>
+        <li>API access</li>
+        <li>Invoice / PO billing</li>
+        <li>Dedicated account manager</li>
+      </ul>
+      <button class="pricing-cta ghost" onclick="toast('Email us for team setup!')">Contact for Teams</button>
+    </div>
+  </div>
+  <div style="margin-top:20px;background:var(--navy);border:1px solid var(--edge);border-radius:var(--r);padding:16px 22px;font-size:12px;color:var(--muted);line-height:1.7">
+    <strong style="color:var(--text)">Payments &amp; security —</strong> Processed by Stripe. Visa, Mastercard, PayPal, bank transfer. Annual billing saves 20%. 7-day free trial on all paid plans. Cancel any time.
+  </div>
+</div>
+
+</main>
+</div><!-- /shell -->
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const TPLS = [
+  {id:'inspection',e:'🔎',n:'Inspection',h:'Site / equipment findings'},
+  {id:'failure',e:'💥',n:'Failure Analysis',h:'Root cause investigation'},
+  {id:'commissioning',e:'✅',n:'Commissioning',h:'System test & handover'},
+  {id:'design',e:'📐',n:'Design Report',h:'Engineering design & calcs'},
+  {id:'feasibility',e:'📊',n:'Feasibility Study',h:'Technical viability check'},
+  {id:'test',e:'🧪',n:'Test Report',h:'Verification & validation'},
+  {id:'site',e:'🗺️',n:'Site Survey',h:'Field survey & assessment'},
+  {id:'maintenance',e:'🔧',n:'Maintenance',h:'Planned / corrective work'},
+  {id:'progress',e:'📈',n:'Progress Report',h:'Project status & milestones'},
+  {id:'incident',e:'⚠️',n:'Incident Report',h:'Safety incident investigation'},
+];
+const STDS = {
+  electrical:['IEC 60364','BS 7671 (18th Ed.)','IEC 60947','IEEE 1584','IEC 61010','NFPA 70 (NEC)','IEC 60034','IEC 60529 (IP)','IEC 62368','IEC 61000'],
+  mechanical:['ASME B31.3','ISO 9001','ASTM A36','BS EN 1993 (EC3)','ISO 286','ASME VIII Div.1','API 510','ISO 4414','BS PD 5500'],
+  civil:['BS EN 1990 (EC0)','BS EN 1992 (EC2)','BS EN 1997 (EC7)','ACI 318','AASHTO LRFD','BS 8110','IS 456','ASTM C150','CIRIA C660'],
+  software:['ISO 25010','IEC 62443','IEEE 829','ISO/IEC 27001','MISRA C','DO-178C','IEC 61508','ISO 15288'],
+  chemical:['ATEX 2014/34/EU','IEC 60079','API RP 505','OSHA 29 CFR 1910.119','API 650','ASME PCC-2','EN 13480'],
+  petroleum:['API 5CT','API 650','API 6A','ISO 13628','NACE MR0175','API RP 14C','API 520/521','IP Code'],
+  aerospace:['AS9100','DO-160G','MIL-STD-810','FAR Part 25','ARP4761','DO-178C','RTCA DO-254'],
+  telecoms:['ITU-T G.984','ETSI EN 300 132','IEC 60950','IEEE 802.3','TIA-568','GR-63-CORE','ITU-T G.657'],
+};
+const SECS = {
+  inspection:['Cover & Document Control','Executive Summary','Scope & Objectives','Methodology','Site Observations','Test Results & Measurements','Non-Conformances','Risk Assessment','Recommendations','Corrective Action Plan','Conclusion','Appendices'],
+  failure:['Document Header','Executive Summary','Background & Timeline','Scope of Investigation','Evidence Collected','Root Cause Analysis','Contributing Factors','Failure Mechanism','Corrective Actions','Preventive Measures','Conclusion','Supporting Data'],
+  commissioning:['Document Control','Project Overview','Scope of Commissioning','Pre-Commissioning Checks','Test Procedures','Test Results','Defects & Punch List','Performance Verification','Handover Statement','Outstanding Items','Sign-off Records','Appendices'],
+  design:['Document Control','Introduction','Design Basis & Standards','Design Calculations','Material Specifications','Equipment Schedule','Safety Analysis','Constructability Review','Drawing Register','Conclusions','Recommendations','Appendices'],
+  feasibility:['Executive Summary','Project Background','Technical Assessment','Alternatives Considered','Recommended Solution','Cost Estimate','Risk Register','Implementation Plan','Conclusion','Next Steps'],
+  test:['Document Header','Test Objectives','Test Configuration','Equipment & Calibration','Test Procedures','Test Results','Pass/Fail Assessment','Deviations & Anomalies','Conclusions','Recommendations'],
+  site:['Document Header','Site Overview','Access & Safety','Asset Inventory','Condition Assessment','Environmental Observations','Constraints & Risks','Recommendations','Cost Implications','Survey Drawings'],
+  maintenance:['Document Header','Asset Details','Maintenance Scope','Work Performed','Parts & Materials','Condition Before & After','Defects Found','Recommendations','Completion Status','Sign-off'],
+  progress:['Cover Page','Summary Status','Work Completed','Work Planned Next Period','Schedule Performance','Budget Status','Issues & Risks','Key Decisions Required','Milestones'],
+  incident:['Document Header','Incident Summary','Immediate Actions','Investigation Methodology','Timeline of Events','Root Cause Analysis','Contributing Factors','Corrective Actions','Preventive Measures','Conclusion'],
+};
+const GOLD2 = 'rgba(251,191,36,.08)';
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let selTpl='inspection', selStds=new Set(['IEC 60364','BS 7671 (18th Ed.)']), selSecs=new Set();
+let dsCtx='', qaHist=[], usageN=3, rptLast='';
+let dsFiles=[], dsContent='';
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function init(){
+  document.getElementById('rpt-date').value = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  renderTpls(); renderStds('electrical'); renderSecs('inspection');
+  document.getElementById('rpt-field').addEventListener('change', e=>renderStds(e.target.value));
+  toggleAppField();
+}
+function onFieldChange(){ renderStds(document.getElementById('rpt-field').value); }
+function toggleAppField(){ document.getElementById('ds-app-f').style.display = document.getElementById('ds-mode').value==='suitability'?'block':'block'; }
+
+/* ═══════════════════════════════════════
+   RENDER TEMPLATES
+═══════════════════════════════════════ */
+function renderTpls(){
+  document.getElementById('tpl-grid').innerHTML = TPLS.map(t=>`
+    <div class="tpl-card ${t.id===selTpl?'on':''}" onclick="pickTpl('${t.id}')">
+      <div class="tpl-check">✓</div>
+      <span class="tpl-em">${t.e}</span>
+      <div class="tpl-name">${t.n}</div>
+      <div class="tpl-sub">${t.h}</div>
+    </div>`).join('');
+}
+function pickTpl(id){ selTpl=id; renderTpls(); renderSecs(id); }
+
+/* ═══════════════════════════════════════
+   RENDER STANDARDS
+═══════════════════════════════════════ */
+function renderStds(field){
+  const list = STDS[field]||STDS.electrical;
+  document.getElementById('stds-wrap').innerHTML = list.map(s=>`
+    <div class="std-chip ${selStds.has(s)?'on':''}" onclick="toggleStd(this,'${s}')">${s}</div>`).join('');
+}
+function toggleStd(el,s){ selStds.has(s)?selStds.delete(s):selStds.add(s); el.classList.toggle('on'); }
+
+/* ═══════════════════════════════════════
+   RENDER SECTIONS
+═══════════════════════════════════════ */
+function renderSecs(tpl){
+  const list = SECS[tpl]||SECS.inspection;
+  selSecs = new Set(list);
+  document.getElementById('sec-grid').innerHTML = list.map((s,i)=>`
+    <div class="sec-item on" onclick="toggleSec(this,'${s.replace(/'/g,"\\'")}')">
+      <div class="sec-box">✓</div>
+      <div class="sec-text">${s}</div>
+      <div class="sec-num">${String(i+1).padStart(2,'0')}</div>
+    </div>`).join('');
+}
+function toggleSec(el,s){
+  if(selSecs.has(s)){selSecs.delete(s);el.classList.remove('on');el.querySelector('.sec-box').textContent='';}
+  else{selSecs.add(s);el.classList.add('on');el.querySelector('.sec-box').textContent='✓';}
+}
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('.ntab').forEach((b,i)=>b.classList.toggle('on',['report','datasheet','compare','pricing'][i]===id));
+  document.querySelectorAll('.sb-item').forEach((r,i)=>r.classList.toggle('on',i==={'report':0,'datasheet':1,'compare':2,'pricing':3}[id]));
+}
+
+/* ═══════════════════════════════════════
+   REPORT GENERATOR
+═══════════════════════════════════════ */
+async function genReport(){
+  const notes=document.getElementById('rpt-notes').value.trim();
+  if(!notes){toast('Please enter your notes and findings first');return;}
+  const proj=document.getElementById('rpt-proj').value||'Engineering Project';
+  const org=document.getElementById('rpt-org').value||'';
+  const site=document.getElementById('rpt-site').value||'';
+  const ref=document.getElementById('rpt-ref').value||'';
+  const date=document.getElementById('rpt-date').value;
+  const field=document.getElementById('rpt-field').value;
+  const tone=document.getElementById('rpt-tone').value;
+  const lang=document.getElementById('rpt-lang').value;
+  const extra=document.getElementById('rpt-extra').value;
+  const tplObj=TPLS.find(t=>t.id===selTpl)||TPLS[0];
+  const stdsArr=[...selStds];
+  const customStd=document.getElementById('rpt-custom-std').value;
+  if(customStd)stdsArr.push(...customStd.split(',').map(s=>s.trim()).filter(Boolean));
+  const secsArr=[...selSecs];
+  const toneMap={formal:'formal and professional, suitable for client/management',technical:'highly technical, precise, using correct engineering terminology for peer review',regulatory:'regulatory compliance language with precise standard citations, suitable for authority submission',academic:'academic research style with structured analysis and referencing'};
+  const langNote={uk:'Use British English spelling.',us:'Use American English spelling.',ng:'Use standard engineering English appropriate for Nigerian regulatory and industry context.'}[lang];
+  setLoad('rpt',true,'Writing your report…');
+  showProg(secsArr);
+  const sys=`You are a senior ${field} engineering consultant with 20+ years of professional report writing experience. Write in a ${toneMap[tone]} style. ${langNote}
+Format with Markdown: ## for main sections, ### for subsections, **bold** for key values, tables for data, bullet lists where appropriate.
+Reference standards precisely when citing requirements or pass/fail criteria.
+Flag safety-critical findings prominently with ⚠️ SAFETY CRITICAL.
+Every finding must have a corresponding numbered recommendation. Be technically rigorous and precise.`;
+  const msg=`Write a complete, professional ${tplObj.n} with these details:
+
+PROJECT: ${proj}
+PREPARED BY: ${org||'Not specified'}
+SITE: ${site||'Not specified'}
+REF: ${ref||'TBD'}
+DATE: ${date}
+FIELD: ${field}
+
+APPLICABLE STANDARDS: ${stdsArr.length?stdsArr.join(', '):'Standard engineering practice'}
+
+RAW NOTES / MEASUREMENTS / FINDINGS:
+${notes}
+
+REPORT SECTIONS (include all, in this order):
+${secsArr.map((s,i)=>`${i+1}. ${s}`).join('\n')}
+
+${extra?'ADDITIONAL REQUIREMENTS: '+extra:''}
+
+Write every section fully. Present measurements in tables. Number and prioritise all recommendations (CRITICAL / HIGH / MEDIUM / LOW). The report must be complete, polished, and ready to submit.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]})});
+    const d=await r.json();
+    const text=d.content?.find(c=>c.type==='text')?.text||'Error generating report.';
+    rptLast=text;
+    setLoad('rpt',false);
+    document.getElementById('rpt-prog').classList.remove('on');
+    showRptOut(text,tplObj.n);
+    bumpUsage();
+    finProg(secsArr);
+  }catch(e){setLoad('rpt',false);document.getElementById('rpt-prog').classList.remove('on');toast('Connection error — please try again');}
+}
+
+function showProg(secs){
+  document.getElementById('rpt-prog').classList.add('on');
+  document.getElementById('rpt-prog-count').textContent=`0 / ${secs.length}`;
+  document.getElementById('rpt-prog-list').innerHTML=secs.map((s,i)=>`
+    <div class="prog-row" id="pr${i}">
+      <div class="prog-icon wait" id="pi${i}">${String(i+1).padStart(2,'0')}</div>
+      <span>${s}</span>
+    </div>`).join('');
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i>0){document.getElementById('pi'+(i-1)).className='prog-icon done';document.getElementById('pi'+(i-1)).textContent='✓';document.getElementById('pr'+(i-1)).className='prog-row done';document.getElementById('rpt-prog-count').textContent=`${i} / ${secs.length}`;}
+    if(i<secs.length){document.getElementById('pi'+i).className='prog-icon working';document.getElementById('pi'+i).textContent='…';document.getElementById('pr'+i).className='prog-row working';i++;}
+    else clearInterval(iv);
+  },Math.max(280,5000/secs.length));
+}
+function finProg(secs){secs.forEach((_,i)=>{const el=document.getElementById('pi'+i);if(el){el.className='prog-icon done';el.textContent='✓';}});document.getElementById('rpt-prog-count').textContent=`${secs.length} / ${secs.length}`;}
+
+function showRptOut(text,tplName){
+  const out=document.getElementById('rpt-out');
+  out.classList.add('on');
+  document.getElementById('rpt-body').innerHTML=md(text);
+  document.getElementById('m-date').textContent=new Date().toLocaleString();
+  document.getElementById('m-words').textContent=text.split(/\s+/).length.toLocaleString();
+  document.getElementById('m-tpl').textContent=tplName;
+  out.scrollIntoView({behavior:'smooth',block:'start'});
+  ['sn1','sn2','sn3'].forEach(id=>{const el=document.getElementById(id);el.className='stp-n done';el.textContent='✓';});
+  document.getElementById('sn4').className='stp-n active';
+}
+
+async function refine(instruction){
+  if(!rptLast){toast('Generate a report first');return;}
+  setLoad('rpt',true,'Refining your report…');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:'You are a senior engineering report editor. Revise as instructed, keeping all existing content and Markdown formatting. Return the complete revised report.',messages:[{role:'user',content:`REPORT:\n\n${rptLast}\n\n---\nINSTRUCTION: ${instruction}\n\nReturn the complete revised report.`}]})});
+    const d=await r.json();
+    const text=d.content?.find(c=>c.type==='text')?.text||rptLast;
+    rptLast=text;
+    document.getElementById('rpt-body').innerHTML=md(text);
+    document.getElementById('m-words').textContent=text.split(/\s+/).length.toLocaleString();
+    setLoad('rpt',false); bumpUsage(); toast('Report updated ✓');
+  }catch(e){setLoad('rpt',false);toast('Connection error');}
+}
+
+function clearReport(){
+  ['rpt-notes','rpt-proj','rpt-org','rpt-extra'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rpt-out').classList.remove('on');
+  document.getElementById('rpt-prog').classList.remove('on');
+  rptLast='';
+  ['sn1','sn2','sn3','sn4'].forEach((id,i)=>{const el=document.getElementById(id);el.className=i===0?'stp-n active':'stp-n';el.textContent=String(i+1);});
+}
+
+/* ═══════════════════════════════════════
+   DATASHEET
+═══════════════════════════════════════ */
+function dsDrop(e){e.preventDefault();document.getElementById('ds-drop').classList.remove('drag');if(e.dataTransfer.files[0])procFile(e.dataTransfer.files[0]);}
+function dsPickFile(e){if(e.target.files[0])procFile(e.target.files[0]);}
+function procFile(f){
+  if(f.type==='application/pdf'){dsContent=`[PDF: ${f.name}]`;toast('PDF: paste key content below for free plan');}
+  else{const r=new FileReader();r.onload=e=>{dsContent=e.target.result;};r.readAsText(f);}
+  dsFiles.push(f.name);renderPills();
+}
+function renderPills(){document.getElementById('ds-pills').innerHTML=dsFiles.map((f,i)=>`<span class="fpill">📄 ${f}<span class="fpill-x" onclick="rmFile(${i})"> ×</span></span>`).join('');}
+function rmFile(i){dsFiles.splice(i,1);dsContent='';renderPills();}
+
+async function analyzeDS(){
+  const paste=document.getElementById('ds-paste').value.trim();
+  const content=dsContent||paste;
+  if(!content){toast('Upload a file or paste datasheet content');return;}
+  const type=document.getElementById('ds-type').value;
+  const mode=document.getElementById('ds-mode').value;
+  const app=document.getElementById('ds-app').value;
+  dsCtx=content; qaHist=[];
+  document.getElementById('ds-qa').style.display='none';
+  document.getElementById('ds-params-wrap').style.display='none';
+  setLoad('ds',true,'Analyzing datasheet…');
+  const modeP={
+    extract:`Extract ALL technical parameters. Output:
+1. A table: Parameter | Value | Unit | Condition
+2. Absolute Maximum Ratings section
+3. Recommended Operating Conditions
+4. A JSON block of 6–8 critical params: {"p":[{"n":"VDS max","v":"55","u":"V","f":"max"},{"n":"ID","v":"47","u":"A","f":"ok"}]}
+Flags: "max"=absolute max, "crit"=warning/critical, "ok"=normal`,
+    summary:`Write a comprehensive plain-English summary: what it is, primary function, key capabilities, typical applications, major strengths, important limitations. Include a quick-reference table of top 8 parameters.`,
+    suitability:`Assess suitability for: "${app||'general use'}". Structure as:\n## Suitability Assessment\n**Overall verdict:** [SUITABLE/CONDITIONALLY SUITABLE/NOT SUITABLE]\n## Requirements Met\n## Concerns & Risks\n## Derating Considerations\n## Final Recommendation`,
+    risks:`Produce a risk register. Table format: Risk | Severity (H/M/L) | Likelihood (H/M/L) | Mitigation. Cover: absolute max violations, failure modes, thermal risks, ESD sensitivity, environmental limits, derating.`,
+    application:`Provide detailed application notes: recommended topologies, layout considerations, thermal management, decoupling requirements, protection circuitry, and common design mistakes.`,
+  };
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:`You are an expert ${type} application engineer. Analyze precisely, cite specific values. Use ## for sections, **bold** for critical values, tables for structured data.`,messages:[{role:'user',content:`DATASHEET:\n\n${content}\n\n---\n${modeP[mode]}`}]})});
+    const d=await r.json();
+    const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
+    qaHist=[{role:'user',content:`Datasheet:\n${content}`},{role:'assistant',content:text}];
+    if(mode==='extract'){
+      const m=text.match(/\{"p":\[.*?\]\}/s);
+      if(m){try{renderParamCards(JSON.parse(m[0]).p);}catch(e){}}
+    }
+    setLoad('ds',false);
+    const out=document.getElementById('ds-out');
+    out.classList.add('on');
+    document.getElementById('ds-body').innerHTML=md(text.replace(/\{"p":\[.*?\]\}/s,'').trim());
+    document.getElementById('ds-qa').style.display='block';
+    out.scrollIntoView({behavior:'smooth',block:'start'});
+    bumpUsage();
+  }catch(e){setLoad('ds',false);toast('Connection error — please try again');}
+}
+
+function renderParamCards(params){
+  document.getElementById('ds-params-wrap').style.display='block';
+  const fc={max:'amber',crit:'rose',ok:'sky'};
+  const fl={max:'Absolute Max',crit:'⚠ Critical',ok:'✓ Standard'};
+  document.getElementById('ds-params').innerHTML=params.map(p=>`
+    <div class="param-card">
+      <div class="param-nm">${p.n}</div>
+      <div class="param-v ${fc[p.f]||'sky'}">${p.v}</div>
+      <div class="param-u">${p.u||''}</div>
+      ${p.f?`<div class="param-f" style="color:var(--${fc[p.f]||'teal'})">${fl[p.f]||''}</div>`:''}
+    </div>`).join('');
+}
+
+function clearDS(){
+  document.getElementById('ds-paste').value='';
+  dsFiles=[];dsContent='';renderPills();
+  document.getElementById('ds-out').classList.remove('on');
+  document.getElementById('ds-qa').style.display='none';
+  document.getElementById('ds-params-wrap').style.display='none';
+  document.getElementById('qa-msgs').innerHTML='';
+  qaHist=[];dsCtx='';
+}
+
+/* ═══════════════════════════════════════
+   QA CHAT
+═══════════════════════════════════════ */
+async function qsend(){
+  const inp=document.getElementById('qa-in');
+  const q=inp.value.trim();
+  if(!q||!dsCtx)return;
+  inp.value='';
+  addQMsg('you',q);
+  document.getElementById('qa-go').disabled=true;
+  qaHist.push({role:'user',content:q});
+  const tid=addQTyping();
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:'You are an expert component/datasheet engineer. Answer precisely based on the provided datasheet. Cite specific values. Use tables where helpful. Be concise but complete.',messages:qaHist.slice(-14)})});
+    const d=await r.json();
+    const text=d.content?.find(c=>c.type==='text')?.text||'No response.';
+    qaHist.push({role:'assistant',content:text});
+    removeQTyping(tid);
+    addQMsg('ai',text);
+    bumpUsage();
+  }catch(e){removeQTyping(tid);addQMsg('ai','Connection error.');}
+  document.getElementById('qa-go').disabled=false;
+}
+function qask(q){document.getElementById('qa-in').value=q;qsend();}
+let qtid=0;
+function addQMsg(role,text){
+  const m=document.getElementById('qa-msgs');
+  const d=document.createElement('div');d.className='cmsg';
+  d.innerHTML=`<div class="cav ${role}">${role==='ai'?'AI':'You'}</div><div class="cbub ${role}">${md(text)}</div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function addQTyping(){const id=++qtid;const m=document.getElementById('qa-msgs');const d=document.createElement('div');d.className='cmsg';d.id='qt'+id;d.innerHTML=`<div class="cav ai">AI</div><div class="cbub ai"><span class="td"></span><span class="td"></span><span class="td"></span></div>`;m.appendChild(d);m.scrollTop=m.scrollHeight;return id;}
+function removeQTyping(id){document.getElementById('qt'+id)?.remove();}
+
+/* ═══════════════════════════════════════
+   COMPARE
+═══════════════════════════════════════ */
+async function cmpDS(){
+  const a=document.getElementById('cmp-a').value.trim(),b=document.getElementById('cmp-b').value.trim();
+  if(!a||!b){toast('Paste content for both options');return;}
+  const an=document.getElementById('cmp-a-name').value||'Option A';
+  const bn=document.getElementById('cmp-b-name').value||'Option B';
+  const app=document.getElementById('cmp-app').value;
+  setLoad('cmp',true,'Comparing both datasheets…');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:'You are a senior engineer specialising in component and design option selection. Compare rigorously with specific values and give a clear, justified recommendation.',messages:[{role:'user',content:`Compare for application: "${app||'general engineering use'}"\n\n## ${an}:\n${a}\n\n## ${bn}:\n${b}\n\n---\nProvide:\n1. **Side-by-Side Comparison Table** (Parameter | ${an} | ${bn} | Winner)\n2. **Key Differences** for this specific application\n3. **${an}: Pros & Cons**\n4. **${bn}: Pros & Cons**\n5. **Overall Recommendation** with specific values justifying the choice\n6. **Risk Factors** to watch with the recommended option`}]})});
+    const d=await r.json();
+    const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
+    setLoad('cmp',false);
+    const out=document.getElementById('cmp-out');
+    out.classList.add('on');
+    document.getElementById('cmp-body').innerHTML=md(text);
+    out.scrollIntoView({behavior:'smooth',block:'start'});
+    bumpUsage();
+  }catch(e){setLoad('cmp',false);toast('Connection error');}
+}
+function clearCmp(){['cmp-a','cmp-b','cmp-a-name','cmp-b-name','cmp-app'].forEach(id=>document.getElementById(id).value='');document.getElementById('cmp-out').classList.remove('on');}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function setLoad(id,on,msg){
+  document.getElementById(id+'-lb')?.classList.toggle('on',on);
+  const lm=document.getElementById(id+'-lm');if(lm){lm.classList.toggle('on',on);if(msg)lm.textContent=msg;}
+  const btn=document.getElementById(id+'-btn');if(btn)btn.disabled=on;
+}
+
+function md(t){
+  return t
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^\|(.+)\|$/gm,row=>{
+      const cells=row.split('|').filter(c=>c.trim()!=='');
+      if(cells.every(c=>/^[\s\-:]+$/.test(c)))return '';
+      return '<tr>'+cells.map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>';
+    })
+    .replace(/(<tr>.*?<\/tr>)+/gs,m=>m.includes('<td>')?`<table>${m}</table>`:'')
+    .replace(/^[-*] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*?<\/li>)+/gs,'<ul>$&</ul>')
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/⚠️/g,'<span class="warn">⚠️</span>')
+    .replace(/\n{2,}/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+function copyEl(id){navigator.clipboard.writeText(document.getElementById(id).innerText).then(()=>toast('Copied to clipboard ✓'));}
+function dlTxt(id,name){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(document.getElementById(id).innerText);a.download=`EngToolsPro-${name}-${Date.now()}.txt`;a.click();}
+
+function bumpUsage(){usageN=Math.min(usageN+1,10);document.getElementById('u-count').textContent=`${usageN} / 10`;document.getElementById('u-bar').style.width=(usageN*10)+'%';}
+
+let toastT;
+function toast(msg){const el=document.getElementById('toast-el');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),3200);}
+
+init();
+</script>
+</body>
+</html>

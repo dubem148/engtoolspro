@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard — EngTools Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --void:#050608;--deep:#080a0f;--navy:#0d1018;--surface:#111520;--raised:#161d2e;--hover:#1c2438;
+  --teal:#14f0cc;--teal-lo:rgba(20,240,204,0.06);--teal-glow:0 0 32px rgba(20,240,204,0.3);
+  --gold:#f5a623;--lime:#7eed6a;--rose:#ff5c7a;--amber:#ffb830;--violet:#b07ef8;--blue:#4d9fff;
+  --text:#dde6f5;--muted:#5c7090;--faint:#253040;
+  --edge:rgba(20,240,204,0.08);--edge2:rgba(20,240,204,0.16);
+  --display:'Fraunces',serif;--body:'DM Sans',sans-serif;--mono:'Fira Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:var(--void);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 80% 10%,rgba(20,240,204,0.07) 0%,transparent 60%),
+  radial-gradient(ellipse 40% 40% at 10% 80%,rgba(245,166,35,0.05) 0%,transparent 60%)}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;height:62px;background:rgba(5,6,8,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--edge);display:flex;align-items:center;padding:0 28px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-gem{width:32px;height:32px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:900;font-size:13px;color:#000;letter-spacing:-1px;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(20,240,204,0.4),0 4px 12px rgba(20,240,204,0.15)}
+.logo-gem::after{content:'';position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(rgba(255,255,255,0.3),transparent)}
+.logo-name{font-family:var(--display);font-size:16px;font-weight:700}
+.topbar-end{margin-left:auto;display:flex;align-items:center;gap:10px}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--edge2);border-radius:20px;padding:6px 14px;font-size:12px}
+.user-av{width:24px;height:24px;border-radius:50%;background:var(--teal-lo);border:1px solid var(--edge2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--teal)}
+.plan-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:0.5px;font-weight:700}
+.badge-free{background:rgba(92,112,144,0.2);color:var(--muted)}
+.badge-pro{background:rgba(20,240,204,0.12);color:var(--teal)}
+.badge-student{background:rgba(77,159,255,0.12);color:var(--blue)}
+.btn-app{font-family:var(--body);font-size:13px;font-weight:600;padding:8px 18px;border-radius:7px;background:var(--teal);color:#000;border:none;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.btn-app::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25) 0%,transparent 55%)}
+.btn-app:hover{transform:translateY(-1px);box-shadow:var(--teal-glow)}
+.btn-out{font-size:12px;color:var(--muted);background:none;border:1px solid var(--edge);border-radius:6px;padding:7px 13px;cursor:pointer;font-family:var(--body);transition:all .15s}
+.btn-out:hover{color:var(--text);border-color:var(--edge2)}
+/* MAIN */
+.main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:36px 28px}
+/* WELCOME */
+.welcome{margin-bottom:28px}
+.welcome h1{font-family:var(--display);font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
+.welcome h1 em{font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome p{font-size:14px;color:var(--muted)}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:18px 20px;transition:border-color .15s}
+.stat:hover{border-color:var(--edge2)}
+.stat-label{font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.stat-value{font-family:var(--display);font-size:32px;font-weight:900;letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+/* USAGE */
+.usage-card{background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:20px;margin-bottom:24px}
+.usage-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.usage-title{font-size:13px;font-weight:600}
+.usage-count{font-family:var(--mono);font-size:12px;color:var(--teal)}
+.usage-track{height:6px;background:var(--raised);border-radius:3px;overflow:hidden}
+.usage-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width .5s ease}
+.usage-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--faint);font-family:var(--mono)}
+/* UPGRADE BANNER */
+.upgrade-banner{background:linear-gradient(135deg,rgba(20,240,204,0.05) 0%,rgba(245,166,35,0.05) 100%);border:1px solid var(--edge2);border-radius:14px;padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ub-text h3{font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:4px}
+.ub-text p{font-size:13px;color:var(--muted)}
+.ub-text p strong{color:var(--teal)}
+.btn-upgrade{font-family:var(--body);font-size:13px;font-weight:700;padding:11px 24px;border-radius:9px;background:var(--teal);color:#000;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;position:relative;overflow:hidden}
+.btn-upgrade::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25) 0%,transparent 55%)}
+.btn-upgrade:hover{transform:translateY(-1px);box-shadow:var(--teal-glow)}
+/* REPORTS */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.4px}
+.sec-title em{font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.btn-new{font-size:12px;padding:7px 14px;border-radius:6px;background:var(--surface);border:1px solid var(--edge2);color:var(--muted);cursor:pointer;transition:all .12s;font-family:var(--body)}
+.btn-new:hover{color:var(--teal);border-color:var(--teal)}
+.report-list{display:flex;flex-direction:column;gap:10px}
+.report-card{background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:all .15s;cursor:pointer}
+.report-card:hover{border-color:var(--edge2);background:var(--raised);transform:translateY(-1px)}
+.r-icon{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--raised);border:1px solid var(--edge)}
+.r-info{flex:1;min-width:0}
+.r-title{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-meta{font-size:11px;color:var(--muted);font-family:var(--mono);display:flex;gap:12px;flex-wrap:wrap}
+.r-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-sm{font-size:11px;padding:5px 11px;border-radius:5px;border:1px solid var(--edge);background:transparent;color:var(--muted);cursor:pointer;transition:all .12s;font-family:var(--body)}
+.btn-sm:hover{color:var(--text);border-color:var(--edge2);background:var(--raised)}
+.btn-sm.del:hover{color:var(--rose);border-color:rgba(255,92,122,0.3)}
+.empty{text-align:center;padding:60px 20px;background:var(--surface);border:1.5px dashed var(--edge2);border-radius:14px}
+.empty-icon{font-size:44px;margin-bottom:14px}
+.empty-title{font-family:var(--display);font-size:20px;font-weight:700;margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6}
+/* SUCCESS TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--raised);border:1px solid var(--edge2);border-radius:9px;
+  padding:12px 18px;font-size:13px;color:var(--text);z-index:999;
+  opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:none}
+.toast::before{content:'●';color:var(--teal);font-size:8px}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.topbar{padding:0 16px}.main{padding:20px 16px}}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a class="logo" href="index.html">
+    <div class="logo-gem">E</div>
+    <div class="logo-name">EngTools Pro</div>
+  </a>
+  <div class="topbar-end">
+    <div class="user-pill">
+      <div class="user-av" id="user-av">—</div>
+      <span id="user-name" style="font-size:13px;font-weight:500">Loading…</span>
+      <span class="plan-badge badge-free" id="plan-badge">Free</span>
+    </div>
+    <button class="btn-app" onclick="window.location.href='app.html'">Open App ✦</button>
+    <button class="btn-out" id="signout-btn">Sign out</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <div class="welcome">
+    <h1>Good to see you, <em id="first-name">Engineer</em></h1>
+    <p>Here's your EngTools Pro dashboard — your reports, usage, and account all in one place.</p>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Reports generated</div>
+      <div class="stat-value" id="s-reports" style="color:var(--teal)">0</div>
+      <div class="stat-sub">all time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Queries today</div>
+      <div class="stat-value" id="s-queries" style="color:var(--gold)">0</div>
+      <div class="stat-sub" id="s-limit-label">of 10 today</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Current plan</div>
+      <div class="stat-value" id="s-plan" style="font-size:22px;color:var(--violet)">Free</div>
+      <div class="stat-sub">upgrade any time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Member since</div>
+      <div class="stat-value" id="s-since" style="font-size:18px;color:var(--lime)">—</div>
+      <div class="stat-sub">welcome aboard ✦</div>
+    </div>
+  </div>
+
+  <!-- USAGE BAR -->
+  <div class="usage-card">
+    <div class="usage-head">
+      <div class="usage-title">Daily AI query usage</div>
+      <div class="usage-count" id="usage-label">— / — used today</div>
+    </div>
+    <div class="usage-track"><div class="usage-fill" id="usage-fill" style="width:0%"></div></div>
+    <div class="usage-meta"><span>0</span><span id="usage-max">10</span></div>
+  </div>
+
+  <!-- UPGRADE BANNER (hidden for paid users) -->
+  <div class="upgrade-banner" id="upgrade-banner">
+    <div class="ub-text">
+      <h3>Unlock unlimited reports ✦</h3>
+      <p>Professional plan — <strong>$39/month</strong> · Unlimited queries · All 10 templates · PDF upload · Save reports · Priority speed</p>
+    </div>
+    <button class="btn-upgrade" onclick="window.location.href='pricing.html'">Upgrade to Pro →</button>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="sec-head">
+    <div class="sec-title">Your <em>saved reports</em></div>
+    <button class="btn-new" onclick="window.location.href='app.html'">+ New report</button>
+  </div>
+  <div class="report-list" id="report-list">
+    <div style="text-align:center;padding:40px;color:var(--muted);font-family:var(--mono);font-size:12px">
+      Loading your reports…
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const supabase = createClient(
+    'https://jykqcothsmogauvfnuvh.supabase.co',
+    'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J'
+  );
+
+  // ── AUTH GUARD ──────────────────────────────────────
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html?redirect=dashboard.html';
+  }
+  const user = session.user;
+
+  // ── LOAD PROFILE ────────────────────────────────────
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (profile) {
+    const name     = profile.full_name || user.email;
+    const initials = name.slice(0,2).toUpperCase();
+    const firstName = name.split(' ')[0];
+
+    document.getElementById('user-av').textContent    = initials;
+    document.getElementById('user-name').textContent  = name;
+    document.getElementById('first-name').textContent = firstName;
+    document.getElementById('s-reports').textContent  = profile.total_reports_generated || 0;
+    document.getElementById('s-plan').textContent     = profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1);
+    document.getElementById('s-since').textContent    = new Date(user.created_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+
+    // Plan badge
+    const pb = document.getElementById('plan-badge');
+    pb.textContent  = profile.plan.toUpperCase();
+    pb.className    = 'plan-badge badge-' + (profile.plan === 'free' ? 'free' : profile.plan === 'student' ? 'student' : 'pro');
+
+    // Hide upgrade banner for paid users
+    if (profile.plan !== 'free') document.getElementById('upgrade-banner').style.display = 'none';
+
+    // Usage
+    const today = new Date().toISOString().split('T')[0];
+    const used  = profile.daily_queries_reset < today ? 0 : (profile.daily_queries_used || 0);
+    const limit = { free:10, student:100, pro:9999, enterprise:9999 }[profile.plan] || 10;
+    const pct   = Math.min(100, (used / limit) * 100);
+    const limitLabel = limit >= 9999 ? '∞' : limit;
+
+    document.getElementById('s-queries').textContent     = used;
+    document.getElementById('s-limit-label').textContent = `of ${limitLabel} today`;
+    document.getElementById('usage-label').textContent   = `${used} / ${limitLabel} used today`;
+    document.getElementById('usage-fill').style.width    = pct + '%';
+    document.getElementById('usage-max').textContent     = limitLabel;
+
+    if (pct > 80) document.getElementById('usage-fill').style.background = 'linear-gradient(90deg,var(--amber),var(--rose))';
+  }
+
+  // ── SHOW UPGRADE SUCCESS TOAST ──────────────────────
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('upgraded') === '1') showToast('🎉 Welcome to Pro! Your account has been upgraded.');
+
+  // ── LOAD REPORTS ────────────────────────────────────
+  const { data: reports, error: rErr } = await supabase
+    .from('reports')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('is_deleted', false)
+    .order('created_at', { ascending: false });
+
+  const list = document.getElementById('report-list');
+  const icons = { inspection:'🔎',failure:'💥',commissioning:'✅',design:'📐',feasibility:'📊',test:'🧪',site:'🗺️',maintenance:'🔧',progress:'📈',incident:'⚠️' };
+
+  if (!reports || reports.length === 0) {
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📄</div>
+        <div class="empty-title">No reports yet</div>
+        <p class="empty-sub">Generate your first AI engineering report.<br/>It takes less than 2 minutes.</p>
+        <button class="btn-upgrade" onclick="window.location.href='app.html'">Create first report ✦</button>
+      </div>`;
+  } else {
+    list.innerHTML = reports.map(r => `
+      <div class="report-card" onclick="openReport('${r.id}')">
+        <div class="r-icon">${icons[r.report_type] || '📄'}</div>
+        <div class="r-info">
+          <div class="r-title">${r.title || 'Untitled Report'}</div>
+          <div class="r-meta">
+            <span>${r.report_type || 'report'}</span>
+            <span>${r.field || ''}</span>
+            ${r.word_count ? `<span>${r.word_count.toLocaleString()} words</span>` : ''}
+            <span>${new Date(r.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
+          </div>
+        </div>
+        <div class="r-actions" onclick="event.stopPropagation()">
+          <button class="btn-sm" onclick="dlReport('${r.id}')">↓ Download</button>
+          <button class="btn-sm del" onclick="delReport('${r.id}', this)">Delete</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── ACTIONS ─────────────────────────────────────────
+  document.getElementById('signout-btn').onclick = async () => {
+    await supabase.auth.signOut();
+    window.location.href = 'index.html';
+  };
+
+  window.openReport = async (id) => {
+    const { data } = await supabase.from('reports').select('*').eq('id', id).single();
+    if (data) {
+      sessionStorage.setItem('open_report', JSON.stringify(data));
+      window.location.href = 'app.html?report=' + id;
+    }
+  };
+
+  window.dlReport = async (id) => {
+    const { data } = await supabase.from('reports').select('*').eq('id', id).single();
+    if (data) {
+      const a = document.createElement('a');
+      a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.content);
+      a.download = (data.title || 'report').replace(/[^a-z0-9]/gi,'_') + '.txt';
+      a.click();
+      showToast('Report downloaded ✓');
+    }
+  };
+
+  window.delReport = async (id, btn) => {
+    if (!confirm('Delete this report? This cannot be undone.')) return;
+    await supabase.from('reports').update({ is_deleted: true }).eq('id', id);
+    btn.closest('.report-card').remove();
+    showToast('Report deleted');
+  };
+
+  // ── TOAST ────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+  window.showToast = showToast;
+</script>
+</body>
+</html>

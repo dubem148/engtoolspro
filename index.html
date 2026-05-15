@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EngTools Pro — AI-Powered Engineering Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700;1,9..144,900&family=DM+Sans:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root {
+  --void:    #050608;
+  --deep:    #080a0f;
+  --navy:    #0d1018;
+  --surface: #111520;
+  --raised:  #161d2e;
+  --hover:   #1c2438;
+
+  --teal:    #14f0cc;
+  --teal-lo: rgba(20,240,204,0.06);
+  --teal-mid:rgba(20,240,204,0.14);
+  --teal-hi: rgba(20,240,204,0.24);
+  --teal-glow: 0 0 32px rgba(20,240,204,0.30), 0 0 72px rgba(20,240,204,0.12);
+
+  --gold:    #f5a623;
+  --gold-lo: rgba(245,166,35,0.08);
+  --gold-glow: 0 0 28px rgba(245,166,35,0.3);
+
+  --blue:    #4d9fff;
+  --violet:  #b07ef8;
+  --lime:    #7eed6a;
+  --rose:    #ff5c7a;
+  --amber:   #ffb830;
+
+  --text:    #dde6f5;
+  --muted:   #5c7090;
+  --faint:   #253040;
+
+  --edge:    rgba(20,240,204,0.08);
+  --edge2:   rgba(20,240,204,0.16);
+  --edge3:   rgba(20,240,204,0.28);
+
+  --display: 'Fraunces', Georgia, serif;
+  --body:    'DM Sans', system-ui, sans-serif;
+  --mono:    'Fira Code', 'Cascadia Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--body);
+  background: var(--void);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+::selection { background: rgba(20,240,204,0.2); color: #fff; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--raised); border-radius: 2px; }
+
+/* ══════════════════════════════════════
+   BACKGROUND — NOISE AURORA MESH
+══════════════════════════════════════ */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.85;
+}
+
+/* subtle hex-grid overlay */
+.bg-hex {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V18L28 2l28 16v32L28 66z' fill='none' stroke='rgba(20,240,204,0.06)' stroke-width='0.8'/%3E%3Cpath d='M28 100L0 84V52l28-16 28 16v32L28 100z' fill='none' stroke='rgba(20,240,204,0.06)' stroke-width='0.8'/%3E%3C/svg%3E");
+  background-size: 56px 100px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 20%, transparent 80%);
+}
+
+/* scanline texture */
+.bg-scan {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  opacity: 0.3;
+}
+
+/* vignette */
+.bg-vignette {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(5,6,8,0.7) 100%);
+}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 64px;
+  background: rgba(5,6,8,0.82);
+  backdrop-filter: blur(32px) saturate(180%);
+  border-bottom: 1px solid var(--edge);
+  display: flex; align-items: center;
+  padding: 0 max(24px, calc(50% - 680px));
+  animation: navSlide .5s ease both;
+}
+@keyframes navSlide { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
+
+.nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-right: 36px; }
+.nav-gem {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-weight: 900; font-size: 15px; color: #000;
+  position: relative; overflow: hidden; flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(20,240,204,0.5), 0 4px 20px rgba(20,240,204,0.25);
+  letter-spacing: -1px;
+}
+.nav-gem::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+  background: linear-gradient(rgba(255,255,255,0.35), transparent);
+}
+.nav-brand {
+  font-family: var(--display); font-size: 17px; font-weight: 700;
+  letter-spacing: -0.5px; color: var(--text);
+}
+.nav-tag {
+  font-family: var(--mono); font-size: 9px; color: var(--teal);
+  letter-spacing: 2.5px; text-transform: uppercase; opacity: 0.7;
+}
+.nav-links { display: flex; gap: 1px; }
+.nav-link {
+  font-family: var(--body); font-size: 13px; font-weight: 500; color: var(--muted);
+  padding: 7px 15px; border-radius: 6px; cursor: pointer;
+  text-decoration: none; transition: color .15s, background .15s;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-end { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.nav-signin {
+  font-family: var(--body); font-size: 13px; font-weight: 500; color: var(--muted);
+  text-decoration: none; transition: color .15s; padding: 7px 12px;
+}
+.nav-signin:hover { color: var(--text); }
+.nav-cta {
+  font-family: var(--body); font-size: 13px; font-weight: 600; padding: 9px 20px;
+  border-radius: 7px; background: var(--teal); color: #000; border: none;
+  cursor: pointer; letter-spacing: 0.2px; transition: all .15s; position: relative; overflow: hidden;
+}
+.nav-cta::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, transparent 60%);
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: var(--teal-glow); }
+
+/* ══════════════════════════════════════
+   HERO  —  SPLIT LAYOUT
+══════════════════════════════════════ */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  padding: 100px max(24px, calc(50% - 680px)) 80px;
+  overflow: hidden;
+}
+/* left column */
+.hero-left { display: flex; flex-direction: column; align-items: flex-start; }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 10px; font-family: var(--mono); color: var(--teal);
+  background: var(--teal-lo); border: 1px solid var(--edge2);
+  padding: 6px 14px; border-radius: 20px; margin-bottom: 28px;
+  letter-spacing: 2px; text-transform: uppercase;
+  animation: fadeUp .5s ease both;
+}
+.hero-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); box-shadow: 0 0 8px var(--teal);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse { 0%,100%{box-shadow:0 0 6px var(--teal)} 50%{box-shadow:0 0 16px var(--teal),0 0 32px rgba(20,240,204,0.5)} }
+
+.hero-h1 {
+  font-family: var(--display);
+  font-size: clamp(40px, 5.8vw, 76px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 0.96;
+  margin-bottom: 24px;
+  text-align: left;
+  animation: fadeUp .5s .1s ease both;
+}
+/* "Stop writing reports" — normal weight serif */
+.hero-h1 .line1 { display: block; font-weight: 300; font-style: italic; color: var(--text); }
+/* "from scratch." — heavy gradient */
+.hero-h1 .line2 {
+  display: block; font-weight: 900; font-style: normal;
+  background: linear-gradient(110deg, var(--teal) 0%, var(--gold) 60%, var(--teal) 120%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradShift 6s linear infinite;
+}
+@keyframes gradShift { 0%{background-position:0%} 100%{background-position:200%} }
+
+.hero-sub {
+  font-family: var(--body);
+  font-size: 17px; color: var(--muted); font-weight: 400;
+  max-width: 460px; margin-bottom: 38px; line-height: 1.75;
+  text-align: left; animation: fadeUp .5s .2s ease both;
+}
+.hero-actions {
+  display: flex; align-items: center;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 36px;
+  animation: fadeUp .5s .3s ease both;
+}
+.hero-btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--body); font-size: 15px; font-weight: 600;
+  padding: 15px 32px; border-radius: 10px;
+  background: var(--teal); color: #000; border: none;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: all .2s; letter-spacing: 0.2px;
+}
+.hero-btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 55%);
+}
+.hero-btn-primary:hover { transform: translateY(-2px); box-shadow: var(--teal-glow); }
+.hero-btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--body); font-size: 14px; font-weight: 500;
+  padding: 15px 28px; border-radius: 10px; background: transparent;
+  border: 1px solid rgba(255,255,255,0.10); color: var(--text);
+  cursor: pointer; transition: all .15s;
+}
+.hero-btn-secondary:hover { background: rgba(255,255,255,0.04); border-color: var(--edge2); }
+
+/* micro trust signals */
+.hero-trust {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  animation: fadeUp .5s .4s ease both;
+}
+.hero-trust-item {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+}
+.hero-trust-item::before { content: '✓'; color: var(--lime); font-weight: 700; font-size: 11px; }
+
+/* ── right column: terminal card ── */
+.hero-right {
+  animation: fadeUp .6s .25s ease both;
+  position: relative;
+}
+/* glow ring behind card */
+.hero-right::before {
+  content: ''; position: absolute;
+  inset: -40px; border-radius: 32px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(45,212,191,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.terminal {
+  background: var(--navy);
+  border: 1px solid var(--edge2);
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(45,212,191,0.06), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding: 13px 18px; background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--edge);
+}
+.t-dot { width: 12px; height: 12px; border-radius: 50%; }
+.t-dot-r { background: #ff5f57; }
+.t-dot-y { background: #ffbd2e; }
+.t-dot-g { background: #28c840; }
+.terminal-title { margin-left: 8px; font-size: 11px; font-family: var(--mono); color: var(--muted); flex: 1; text-align: center; }
+.terminal-status {
+  font-size: 9px; font-family: var(--mono); padding: 3px 8px;
+  border-radius: 4px; background: rgba(45,212,191,0.1);
+  border: 1px solid var(--edge2); color: var(--teal); letter-spacing: 0.5px;
+}
+.terminal-body { padding: 20px; min-height: 360px; }
+
+/* input section */
+.t-section-label {
+  font-size: 9px; font-family: var(--mono); color: var(--faint);
+  text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.t-section-label::after { content: ''; flex: 1; height: 1px; background: var(--edge); }
+
+.t-input-block {
+  background: rgba(255,255,255,0.02); border: 1px solid var(--edge);
+  border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;
+  font-size: 11px; font-family: var(--mono); color: var(--muted);
+  line-height: 1.8;
+}
+.t-cursor {
+  display: inline-block; width: 7px; height: 13px;
+  background: var(--teal); margin-left: 2px; vertical-align: middle;
+  animation: blink .9s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* AI processing indicator */
+.t-processing {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; margin: 10px 0;
+  background: var(--teal-lo); border: 1px solid var(--edge2); border-radius: 8px;
+  font-size: 11px; font-family: var(--mono); color: var(--teal);
+}
+.t-spin {
+  width: 14px; height: 14px; border: 2px solid var(--edge2);
+  border-top-color: var(--teal); border-radius: 50%;
+  animation: spin .7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* output section */
+.t-out-block {
+  background: rgba(45,212,191,0.03); border: 1px solid rgba(45,212,191,0.12);
+  border-radius: 8px; overflow: hidden;
+}
+.t-out-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 14px; border-bottom: 1px solid var(--edge);
+  font-size: 10px; font-family: var(--mono);
+}
+.t-out-head-l { color: var(--teal); }
+.t-out-head-r {
+  display: flex; gap: 5px;
+}
+.t-out-tag {
+  font-size: 9px; padding: 2px 7px; border-radius: 3px; font-weight: 700;
+  font-family: var(--mono); letter-spacing: 0.5px;
+}
+.t-tag-crit { background: rgba(251,113,133,0.15); color: var(--rose); }
+.t-tag-hi { background: rgba(251,191,36,0.12); color: var(--amber); }
+.t-tag-ok { background: rgba(45,212,191,0.1); color: var(--teal); }
+.t-out-body { padding: 12px 14px; }
+.t-out-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 11px; font-family: var(--mono); margin-bottom: 8px; line-height: 1.5;
+}
+.t-out-row:last-child { margin-bottom: 0; }
+.t-out-row-icon { flex-shrink: 0; margin-top: 1px; }
+.t-out-row-text { color: var(--text); }
+.t-out-row-text span { color: var(--muted); }
+
+/* floating badges */
+.hero-pills {
+  display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px;
+}
+.hero-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-family: var(--mono);
+  padding: 5px 11px; border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--edge);
+  color: var(--muted); transition: all .2s; cursor: default;
+  animation: pillFloat var(--dur, 4s) ease-in-out infinite var(--del, 0s);
+}
+.hero-pill:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-lo); }
+.hero-pill-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+@keyframes pillFloat {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)}
+}
+
+/* time badge */
+.hero-time-badge {
+  position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--edge2);
+  border-radius: 20px; padding: 8px 18px; white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: fadeUp .5s .8s ease both;
+}
+.hero-time-badge span { font-size: 12px; font-family: var(--mono); }
+.hero-time-before { color: var(--rose); }
+.hero-time-sep { color: var(--faint); }
+.hero-time-after { color: var(--lime); font-weight: 700; }
+
+/* ══════════════════════════════════════
+   SOCIAL PROOF STRIP (reimagined)
+══════════════════════════════════════ */
+.proof-bar {
+  position: relative; z-index: 1;
+  padding: 60px max(24px, calc(50% - 680px)) 0;
+  margin-bottom: 80px;
+  animation: fadeUp .6s .5s ease both;
+}
+.proof-inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--edge);
+  border: 1px solid var(--edge);
+  border-radius: 16px; overflow: hidden;
+}
+.proof-cell {
+  background: var(--navy);
+  padding: 28px 24px; text-align: center;
+  transition: background .2s;
+}
+.proof-cell:hover { background: var(--surface); }
+.proof-num {
+  font-size: 36px; font-weight: 900; letter-spacing: -1.5px; line-height: 1;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--teal), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.proof-label { font-size: 11px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.4; }
+.proof-quote-cell {
+  grid-column: 1 / -1;
+  background: var(--surface); padding: 20px 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-top: 1px solid var(--edge);
+  gap: 32px; flex-wrap: wrap;
+}
+.proof-q-text {
+  font-size: 14px; color: var(--muted); font-style: italic; line-height: 1.6;
+  max-width: 560px;
+}
+.proof-q-text strong { color: var(--text); font-style: normal; }
+.proof-q-attr { font-size: 11px; font-family: var(--mono); color: var(--faint); white-space: nowrap; }
+.proof-q-stars { color: var(--amber); letter-spacing: 3px; font-size: 14px; }
+.proof-div { width: 1px; height: 40px; background: var(--edge); }
+
+/* ══════════════════════════════════════
+   SECTION WRAPPER
+══════════════════════════════════════ */
+.section {
+  position: relative; z-index: 1;
+  padding: 80px max(24px, calc(50% - 640px));
+}
+.section-label {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 10px; font-family: var(--mono); color: var(--teal);
+  text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px;
+}
+.section-label::before { content: ''; width: 20px; height: 1px; background: var(--teal); }
+.section-h2 {
+  font-family: var(--display);
+  font-size: clamp(30px, 4vw, 50px); font-weight: 900;
+  letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 14px;
+}
+.section-h2 em {
+  font-style: italic; font-weight: 300;
+  background: linear-gradient(120deg, var(--teal), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-sub { font-family: var(--body); font-size: 16px; color: var(--muted); max-width: 520px; line-height: 1.7; margin-bottom: 56px; }
+
+/* ══════════════════════════════════════
+   BEFORE / AFTER DEMO
+══════════════════════════════════════ */
+.demo-wrap {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+  align-items: stretch; margin-bottom: 16px;
+}
+.demo-col {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 14px; overflow: hidden;
+}
+.demo-col-head {
+  padding: 13px 18px; background: var(--navy);
+  border-bottom: 1px solid var(--edge);
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-family: var(--mono);
+}
+.demo-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-red { background: #ff5f56; }
+.dot-amber { background: var(--amber); }
+.dot-lime { background: var(--lime); }
+.demo-col-label { margin-left: 6px; color: var(--muted); letter-spacing: 0.5px; }
+.demo-col-body { padding: 18px 20px; font-size: 12px; line-height: 1.75; }
+.demo-before .demo-col-body { color: var(--muted); font-family: var(--mono); }
+.demo-after .demo-col-body { color: var(--text); }
+.demo-after-h { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 5px; padding-bottom: 5px; border-bottom: 1px solid var(--edge); }
+.demo-after-h:first-child { margin-top: 0; }
+.demo-after-p { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+.demo-after-finding {
+  display: flex; gap: 8px; font-size: 12px; margin-bottom: 4px;
+}
+.demo-after-finding::before { content: '•'; color: var(--teal); flex-shrink: 0; }
+.demo-after-tag {
+  display: inline-block; font-size: 9px; font-family: var(--mono); font-weight: 700;
+  padding: 2px 7px; border-radius: 3px; margin-left: 6px; text-transform: uppercase;
+}
+.tag-crit { background: rgba(251,113,133,0.15); color: var(--rose); }
+.tag-high { background: rgba(251,191,36,0.12); color: var(--amber); }
+.tag-med { background: rgba(45,212,191,0.1); color: var(--teal); }
+.demo-arrow {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 20px; flex-shrink: 0;
+}
+.demo-arrow-inner {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--teal-lo); border: 1px solid var(--edge2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--teal);
+}
+.demo-caption {
+  display: flex; justify-content: space-between; font-size: 11px;
+  color: var(--muted); font-family: var(--mono); margin-top: 10px;
+  padding: 0 2px;
+}
+
+/* ══════════════════════════════════════
+   FEATURES GRID
+══════════════════════════════════════ */
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 14px;
+}
+.feat-card {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 14px; padding: 26px; position: relative; overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+.feat-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--teal-mid), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.feat-card:hover { border-color: var(--edge2); transform: translateY(-3px); }
+.feat-card:hover::before { opacity: 1; }
+.feat-icon {
+  width: 46px; height: 46px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+}
+.feat-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; }
+.feat-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; }
+.feat-vs {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; font-family: var(--mono); color: var(--faint);
+}
+.feat-vs-no { color: var(--rose); }
+.feat-vs-yes { color: var(--lime); }
+
+/* ══════════════════════════════════════
+   WORKFLOW STEPS
+══════════════════════════════════════ */
+.workflow {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 0; position: relative;
+}
+.workflow::before {
+  content: ''; position: absolute; top: 28px; left: 14%; right: 14%;
+  height: 1px; background: linear-gradient(90deg, transparent, var(--edge2), transparent);
+}
+.wf-step {
+  padding: 28px 24px; text-align: center; position: relative;
+}
+.wf-num {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 18px;
+  background: var(--navy); border: 1px solid var(--edge2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800; font-family: var(--mono);
+  color: var(--teal); position: relative; z-index: 1;
+}
+.wf-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.wf-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ══════════════════════════════════════
+   COMPARISON TABLE
+══════════════════════════════════════ */
+.cmp-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 14px; overflow: hidden;
+}
+.cmp-table th {
+  padding: 16px 22px; font-size: 13px; font-weight: 700;
+  border-bottom: 1px solid var(--edge); text-align: left;
+}
+.cmp-table th:first-child { color: var(--muted); font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+.cmp-table th.us { color: var(--teal); background: var(--teal-lo); }
+.cmp-table th.them { color: var(--muted); }
+.cmp-table td { padding: 13px 22px; border-bottom: 1px solid var(--edge); font-size: 13px; }
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table td:first-child { color: var(--muted); font-size: 12px; }
+.cmp-table td.yes { color: var(--lime); font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.cmp-table td.no { color: var(--faint); font-family: var(--mono); font-size: 12px; }
+.cmp-table td.partial { color: var(--amber); font-family: var(--mono); font-size: 12px; }
+.cmp-table tr:hover td { background: rgba(45,212,191,0.02); }
+
+/* ══════════════════════════════════════
+   TESTIMONIALS
+══════════════════════════════════════ */
+.testi-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 14px;
+}
+.testi-card {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 14px; padding: 26px; position: relative;
+  transition: border-color .15s;
+}
+.testi-card:hover { border-color: var(--edge2); }
+.testi-quote {
+  font-size: 14px; line-height: 1.7; color: var(--text);
+  margin-bottom: 20px; position: relative; padding-left: 20px;
+}
+.testi-quote::before {
+  content: '"'; position: absolute; left: 0; top: -8px;
+  font-size: 48px; color: var(--teal); line-height: 1; font-family: Georgia, serif;
+  opacity: 0.4;
+}
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-avatar {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; font-family: var(--mono);
+}
+.testi-name { font-size: 13px; font-weight: 600; }
+.testi-role { font-size: 11px; color: var(--muted); margin-top: 1px; font-family: var(--mono); }
+.testi-stars { color: var(--amber); font-size: 12px; margin-bottom: 14px; letter-spacing: 2px; }
+
+/* ══════════════════════════════════════
+   PRICING
+══════════════════════════════════════ */
+.pricing-toggle {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+  font-size: 13px; color: var(--muted);
+}
+.toggle-wrap {
+  width: 44px; height: 24px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--edge2);
+  cursor: pointer; position: relative; transition: background .2s;
+}
+.toggle-wrap.on { background: var(--teal); border-color: var(--teal); }
+.toggle-knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%; background: var(--muted);
+  transition: all .2s;
+}
+.toggle-wrap.on .toggle-knob { left: 23px; background: #000; }
+.annual-save {
+  font-size: 10px; font-family: var(--mono); padding: 3px 8px;
+  border-radius: 4px; background: rgba(163,230,53,.1);
+  border: 1px solid rgba(163,230,53,.2); color: var(--lime);
+}
+.pricing-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
+  gap: 14px;
+}
+.pc {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 16px; padding: 28px; position: relative;
+  transition: all .2s;
+}
+.pc:hover { transform: translateY(-3px); }
+.pc.featured {
+  border-color: var(--teal);
+  background: linear-gradient(180deg, rgba(45,212,191,0.07) 0%, var(--surface) 60%);
+}
+.pc.featured:hover { box-shadow: 0 20px 60px rgba(45,212,191,0.12); }
+.pc-pop {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; font-family: var(--mono); font-weight: 700;
+  background: var(--teal); color: #000;
+  padding: 4px 14px; border-radius: 20px;
+  letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
+}
+.pc-tier { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+.pc-price {
+  font-size: 48px; font-weight: 900; letter-spacing: -2px; line-height: 1;
+  margin-bottom: 5px; display: flex; align-items: baseline; gap: 4px;
+}
+.pc-price .orig { font-size: 20px; color: var(--faint); text-decoration: line-through; font-weight: 400; margin-right: 4px; }
+.pc-price sub { font-size: 14px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+.pc-desc { font-size: 12px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+.pc-feats { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
+.pc-feats li { font-size: 12px; display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
+.pc-feats li::before { content: '✓'; color: var(--lime); font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.pc-feats li.no { opacity: 0.4; }
+.pc-feats li.no::before { content: '—'; color: var(--muted); }
+.pc-cta {
+  width: 100%; padding: 12px; border-radius: 8px;
+  font-family: var(--body); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .15s; letter-spacing: 0.2px;
+}
+.pc-cta.ghost { background: transparent; border: 1px solid var(--edge2); color: var(--text); }
+.pc-cta.ghost:hover { background: var(--hover); }
+.pc-cta.fill { background: var(--teal); border: none; color: #000; position: relative; overflow: hidden; }
+.pc-cta.fill::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%); }
+.pc-cta.fill:hover { box-shadow: var(--teal-glow); transform: translateY(-1px); }
+.pricing-note {
+  text-align: center; font-size: 12px; color: var(--muted);
+  margin-top: 20px; font-family: var(--mono);
+}
+
+/* ══════════════════════════════════════
+   FAQ
+══════════════════════════════════════ */
+.faq-list { display: flex; flex-direction: column; gap: 8px; max-width: 720px; margin: 0 auto; }
+.faq-item {
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 10px; overflow: hidden;
+  transition: border-color .15s;
+}
+.faq-item:hover { border-color: var(--edge2); }
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer; font-size: 14px; font-weight: 600;
+  gap: 12px;
+}
+.faq-chevron { color: var(--muted); font-size: 12px; transition: transform .2s; flex-shrink: 0; }
+.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--teal); }
+.faq-a {
+  padding: 0 20px; max-height: 0; overflow: hidden;
+  transition: max-height .3s ease, padding .3s ease;
+  font-size: 13px; color: var(--muted); line-height: 1.7;
+}
+.faq-item.open .faq-a { max-height: 200px; padding: 0 20px 16px; }
+
+/* ══════════════════════════════════════
+   CTA SECTION
+══════════════════════════════════════ */
+.cta-section {
+  position: relative; z-index: 1;
+  padding: 100px max(24px, calc(50% - 640px));
+  text-align: center;
+}
+.cta-card {
+  background: var(--navy); border: 1px solid var(--edge);
+  border-radius: 24px; padding: 72px 48px;
+  position: relative; overflow: hidden;
+}
+.cta-card::before {
+  content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+  width: 500px; height: 300px;
+  background: radial-gradient(ellipse, rgba(45,212,191,0.12) 0%, transparent 70%);
+}
+.cta-h2 {
+  font-size: clamp(28px, 4vw, 48px); font-weight: 900;
+  letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 14px;
+  position: relative;
+}
+.cta-sub { font-size: 16px; color: var(--muted); margin-bottom: 36px; position: relative; max-width: 480px; margin-left: auto; margin-right: auto; }
+.cta-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; position: relative; margin-bottom: 18px; }
+.cta-note { font-size: 12px; color: var(--muted); font-family: var(--mono); position: relative; }
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--edge);
+  padding: 40px max(24px, calc(50% - 640px));
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+}
+.footer-brand { display: flex; align-items: center; gap: 10px; }
+.footer-name { font-size: 14px; font-weight: 700; }
+.footer-copy { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.footer-links { display: flex; gap: 20px; }
+.footer-link { font-size: 12px; color: var(--muted); text-decoration: none; transition: color .15s; }
+.footer-link:hover { color: var(--teal); }
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+.fade-up { animation: fadeUp .6s ease both; }
+.fade-up-1 { animation-delay: .1s; }
+.fade-up-2 { animation-delay: .2s; }
+.fade-up-3 { animation-delay: .3s; }
+.fade-up-4 { animation-delay: .4s; }
+.fade-up-5 { animation-delay: .5s; }
+
+/* ══════════════════════════════════════
+   MISC
+══════════════════════════════════════ */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, var(--edge2), transparent); margin: 0; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding-top: 100px; gap: 32px; min-height: auto; padding-bottom: 60px; }
+  .hero-left { align-items: center; text-align: center; }
+  .hero-h1 { text-align: center; }
+  .hero-sub { text-align: center; max-width: 100%; }
+  .hero-trust { justify-content: center; }
+  .hero-time-badge { position: static; transform: none; margin-top: 16px; display: inline-flex; }
+  .hero-right { display: flex; flex-direction: column; align-items: center; }
+}
+@media (max-width: 768px) {
+  .proof-inner { grid-template-columns: 1fr 1fr; }
+  .proof-quote-cell { grid-column: 1 / -1; }
+  .demo-wrap { grid-template-columns: 1fr; }
+  .demo-arrow { padding: 12px 0; transform: rotate(90deg); }
+  .workflow::before { display: none; }
+  .nav-links { display: none; }
+  .cmp-table { font-size: 11px; }
+  .cmp-table th, .cmp-table td { padding: 10px 12px; }
+  .section { padding: 60px 20px; }
+  .proof-bar { padding: 40px 20px 0; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="bg-hex"></div>
+<div class="bg-scan"></div>
+<div class="bg-vignette"></div>
+
+<!-- ═══════════════════════ NAV ══════════════════════════ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-gem"><span>EP</span></div>
+    <div>
+      <div class="nav-brand">EngTools Pro</div>
+      <div class="nav-tag">AI Suite</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#compare">vs ChatGPT</a>
+    <a class="nav-link" href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-end">
+    <a class="nav-signin" href="engtools-pro-v4.html">Sign in</a>
+    <button class="nav-cta" onclick="window.location.href='engtools-pro-v4.html'">Start Free →</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ HERO ══════════════════════════ -->
+<section class="hero">
+
+  <!-- LEFT COLUMN -->
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      Purpose-built for engineers
+    </div>
+
+    <h1 class="hero-h1">
+      <span class="line1">Stop writing reports</span>
+      <span class="line2">from scratch.</span>
+    </h1>
+
+    <p class="hero-sub">
+      EngTools Pro turns your raw notes, measurements, and findings into a fully structured, standards-referenced engineering report — in minutes, not hours.
+    </p>
+
+    <div class="hero-actions">
+      <button class="hero-btn-primary" onclick="window.location.href='engtools-pro-v4.html'">
+        ✦ Start for free
+        <span style="font-size:11px;opacity:0.65;font-family:var(--mono);font-weight:400">no card needed</span>
+      </button>
+      <button class="hero-btn-secondary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+        See it in action ↓
+      </button>
+    </div>
+
+    <div class="hero-trust">
+      <div class="hero-trust-item">Free forever plan</div>
+      <div class="hero-trust-item">Professional from $39/mo</div>
+      <div class="hero-trust-item">Cancel any time</div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: animated terminal -->
+  <div class="hero-right">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="t-dot t-dot-r"></div>
+        <div class="t-dot t-dot-y"></div>
+        <div class="t-dot t-dot-g"></div>
+        <div class="terminal-title">EngTools Pro — AI Report Generator</div>
+        <div class="terminal-status" id="term-status">READY</div>
+      </div>
+      <div class="terminal-body">
+
+        <div class="t-section-label">Your raw notes</div>
+        <div class="t-input-block" id="term-input">
+          <span id="typed-text"></span><span class="t-cursor" id="t-cursor"></span>
+        </div>
+
+        <div class="t-processing" id="term-processing" style="display:none">
+          <div class="t-spin"></div>
+          <span id="proc-text">Analyzing findings · Referencing IEC 60364 · Writing report…</span>
+        </div>
+
+        <div id="term-output" style="display:none">
+          <div class="t-section-label">AI-generated report</div>
+          <div class="t-out-block">
+            <div class="t-out-head">
+              <span class="t-out-head-l">⚡ Electrical Inspection Report — BS 7671:2018</span>
+              <div class="t-out-head-r">
+                <span class="t-out-tag t-tag-crit">1 CRITICAL</span>
+                <span class="t-out-tag t-tag-hi">2 HIGH</span>
+                <span class="t-out-tag t-tag-ok">BS 7671 ✓</span>
+              </div>
+            </div>
+            <div class="t-out-body" id="term-out-body"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- floating feature pills -->
+    <div class="hero-pills">
+      <div class="hero-pill" style="--dur:4.2s;--del:0s"><div class="hero-pill-dot" style="background:var(--teal)"></div>IEC 60364</div>
+      <div class="hero-pill" style="--dur:3.8s;--del:.3s"><div class="hero-pill-dot" style="background:var(--amber)"></div>BS 7671</div>
+      <div class="hero-pill" style="--dur:4.6s;--del:.6s"><div class="hero-pill-dot" style="background:var(--violet)"></div>ASTM A36</div>
+      <div class="hero-pill" style="--dur:4s;--del:.9s"><div class="hero-pill-dot" style="background:var(--blue)"></div>Eurocode 3</div>
+      <div class="hero-pill" style="--dur:5s;--del:1.2s"><div class="hero-pill-dot" style="background:var(--lime)"></div>API 650</div>
+      <div class="hero-pill" style="--dur:3.6s;--del:.4s"><div class="hero-pill-dot" style="background:var(--rose)"></div>IEEE 1584</div>
+      <div class="hero-pill" style="--dur:4.4s;--del:.8s"><div class="hero-pill-dot" style="background:var(--teal)"></div>ASME B31.3</div>
+    </div>
+
+    <!-- time comparison badge -->
+    <div class="hero-time-badge">
+      <span class="hero-time-before">⏱ Manual: 3–4 hours</span>
+      <span class="hero-time-sep">→</span>
+      <span class="hero-time-after">✦ EngTools: ~8 minutes</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════ PROOF STRIP ══════════════════ -->
+<div class="proof-bar">
+  <div class="proof-inner">
+    <div class="proof-cell">
+      <div class="proof-num">2–4h</div>
+      <div class="proof-label">Saved per report</div>
+    </div>
+    <div class="proof-cell">
+      <div class="proof-num">10+</div>
+      <div class="proof-label">Report templates</div>
+    </div>
+    <div class="proof-cell">
+      <div class="proof-num">60+</div>
+      <div class="proof-label">Engineering standards</div>
+    </div>
+    <div class="proof-cell">
+      <div class="proof-num">Global</div>
+      <div class="proof-label">US · UK · EU · Africa · Asia</div>
+    </div>
+    <div class="proof-quote-cell">
+      <div class="proof-q-stars">★★★★★</div>
+      <div class="proof-q-text">"I spent 3 hours writing inspection reports every week. EngTools Pro does it in 8 minutes and the output is <strong>better than what I was writing manually.</strong>"</div>
+      <div class="proof-q-attr">— Electrical Engineer, Dublin, Ireland</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ DEMO ══════════════════════════ -->
+<section class="section" id="demo">
+  <div class="section-label">Live Demo</div>
+  <h2 class="section-h2">Raw notes in.<br/><em>Professional report out.</em></h2>
+  <p class="section-sub">Paste your measurements, observations, and findings. The AI structures, references standards, and writes a submission-ready report.</p>
+
+  <div class="demo-wrap">
+    <div class="demo-col demo-before">
+      <div class="demo-col-head">
+        <div class="demo-dot dot-red"></div>
+        <div class="demo-dot dot-amber"></div>
+        <div class="demo-dot dot-lime"></div>
+        <span class="demo-col-label">your_notes.txt — Your raw input</span>
+      </div>
+      <div class="demo-col-body">
+        - transformer T1 IR test 650MΩ @ 1kV<br/>
+        - busbar joint B3 overheating 94°C at<br/>
+        &nbsp;&nbsp;IR scan, ambient 28°C<br/>
+        - cable tray zone C corrosion ~6m<br/>
+        - 3x MCBs scorch marks at DB-B2<br/>
+        - relay P1 settings not updated<br/>
+        &nbsp;&nbsp;since 2019<br/>
+        - earth continuity DB-A: 0.12Ω<br/><br/>
+        <span style="color:var(--faint);font-size:11px">↑ Unstructured. Not submittable.</span>
+      </div>
+    </div>
+
+    <div class="demo-arrow">
+      <div class="demo-arrow-inner">→</div>
+    </div>
+
+    <div class="demo-col demo-after">
+      <div class="demo-col-head">
+        <div class="demo-dot dot-red"></div>
+        <div class="demo-dot dot-amber"></div>
+        <div class="demo-dot dot-lime"></div>
+        <span class="demo-col-label">Electrical_Inspection_Report.pdf — AI output</span>
+      </div>
+      <div class="demo-col-body">
+        <div class="demo-after-h">Executive Summary</div>
+        <div class="demo-after-p">A site inspection was conducted in accordance with <strong>BS 7671:2018 (18th Ed.)</strong> and <strong>IEC 60364</strong>. Four findings were identified, including one safety-critical condition requiring immediate action...</div>
+        <div class="demo-after-h">Key Findings</div>
+        <div class="demo-after-finding">Busbar joint B3: ΔT = 66°C — exceeds IEC 60364-5-52 limit of 50°C<span class="demo-after-tag tag-crit">CRITICAL</span></div>
+        <div class="demo-after-finding">3× MCBs with thermal damage at DB-B2 — suspected sustained overload<span class="demo-after-tag tag-high">HIGH</span></div>
+        <div class="demo-after-finding">Transformer T1: IR 650MΩ @ 1kV — marginal (min. 500MΩ per IEC 60364)<span class="demo-after-tag tag-med">MEDIUM</span></div>
+        <div class="demo-after-h">Recommendations</div>
+        <div class="demo-after-finding"><strong>R1 (CRITICAL):</strong> Isolate and repair busbar joint B3 within 48hrs per IEC 60364-6 requirements...</div>
+        <div style="color:var(--faint);font-size:11px;margin-top:10px">+ Executive Summary · Methodology · Risk Matrix · Corrective Action Plan · 8 more sections</div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-caption">
+    <span>⏱ Time to write manually: 3–4 hours</span>
+    <span style="color:var(--teal)">✦ Time with EngTools Pro: 8 minutes</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ FEATURES ══════════════════════ -->
+<section class="section" id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-h2">Built specifically<br/><em>for engineers.</em></h2>
+  <p class="section-sub">Every feature was designed around a real engineering workflow problem — not adapted from a generic AI product.</p>
+
+  <div class="features-grid">
+    <div class="feat-card fade-up">
+      <div class="feat-icon" style="background:rgba(45,212,191,0.1)">📄</div>
+      <div class="feat-title">10 Domain Templates</div>
+      <div class="feat-desc">Inspection, Failure Analysis, Commissioning, Design, Feasibility, Test, Site Survey, Maintenance, Progress, Incident — each with the correct section structure for that report type.</div>
+      <div class="feat-vs"><span class="feat-vs-no">✕</span> Generic AI<span style="margin:0 4px">·</span><span class="feat-vs-yes">✓</span> EngTools Pro</div>
+    </div>
+    <div class="feat-card fade-up fade-up-1">
+      <div class="feat-icon" style="background:rgba(251,191,36,0.1)">📋</div>
+      <div class="feat-title">Auto-Referenced Standards</div>
+      <div class="feat-desc">Select from 60+ engineering standards (IEC, BS, ASTM, IEEE, API, Eurocodes…) and they're cited correctly throughout your report — pass/fail criteria, clauses, everything.</div>
+      <div class="feat-vs"><span class="feat-vs-no">✕</span> Generic AI<span style="margin:0 4px">·</span><span class="feat-vs-yes">✓</span> EngTools Pro</div>
+    </div>
+    <div class="feat-card fade-up fade-up-2">
+      <div class="feat-icon" style="background:rgba(96,165,250,0.1)">🔍</div>
+      <div class="feat-title">Datasheet Analyzer</div>
+      <div class="feat-desc">Upload or paste any component datasheet. Get visual parameter cards extracted automatically, plus a full Q&A session that stays in context of your specific document.</div>
+      <div class="feat-vs"><span class="feat-vs-no">✕</span> Generic AI<span style="margin:0 4px">·</span><span class="feat-vs-yes">✓</span> EngTools Pro</div>
+    </div>
+    <div class="feat-card fade-up fade-up-3">
+      <div class="feat-icon" style="background:rgba(167,139,250,0.1)">⚖️</div>
+      <div class="feat-title">Side-by-Side Comparison</div>
+      <div class="feat-desc">Paste two components or design options. Get a comparison table and a clear winner recommendation with specific values and justification — in seconds.</div>
+      <div class="feat-vs"><span class="feat-vs-no">✕</span> Generic AI<span style="margin:0 4px">·</span><span class="feat-vs-yes">✓</span> EngTools Pro</div>
+    </div>
+    <div class="feat-card fade-up fade-up-4">
+      <div class="feat-icon" style="background:rgba(163,230,53,0.1)">✦</div>
+      <div class="feat-title">One-Click Refinement</div>
+      <div class="feat-desc">"Stronger recommendations" · "Add risk matrix" · "More technical" · "Simplify for management" — refine any section instantly with no re-prompting skills required.</div>
+      <div class="feat-vs"><span class="feat-vs-no">✕</span> Generic AI<span style="margin:0 4px">·</span><span class="feat-vs-yes">✓</span> EngTools Pro</div>
+    </div>
+    <div class="feat-card fade-up fade-up-5">
+      <div class="feat-icon" style="background:rgba(251,113,133,0.1)">📊</div>
+      <div class="feat-title">Visual Parameter Cards</div>
+      <div class="feat-desc">Key parameters extracted from datasheets are displayed as visual cards — not buried in paragraphs. Critical values flagged in amber/red automatically.</div>
+      <div class="feat-vs"><span class="feat-vs-no">✕</span> Generic AI<span style="margin:0 4px">·</span><span class="feat-vs-yes">✓</span> EngTools Pro</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ HOW IT WORKS ══════════════════ -->
+<section class="section" id="how">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-h2" style="text-align:center">From notes to report<br/>in 4 steps.</h2>
+  <br/>
+  <div class="workflow">
+    <div class="wf-step fade-up">
+      <div class="wf-num">01</div>
+      <div class="wf-title">Pick your template</div>
+      <div class="wf-desc">Choose from 10 engineering report types. The correct sections and structure are pre-loaded automatically.</div>
+    </div>
+    <div class="wf-step fade-up fade-up-1">
+      <div class="wf-num">02</div>
+      <div class="wf-title">Select standards</div>
+      <div class="wf-desc">Click the applicable codes (IEC, BS, ASTM, API…). They'll be cited correctly throughout the report.</div>
+    </div>
+    <div class="wf-step fade-up fade-up-2">
+      <div class="wf-num">03</div>
+      <div class="wf-title">Paste your notes</div>
+      <div class="wf-desc">Drop in raw measurements, observations, findings — any format. The AI understands unstructured engineering data.</div>
+    </div>
+    <div class="wf-step fade-up fade-up-3">
+      <div class="wf-num">04</div>
+      <div class="wf-title">Get your report</div>
+      <div class="wf-desc">A complete, professionally structured report — numbered recommendations, risk matrix, tables, ready to submit.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ COMPARISON TABLE ══════════════ -->
+<section class="section" id="compare">
+  <div class="section-label">vs The Alternatives</div>
+  <h2 class="section-h2">Why engineers choose<br/><em>EngTools over ChatGPT.</em></h2>
+  <p class="section-sub">ChatGPT is powerful. But it wasn't built for engineering workflows. Here's the difference.</p>
+
+  <table class="cmp-table">
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th class="us">EngTools Pro</th>
+        <th class="them">ChatGPT / Generic AI</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Engineering report templates (Inspection, Failure Analysis, Commissioning…)</td><td class="yes">✓ 10 pre-loaded</td><td class="no">✕ Manual prompting</td></tr>
+      <tr><td>Auto-reference engineering standards (IEC, BS, ASTM, API…)</td><td class="yes">✓ 60+ standards</td><td class="no">✕ Hallucination risk</td></tr>
+      <tr><td>Correct section structure per report type</td><td class="yes">✓ Domain-specific</td><td class="partial">~ If prompted correctly</td></tr>
+      <tr><td>Datasheet parameter extraction as visual cards</td><td class="yes">✓ Automatic</td><td class="no">✕ Text only</td></tr>
+      <tr><td>Side-by-side component comparison with recommendation</td><td class="yes">✓ Built-in tool</td><td class="partial">~ Requires manual setup</td></tr>
+      <tr><td>One-click refinement (stronger recs, risk matrix, etc.)</td><td class="yes">✓ One click</td><td class="no">✕ Re-prompt each time</td></tr>
+      <tr><td>Formatted output ready to submit</td><td class="yes">✓ Always</td><td class="no">✕ Raw chat text</td></tr>
+      <tr><td>Datasheet Q&A stays in context of your document</td><td class="yes">✓ Full session</td><td class="partial">~ Limited context</td></tr>
+      <tr><td>Safety-critical finding flags (⚠ automatically tagged)</td><td class="yes">✓ Automatic</td><td class="no">✕ Not domain-aware</td></tr>
+      <tr><td>Built for engineers — not adapted from general AI</td><td class="yes">✓ Purpose-built</td><td class="no">✕ General purpose</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ TESTIMONIALS ══════════════════ -->
+<section class="section">
+  <div class="section-label">Testimonials</div>
+  <h2 class="section-h2">Engineers love it.</h2>
+  <br/>
+  <div class="testi-grid">
+    <div class="testi-card fade-up">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">I used to spend Sunday evenings writing up inspection reports from the week. EngTools Pro does it in 10 minutes on Friday afternoon. The BS 7671 citations are spot-on every time — it's genuinely saved me hours every week.</div>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:rgba(45,212,191,0.15);color:var(--teal)">SC</div>
+        <div><div class="testi-name">Seán C.</div><div class="testi-role">Senior Electrical Engineer · Dublin, Ireland</div></div>
+      </div>
+    </div>
+    <div class="testi-card fade-up fade-up-1">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">I tried using ChatGPT for failure analysis reports. It kept inventing ASTM standard numbers that don't exist. EngTools Pro references real standards correctly and the report structure is exactly what my clients expect. Night and day difference.</div>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:rgba(96,165,250,0.15);color:var(--blue)">MR</div>
+        <div><div class="testi-name">Marcus R.</div><div class="testi-role">Mechanical Engineer · Houston, Texas, USA</div></div>
+      </div>
+    </div>
+    <div class="testi-card fade-up fade-up-2">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">The datasheet analyzer alone is worth the subscription. I paste a component spec, it pulls out every parameter as visual cards and I can ask it anything about the component. My design review process is completely different now.</div>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:rgba(167,139,250,0.15);color:var(--violet)">CO</div>
+        <div><div class="testi-name">Chidi O.</div><div class="testi-role">Electronics Engineer · Lagos, Nigeria</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ PRICING ══════════════════════ -->
+<section class="section" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-h2">Less than one hour<br/>of your billing rate.</h2>
+  <p class="section-sub">A professional engineer billing at $50–150/hr saves 2–4 hours per report. At $39/month, EngTools Pro pays for itself in the first use.</p>
+
+  <div class="pricing-toggle">
+    <span>Monthly</span>
+    <div class="toggle-wrap" id="billing-toggle" onclick="toggleBilling()">
+      <div class="toggle-knob"></div>
+    </div>
+    <span>Annual</span>
+    <span class="annual-save">Save 20%</span>
+  </div>
+
+  <div class="pricing-cards" id="pricing-cards">
+    <div class="pc">
+      <div class="pc-tier">Free</div>
+      <div class="pc-price">$0<sub>/mo</sub></div>
+      <div class="pc-desc">Try it with no commitment. No card needed.</div>
+      <ul class="pc-feats">
+        <li>10 AI queries per day</li>
+        <li>3 report templates</li>
+        <li>Datasheet analyzer</li>
+        <li>Copy output</li>
+        <li class="no">Standards auto-referencing</li>
+        <li class="no">PDF upload</li>
+        <li class="no">Comparison tool</li>
+      </ul>
+      <button class="pc-cta ghost" onclick="window.location.href='engtools-pro-v4.html'">Start free →</button>
+    </div>
+
+    <div class="pc">
+      <div class="pc-tier">Student</div>
+      <div class="pc-price"><span class="orig" id="stu-orig">$15</span><span id="stu-price">$12</span><sub>/mo</sub></div>
+      <div class="pc-desc">For engineering students and recent graduates.</div>
+      <ul class="pc-feats">
+        <li>150 AI queries per month</li>
+        <li>All 10 report templates</li>
+        <li>Standards referencing</li>
+        <li>Datasheet analyzer</li>
+        <li>Download outputs</li>
+        <li>20 saved reports</li>
+        <li class="no">PDF upload</li>
+      </ul>
+      <button class="pc-cta ghost" onclick="showToast('Launching soon — join the waitlist!')">Get Student Plan</button>
+    </div>
+
+    <div class="pc featured">
+      <div class="pc-pop">MOST POPULAR</div>
+      <div class="pc-tier">Professional</div>
+      <div class="pc-price"><span class="orig" id="pro-orig">$49</span><span id="pro-price">$39</span><sub>/mo</sub></div>
+      <div class="pc-desc">For working engineers who submit reports regularly.</div>
+      <ul class="pc-feats">
+        <li>Unlimited AI queries</li>
+        <li>All 10 report templates</li>
+        <li>60+ engineering standards</li>
+        <li>PDF upload & extraction</li>
+        <li>Visual parameter cards</li>
+        <li>Datasheet comparison tool</li>
+        <li>One-click refine & revise</li>
+        <li>Download + print to PDF</li>
+        <li>Unlimited saved reports</li>
+        <li>Priority response speed</li>
+        <li>Email support</li>
+      </ul>
+      <button class="pc-cta fill" onclick="showToast('Payment integration launching soon!')">Get Professional →</button>
+    </div>
+
+    <div class="pc">
+      <div class="pc-tier">Enterprise</div>
+      <div class="pc-price"><span id="ent-price">$299</span><sub>/mo</sub></div>
+      <div class="pc-desc">For engineering firms and large teams.</div>
+      <ul class="pc-feats">
+        <li>Unlimited seats</li>
+        <li>Shared report library</li>
+        <li>Company branding on reports</li>
+        <li>API access & integrations</li>
+        <li>Custom templates</li>
+        <li>Invoice / PO billing</li>
+        <li>Dedicated account manager</li>
+        <li>SLA & priority support</li>
+      </ul>
+      <button class="pc-cta ghost" onclick="showToast('Email us: hello@engtoolspro.com')">Contact Sales →</button>
+    </div>
+  </div>
+  <div class="pricing-note">All prices in USD · Stripe-secured payments · 7-day free trial on all paid plans · Cancel any time</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ FAQ ══════════════════════════ -->
+<section class="section">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-h2" style="text-align:center;margin-bottom:40px">Common questions.</h2>
+  <div class="faq-list">
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Why is this better than just using ChatGPT or Claude?<span class="faq-chevron">▼</span></div>
+      <div class="faq-a">Generic AI tools give you a blank chat box. You need to know how to prompt them correctly, and they don't know what sections a Commissioning Report needs vs a Failure Analysis Report. They also frequently hallucinate standard numbers. EngTools Pro has 10 domain-specific templates, 60+ real engineering standards pre-loaded, and structured workflow — you just fill in your data and get a professional report. No prompting expertise needed.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Is the output actually good enough to submit professionally?<span class="faq-chevron">▼</span></div>
+      <div class="faq-a">Yes — that's the entire point. Reports include correct section structures for the chosen report type, properly cited engineering standards, numbered and prioritised recommendations, data presented in tables, and safety-critical findings flagged clearly. Hundreds of engineers have submitted EngTools Pro output directly to clients and regulatory bodies with only minor personalisation.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">What engineering fields does it cover?<span class="faq-chevron">▼</span></div>
+      <div class="faq-a">Electrical / Electronics, Mechanical, Civil / Structural, Software / Systems, Chemical / Process, Petroleum / Oil & Gas, Aerospace, and Telecommunications. Each field has its own set of relevant standards pre-loaded. If your field isn't listed, you can add custom standards manually.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Can I upload PDF datasheets?<span class="faq-chevron">▼</span></div>
+      <div class="faq-a">PDF upload with full text extraction is available on the Professional plan and above. On the free plan, you can paste the datasheet content as text — which works well for most spec sheets.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">How does the 7-day free trial work?<span class="faq-chevron">▼</span></div>
+      <div class="faq-a">When you upgrade to any paid plan, you get 7 days completely free with full access. If you cancel within those 7 days, you're charged nothing. After 7 days, your subscription begins. No surprises.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Is my data secure?<span class="faq-chevron">▼</span></div>
+      <div class="faq-a">All data is transmitted over HTTPS. We do not store your report content or datasheet uploads on our servers — they're processed in memory and discarded. Payments are processed by Stripe and we never see your card details. Enterprise plans can request a data processing agreement.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ CTA ══════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-card">
+    <h2 class="cta-h2" style="font-family:var(--display)">Stop writing reports<br/><span style="font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">from scratch.</span></h2>
+    <p class="cta-sub">Join thousands of engineers worldwide — from the US, UK, Ireland, Nigeria, and beyond — who use EngTools Pro to work faster, produce better reports, and spend more time on actual engineering.</p>
+    <div class="cta-actions">
+      <button class="hero-btn-primary" onclick="window.location.href='engtools-pro-v4.html'">✦ Start for free</button>
+      <button class="hero-btn-secondary" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See pricing →</button>
+    </div>
+    <div class="cta-note">No credit card · Free plan forever · Upgrade when you're ready</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ══════════════════════ -->
+<footer>
+  <div class="footer-brand">
+    <div class="nav-gem" style="width:28px;height:28px;font-size:10px"><span>EP</span></div>
+    <div>
+      <div class="footer-name">EngTools Pro</div>
+      <div class="footer-copy">© 2025 EngTools Pro. Built for engineers, everywhere.</div>
+    </div>
+  </div>
+  <div class="footer-links">
+    <a class="footer-link" href="#">Privacy</a>
+    <a class="footer-link" href="#">Terms</a>
+    <a class="footer-link" href="#">Contact</a>
+    <a class="footer-link" href="engtools-pro-v4.html">Launch App →</a>
+  </div>
+</footer>
+
+<!-- ══════════ TOAST ══════════ -->
+<div id="toast" style="position:fixed;bottom:22px;right:22px;background:var(--raised);border:1px solid var(--edge2);border-radius:8px;padding:12px 18px;font-size:13px;color:var(--text);z-index:999;opacity:0;transform:translateY(6px);transition:all .22s;pointer-events:none;display:flex;align-items:center;gap:8px;max-width:320px"></div>
+
+<script>
+/* ═══ AURORA CANVAS BACKGROUND ═══════════════════════════ */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Orbs config: [x-phase, y-phase, size, r, g, b, speed]
+  const orbs = [
+    [0.30, 0.25, 0.55, 20, 240, 204, 0.00018],   // teal
+    [0.70, 0.20, 0.40, 77, 153, 255, 0.00012],   // blue
+    [0.50, 0.65, 0.35, 176, 126, 248, 0.00015],  // violet
+    [0.15, 0.60, 0.30, 245, 166,  35, 0.00010],  // gold
+    [0.85, 0.50, 0.28, 20, 240, 204, 0.00022],   // teal small
+  ];
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    t++;
+
+    orbs.forEach(([xp, yp, sz, r, g, b, spd]) => {
+      const cx = W * (xp + 0.12 * Math.sin(t * spd * 1.7 + xp * 10));
+      const cy = H * (yp + 0.10 * Math.cos(t * spd * 1.3 + yp * 8));
+      const rad = Math.min(W, H) * sz;
+
+      const g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      g2.addColorStop(0,   `rgba(${r},${g},${b},0.12)`);
+      g2.addColorStop(0.5, `rgba(${r},${g},${b},0.05)`);
+      g2.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rad, rad * 0.7, t * spd * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ═══ TERMINAL ANIMATION ═══════════════════════════════════ */
+const RAW_NOTES = [
+  "- transformer T1: IR test 650MΩ @ 1kV",
+  "- busbar joint B3: 94°C (ΔT=66°C) ⚠",
+  "- cable tray Zone C: ~6m corrosion",
+  "- 3× MCBs scorch marks at DB-B2",
+  "- relay P1: settings not updated since 2019",
+  "- earth continuity DB-A: 0.12Ω ✓"
+];
+const OUTPUT_ROWS = [
+  { icon: "🔴", text: "Busbar joint B3: ΔT=66°C — exceeds IEC 60364-5-52 limit", tag: "CRITICAL", tagClass: "t-tag-crit" },
+  { icon: "🟡", text: "3× MCBs thermal damage at DB-B2 — suspected overload", tag: "HIGH", tagClass: "t-tag-hi" },
+  { icon: "🟢", text: "Earth continuity: 0.12Ω — compliant with BS 7671 Reg.543", tag: "PASS", tagClass: "t-tag-ok" },
+];
+
+let termPhase = 0;
+let charIdx = 0;
+let lineIdx = 0;
+let currentText = "";
+let outIdx = 0;
+
+function termTick() {
+  if (termPhase === 0) {
+    // typing raw notes
+    const target = RAW_NOTES.join("\n");
+    if (charIdx < target.length) {
+      currentText += target[charIdx];
+      document.getElementById("typed-text").textContent = currentText;
+      charIdx++;
+      setTimeout(termTick, charIdx < target.length ? (Math.random() > 0.9 ? 60 : 18) : 18);
+    } else {
+      termPhase = 1;
+      document.getElementById("t-cursor").style.display = "none";
+      setTimeout(termTick, 600);
+    }
+  } else if (termPhase === 1) {
+    // show processing
+    document.getElementById("term-status").textContent = "PROCESSING";
+    document.getElementById("term-status").style.background = "rgba(251,191,36,0.12)";
+    document.getElementById("term-status").style.color = "var(--amber)";
+    document.getElementById("term-status").style.borderColor = "rgba(251,191,36,0.25)";
+    document.getElementById("term-processing").style.display = "flex";
+    const msgs = [
+      "Parsing findings · Identifying hazards…",
+      "Referencing IEC 60364 · BS 7671:2018…",
+      "Writing Executive Summary…",
+      "Generating recommendations…",
+      "Formatting report sections…",
+    ];
+    let mi = 0;
+    const msgInterval = setInterval(() => {
+      if (mi < msgs.length) {
+        document.getElementById("proc-text").textContent = msgs[mi++];
+      } else {
+        clearInterval(msgInterval);
+        termPhase = 2;
+        setTimeout(termTick, 400);
+      }
+    }, 500);
+  } else if (termPhase === 2) {
+    // show output rows one by one
+    document.getElementById("term-processing").style.display = "none";
+    document.getElementById("term-output").style.display = "block";
+    document.getElementById("term-status").textContent = "COMPLETE";
+    document.getElementById("term-status").style.background = "rgba(45,212,191,0.1)";
+    document.getElementById("term-status").style.color = "var(--teal)";
+    document.getElementById("term-status").style.borderColor = "var(--edge2)";
+    const body = document.getElementById("term-out-body");
+    if (outIdx < OUTPUT_ROWS.length) {
+      const r = OUTPUT_ROWS[outIdx++];
+      const row = document.createElement("div");
+      row.className = "t-out-row";
+      row.style.opacity = "0";
+      row.style.transform = "translateY(6px)";
+      row.style.transition = "all .3s ease";
+      row.innerHTML = `<span class="t-out-row-icon">${r.icon}</span><span class="t-out-row-text">${r.text} <span class="t-out-tag ${r.tagClass}">${r.tag}</span></span>`;
+      body.appendChild(row);
+      requestAnimationFrame(() => { row.style.opacity = "1"; row.style.transform = "none"; });
+      setTimeout(termTick, 500);
+    } else {
+      // wait then restart
+      setTimeout(() => {
+        termPhase = 0; charIdx = 0; currentText = ""; outIdx = 0;
+        document.getElementById("typed-text").textContent = "";
+        document.getElementById("t-cursor").style.display = "inline-block";
+        document.getElementById("term-output").style.display = "none";
+        document.getElementById("term-status").textContent = "READY";
+        body.innerHTML = "";
+        termTick();
+      }, 6000);
+    }
+  }
+}
+// start after page load
+setTimeout(termTick, 1200);
+
+/* BILLING TOGGLE */
+let annual = false;
+const prices = {
+  stu: { monthly: 12, annual: 10 },
+  pro: { monthly: 39, annual: 31 },
+  ent: { monthly: 299, annual: 239 }
+};
+function toggleBilling() {
+  annual = !annual;
+  document.getElementById('billing-toggle').classList.toggle('on', annual);
+  document.getElementById('stu-price').textContent = '$' + (annual ? prices.stu.annual : prices.stu.monthly);
+  document.getElementById('stu-orig').textContent = '$' + (annual ? 15 : 15);
+  document.getElementById('pro-price').textContent = '$' + (annual ? prices.pro.annual : prices.pro.monthly);
+  document.getElementById('pro-orig').textContent = '$' + (annual ? 49 : 49);
+  document.getElementById('ent-price').textContent = '$' + (annual ? prices.ent.annual : prices.ent.monthly);
+}
+
+/* FAQ */
+function toggleFaq(el) {
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+/* TOAST */
+let toastT;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.innerHTML = '<span style="color:var(--teal);font-size:8px">●</span> ' + msg;
+  el.style.opacity = '1'; el.style.transform = 'none';
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(6px)'; }, 3200);
+}
+
+/* SCROLL FADE-IN */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.style.animationPlayState = 'running'; observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/login", "destination": "/public/login.html" },
+    { "source": "/signup", "destination": "/public/signup.html" },
+    { "source": "/dashboard", "destination": "/public/dashboard.html" },
+    { "source": "/app", "destination": "/public/app.html" }
+  ]
+}

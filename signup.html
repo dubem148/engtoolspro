@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Create Account — EngTools Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --void:#050608;--navy:#0d1018;--surface:#111520;--raised:#161d2e;
+  --teal:#14f0cc;--teal-lo:rgba(20,240,204,0.07);--teal-glow:0 0 32px rgba(20,240,204,0.3);
+  --gold:#f5a623;--lime:#7eed6a;--rose:#ff5c7a;
+  --text:#dde6f5;--muted:#5c7090;--faint:#253040;
+  --edge:rgba(20,240,204,0.08);--edge2:rgba(20,240,204,0.18);
+  --display:'Fraunces',serif;--body:'DM Sans',sans-serif;--mono:'Fira Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--body);background:var(--void);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 20%,rgba(20,240,204,0.09) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 50% at 20% 70%,rgba(176,126,248,0.07) 0%,transparent 60%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,240,204,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(20,240,204,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+}
+.card{
+  position:relative;z-index:1;
+  background:var(--surface);border:1px solid var(--edge2);
+  border-radius:20px;padding:48px 44px;width:100%;max-width:480px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.5);
+}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;text-decoration:none}
+.logo-gem{
+  width:36px;height:36px;border-radius:9px;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:900;font-size:15px;color:#000;
+  box-shadow:0 0 0 1px rgba(20,240,204,0.5),0 4px 16px rgba(20,240,204,0.2);
+  letter-spacing:-1px;position:relative;overflow:hidden;
+}
+.logo-gem::after{content:'';position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(rgba(255,255,255,0.3),transparent)}
+.logo-text{font-family:var(--display);font-size:17px;font-weight:700}
+h1{font-family:var(--display);font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+h1 em{font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:14px;color:var(--muted);margin-bottom:20px}
+.free-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(126,237,106,0.1);border:1px solid rgba(126,237,106,0.2);
+  border-radius:20px;padding:5px 12px;font-size:11px;
+  font-family:var(--mono);color:var(--lime);margin-bottom:24px;
+}
+.field{margin-bottom:14px}
+label{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+input,select{
+  width:100%;background:var(--navy);border:1px solid var(--edge2);
+  border-radius:8px;color:var(--text);font-family:var(--body);font-size:14px;
+  padding:12px 14px;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,240,204,0.1)}
+input::placeholder{color:var(--faint)}
+select{cursor:pointer;-webkit-appearance:none}
+select option{background:var(--navy)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.terms{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:12px;color:var(--muted);margin:18px 0 20px;
+}
+.terms input[type=checkbox]{width:16px;height:16px;margin-top:1px;flex-shrink:0;accent-color:var(--teal)}
+.terms a{color:var(--teal);text-decoration:none}
+.btn{
+  width:100%;padding:13px;border-radius:9px;
+  background:var(--teal);color:#000;border:none;
+  font-family:var(--body);font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
+}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.28) 0%,transparent 55%)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--teal-glow)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.switch{text-align:center;font-size:13px;color:var(--muted);margin-top:20px}
+.switch a{color:var(--teal);text-decoration:none;font-weight:500}
+.error-msg{
+  background:rgba(255,92,122,0.1);border:1px solid rgba(255,92,122,0.25);
+  border-radius:7px;padding:10px 14px;font-size:13px;color:var(--rose);
+  margin-bottom:16px;display:none;
+}
+.error-msg.show{display:block}
+.success-card{text-align:center;display:none}
+.success-card.show{display:block}
+.success-icon{font-size:52px;margin-bottom:16px}
+.success-h{font-family:var(--display);font-size:24px;font-weight:700;margin-bottom:10px}
+.success-p{font-size:14px;color:var(--muted);line-height:1.7}
+.success-p strong{color:var(--teal)}
+.back-btn{
+  display:inline-block;margin-top:20px;
+  padding:10px 24px;border-radius:8px;
+  background:var(--teal);color:#000;font-weight:600;
+  font-family:var(--body);font-size:14px;text-decoration:none;
+  transition:all .15s;
+}
+.back-btn:hover{box-shadow:var(--teal-glow)}
+</style>
+</head>
+<body>
+<div class="card">
+  <a class="logo" href="index.html">
+    <div class="logo-gem">E</div>
+    <div class="logo-text">EngTools Pro</div>
+  </a>
+
+  <div id="form-section">
+    <h1>Start <em>for free.</em></h1>
+    <p class="subtitle">Create your account — no credit card needed</p>
+    <div class="free-badge">✓ Free · 10 AI queries/day · No card needed</div>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <form id="signup-form" onsubmit="handleSignup(event)">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="fullname" placeholder="e.g. Chidi Okafor" required autocomplete="name"/>
+      </div>
+      <div class="field">
+        <label>Work Email</label>
+        <input type="email" id="email" placeholder="you@company.com" required autocomplete="email"/>
+      </div>
+      <div class="g2">
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Min 8 characters" required minlength="8" autocomplete="new-password"/>
+        </div>
+        <div class="field">
+          <label>Engineering Field</label>
+          <select id="eng-field">
+            <option value="">Select…</option>
+            <option value="electrical">Electrical / Electronics</option>
+            <option value="mechanical">Mechanical</option>
+            <option value="civil">Civil / Structural</option>
+            <option value="software">Software / Systems</option>
+            <option value="chemical">Chemical / Process</option>
+            <option value="petroleum">Petroleum / Oil & Gas</option>
+            <option value="aerospace">Aerospace</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="terms">
+        <input type="checkbox" id="terms-check" required/>
+        <label for="terms-check" style="text-transform:none;letter-spacing:0;font-family:var(--body);font-size:12px;color:var(--muted)">
+          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        </label>
+      </div>
+      <button class="btn" id="submit-btn" type="submit">Create free account →</button>
+    </form>
+
+    <div class="switch">Already have an account? <a href="login.html">Sign in</a></div>
+  </div>
+
+  <!-- Success state shown after signup -->
+  <div class="success-card" id="success-section">
+    <div class="success-icon">✉️</div>
+    <div class="success-h">Check your email!</div>
+    <p class="success-p">
+      We sent a confirmation link to<br/>
+      <strong id="success-email"></strong><br/><br/>
+      Click the link in that email to activate your account, then come back to sign in.
+    </p>
+    <a class="back-btn" href="login.html">Go to sign in →</a>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const supabase = createClient(
+    'https://jykqcothsmogauvfnuvh.supabase.co',
+    'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J'
+  );
+
+  // Already logged in? Go to dashboard
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) window.location.href = 'dashboard.html';
+
+  window.handleSignup = async function(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('fullname').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const field    = document.getElementById('eng-field').value;
+    const btn      = document.getElementById('submit-btn');
+    const errEl    = document.getElementById('error-msg');
+
+    errEl.classList.remove('show');
+    btn.disabled = true;
+    btn.textContent = 'Creating your account…';
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName, engineering_field: field }
+      }
+    });
+
+    if (error) {
+      errEl.textContent = error.message;
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Create free account →';
+      return;
+    }
+
+    // Show success screen
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-email').textContent = email;
+    document.getElementById('success-section').classList.add('show');
+  };
+</script>
+</body>
+</html>
