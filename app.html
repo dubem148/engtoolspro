@@ -655,6 +655,130 @@ select option { background:var(--surface); color:var(--t1); }
 .vi::before { content:'→'; color:var(--teal); flex-shrink:0; font-weight:700; }
 
 /* ─────────────────────────────────────────
+   TRUST METRICS
+───────────────────────────────────────── */
+.trust-metrics {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:1px;
+  background:var(--b1); border:1px solid var(--b1); border-radius:var(--r);
+  overflow:hidden; margin-bottom:52px;
+}
+.metric-item { background:var(--surface); padding:28px 20px; text-align:center; transition:background .15s; }
+.metric-item:hover { background:var(--raised); }
+.metric-val { font-family:var(--display); font-size:38px; font-weight:900; color:var(--teal); line-height:1; margin-bottom:8px; letter-spacing:-1px; }
+.metric-label { font-size:12px; color:var(--t2); line-height:1.4; }
+
+/* ─────────────────────────────────────────
+   CONVICTION BAR
+───────────────────────────────────────── */
+.conviction-bar {
+  background:rgba(45,212,191,.04); border:1px solid rgba(45,212,191,.12);
+  border-radius:var(--r); padding:24px 32px; margin-bottom:52px; text-align:center;
+}
+.conviction-bar p {
+  font-family:var(--display); font-size:clamp(16px,2.2vw,20px); font-weight:600;
+  color:var(--t1); line-height:1.55; max-width:700px; margin:0 auto;
+}
+.conviction-bar strong { color:var(--teal); }
+
+/* ─────────────────────────────────────────
+   FEATURE SHOWCASE
+───────────────────────────────────────── */
+.features-section { margin-bottom:60px; }
+.features-hd { margin-bottom:32px; }
+.features-hd h2 { font-family:var(--display); font-size:clamp(20px,3vw,28px); font-weight:700; color:var(--t1); margin-bottom:8px; }
+.features-hd p { font-size:14px; color:var(--t2); line-height:1.6; }
+.feature-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+.feature-card {
+  background:var(--surface); border:1px solid var(--b1);
+  border-radius:var(--r); padding:28px 24px;
+  transition:all .18s; position:relative; overflow:hidden;
+}
+.feature-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--blue));
+  transform:scaleX(0); transition:transform .22s;
+}
+.feature-card:hover { border-color:var(--b2); transform:translateY(-2px); }
+.feature-card:hover::after { transform:scaleX(1); }
+.fc-icon  { font-size:26px; margin-bottom:14px; display:block; }
+.fc-title { font-size:15px; font-weight:700; color:var(--t1); margin-bottom:8px; }
+.fc-desc  { font-size:13px; color:var(--t2); line-height:1.65; }
+
+/* ─────────────────────────────────────────
+   VS CHATGPT TABLE
+───────────────────────────────────────── */
+.vs-section { margin-bottom:60px; }
+.vs-hd { text-align:center; margin-bottom:36px; }
+.vs-hd h2 { font-family:var(--display); font-size:clamp(22px,3vw,32px); font-weight:700; color:var(--t1); margin-bottom:10px; }
+.vs-hd p  { font-size:14px; color:var(--t2); max-width:560px; margin:0 auto; line-height:1.65; }
+.vs-table-wrap { overflow-x:auto; border-radius:var(--r); border:1px solid var(--b1); }
+.vs-table { width:100%; border-collapse:collapse; font-size:13.5px; min-width:520px; }
+.vs-table thead tr { background:var(--raised); }
+.vs-table th { padding:14px 20px; text-align:left; font-size:10px; font-family:var(--mono); text-transform:uppercase; letter-spacing:1px; color:var(--t2); border-bottom:1px solid var(--b2); white-space:nowrap; }
+.vs-table th.col-ep { color:var(--teal); }
+.vs-table td { padding:13px 20px; border-bottom:1px solid var(--b1); vertical-align:middle; color:var(--t2); }
+.vs-table tbody tr:last-child td { border-bottom:none; }
+.vs-table tbody tr:hover td { background:rgba(255,255,255,.015); }
+.vs-table td:first-child { color:var(--t1); font-weight:500; }
+.vs-table td.col-ep { background:rgba(45,212,191,.025); }
+.vs-table .chk { color:var(--teal); font-weight:600; font-size:13px; }
+.vs-table .crs { color:var(--t3); font-size:13px; }
+
+/* ─────────────────────────────────────────
+   ENTERPRISE PRICING CARD
+───────────────────────────────────────── */
+.pricing-card.enterprise {
+  border-color:rgba(167,139,250,.25);
+  background:linear-gradient(180deg,rgba(167,139,250,.05) 0%,var(--surface) 60%);
+}
+.pricing-card.enterprise:hover { box-shadow:0 0 40px rgba(167,139,250,.1); border-color:rgba(167,139,250,.4); transform:translateY(-3px); }
+.pricing-price.custom { font-size:30px !important; padding-top:6px; letter-spacing:-.5px; }
+.pricing-cta.fill-violet { background:var(--violet); border:none; color:#fff; font-weight:700; }
+.pricing-cta.fill-violet:hover { box-shadow:0 0 24px rgba(167,139,250,.35); transform:translateY(-1px); }
+
+/* ─────────────────────────────────────────
+   ROI CALCULATOR
+───────────────────────────────────────── */
+.roi-section { margin-bottom:60px; }
+.roi-hd { text-align:center; margin-bottom:36px; }
+.roi-hd h2 { font-family:var(--display); font-size:clamp(20px,3vw,28px); font-weight:700; color:var(--t1); margin-bottom:10px; }
+.roi-hd p  { font-size:14px; color:var(--t2); }
+.roi-wrap {
+  display:grid; grid-template-columns:1fr 1fr; gap:32px;
+  background:var(--surface); border:1px solid var(--b1);
+  border-radius:var(--r1); padding:36px; align-items:start;
+}
+.roi-field { margin-bottom:26px; }
+.roi-field:last-child { margin-bottom:0; }
+.roi-field label { display:block; font-size:10.5px; font-family:var(--mono); color:var(--t2); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+.roi-slider-row { display:flex; align-items:center; gap:16px; }
+.roi-slider-row input[type=range] {
+  flex:1; -webkit-appearance:none; appearance:none;
+  height:4px; background:var(--raised); border-radius:2px; outline:none; cursor:pointer; border:none; padding:0;
+}
+.roi-slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--teal); cursor:pointer; box-shadow:0 0 8px rgba(45,212,191,.4); }
+.roi-slider-row input[type=range]::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--teal); cursor:pointer; border:none; }
+.roi-val { font-family:var(--mono); font-size:13px; color:var(--teal); min-width:52px; text-align:right; font-weight:600; }
+.roi-big-box { text-align:center; padding:28px 20px; background:rgba(45,212,191,.04); border:1px solid rgba(45,212,191,.12); border-radius:var(--r); margin-bottom:16px; }
+.roi-big { font-family:var(--display); font-size:52px; font-weight:900; color:var(--teal); letter-spacing:-2px; line-height:1; margin-bottom:6px; }
+.roi-big-label { font-size:13px; color:var(--t2); }
+.roi-rows { border:1px solid var(--b1); border-radius:var(--rs); overflow:hidden; margin-bottom:18px; }
+.roi-row { display:flex; justify-content:space-between; align-items:center; padding:11px 16px; font-size:13px; color:var(--t2); border-bottom:1px solid var(--b1); }
+.roi-row:last-child { border-bottom:none; }
+.roi-row span:last-child { font-family:var(--mono); color:var(--t1); font-weight:600; }
+.roi-highlight { background:rgba(163,230,53,.04); }
+.roi-highlight span:first-child { color:var(--t1); font-weight:600; }
+.roi-highlight span:last-child { color:var(--lime) !important; }
+.roi-cta { width:100%; height:46px; font-size:14px; }
+
+/* ─────────────────────────────────────────
+   PRICING PAGE HEADER ROW
+───────────────────────────────────────── */
+.pricing-header { margin-bottom:20px; }
+.pricing-header h2 { font-family:var(--display); font-size:clamp(20px,3vw,28px); font-weight:700; color:var(--t1); margin-bottom:8px; }
+.pricing-header p  { font-size:14px; color:var(--t2); }
+
+/* ─────────────────────────────────────────
    TOAST
 ───────────────────────────────────────── */
 .toast {
@@ -679,6 +803,10 @@ select option { background:var(--surface); color:var(--t1); }
   .tpl-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
   .output-body { padding:28px 24px; }
   .page-hero { padding:48px 0 36px; }
+  .trust-metrics { grid-template-columns:repeat(3,1fr); }
+  .roi-wrap { grid-template-columns:1fr; }
+  .feature-cards { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+  .vs-table th, .vs-table td { padding:11px 14px; font-size:12.5px; }
 }
 @media (max-width:640px) {
   .topbar { padding:0 16px; }
@@ -695,6 +823,15 @@ select option { background:var(--surface); color:var(--t1); }
   .output-foot { padding:12px 18px; }
   .page-hero { padding:36px 0 28px; }
   .empty-state { padding:56px 20px; }
+  .trust-metrics { grid-template-columns:repeat(2,1fr); }
+  .metric-val { font-size:28px; }
+  .metric-item { padding:20px 14px; }
+  .roi-big { font-size:40px; }
+  .roi-wrap { padding:20px; gap:24px; }
+  .conviction-bar { padding:18px 20px; }
+  .feature-cards { grid-template-columns:1fr; }
+  .vs-table th, .vs-table td { padding:9px 11px; font-size:12px; }
+  .pricing-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -1110,31 +1247,128 @@ select option { background:var(--surface); color:var(--t1); }
 ══════════════════════════════════════ -->
 <div id="pg-pricing" class="page">
 
+  <!-- Hero -->
   <div class="page-hero">
     <div class="hero-eyebrow">Pricing</div>
-    <h1 class="hero-title">Simple, honest pricing<br>for engineers.</h1>
-    <p class="hero-sub">No per-token billing surprises. Flat monthly rate. Built for engineering professionals who submit reports regularly. Cancel any time.</p>
-  </div>
-
-  <div class="value-strip">
-    <h3>Why engineers pay instead of using free AI</h3>
-    <div class="value-items">
-      <div class="vi">Engineering templates pre-loaded — not a blank prompt</div>
-      <div class="vi">Standards auto-referenced (IEC, BS, ASTM, IEEE, API…)</div>
-      <div class="vi">Visual parameter extraction from datasheets</div>
-      <div class="vi">Side-by-side comparison with clear winner recommendation</div>
-      <div class="vi">One-click refine — no re-prompting skills needed</div>
-      <div class="vi">Output formatted &amp; ready to submit, not raw chat text</div>
-      <div class="vi">Q&amp;A stays in context of your document throughout</div>
-      <div class="vi">Saves 2–4 hours per report vs doing it manually</div>
+    <h1 class="hero-title">Simple, honest pricing<br><span class="hero-gradient">for engineers.</span></h1>
+    <p class="hero-sub">No per-token billing. No prompt engineering required. Flat monthly rate for engineers who need professional documentation — not a chatbot.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+      <button class="btn btn-teal" onclick="goPage('report')">Start Free →</button>
+      <button class="btn btn-outline" onclick="goPage('report')">View Example Report</button>
     </div>
   </div>
 
+  <!-- Trust metrics -->
+  <div class="trust-metrics">
+    <div class="metric-item">
+      <div class="metric-val">10+</div>
+      <div class="metric-label">Engineering templates</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-val">100+</div>
+      <div class="metric-label">Standards supported</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-val">2–4h</div>
+      <div class="metric-label">Saved per report</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-val">8</div>
+      <div class="metric-label">Engineering disciplines</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-val">100%</div>
+      <div class="metric-label">Submit-ready output</div>
+    </div>
+  </div>
+
+  <!-- Conviction -->
+  <div class="conviction-bar">
+    <p>Engineers using EngTools Pro are <strong>not paying for AI words</strong> — they are paying for faster, structured, standards-aware engineering documentation that is ready to submit.</p>
+  </div>
+
+  <!-- Feature showcase -->
+  <div class="features-section">
+    <div class="features-hd">
+      <h2>Everything engineers need, in one workspace</h2>
+      <p>EngTools Pro is not just a report generator. It is built around the engineering documentation workflow.</p>
+    </div>
+    <div class="feature-cards">
+      <div class="feature-card">
+        <span class="fc-icon">📄</span>
+        <div class="fc-title">AI Report Generator</div>
+        <div class="fc-desc">Create inspection, maintenance, commissioning, risk assessment, and design reports from rough notes. Standards referenced automatically.</div>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">🔍</span>
+        <div class="fc-title">Datasheet Analyzer</div>
+        <div class="fc-desc">Extract parameters from engineering datasheets and turn them into clear technical summaries, risk registers, and suitability assessments.</div>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">⚖️</span>
+        <div class="fc-title">Compare Tool</div>
+        <div class="fc-desc">Compare two components, datasheets, or engineering options. Get a structured table and a clear recommendation backed by specific values.</div>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">📚</span>
+        <div class="fc-title">Standards Referencing</div>
+        <div class="fc-desc">IEC, BS, IEEE, ASTM, NFPA, API, ISO and more — cited precisely inside every report. No manual lookup. No missing references.</div>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">✦</span>
+        <div class="fc-title">One-Click Refinement</div>
+        <div class="fc-desc">Strengthen recommendations, add risk matrices, change tone, expand conclusions — with a single click, no re-prompting required.</div>
+      </div>
+      <div class="feature-card">
+        <span class="fc-icon">⬇️</span>
+        <div class="fc-title">Professional Export</div>
+        <div class="fc-desc">Download polished HTML reports with your project title, organisation, date, and reference — formatted and ready to send to clients or regulators.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- vs ChatGPT -->
+  <div class="vs-section">
+    <div class="vs-hd">
+      <h2>Why not just use ChatGPT?</h2>
+      <p>Generic AI gives you words. EngTools Pro gives you structured, standards-referenced engineering documentation — built for the engineering workflow and ready to submit.</p>
+    </div>
+    <div class="vs-table-wrap">
+      <table class="vs-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="col-ep">EngTools Pro</th>
+            <th>Generic AI / ChatGPT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Engineering report templates</td>        <td class="col-ep chk">✓ 10 templates pre-loaded</td>       <td class="crs">✗ None — blank prompt</td></tr>
+          <tr><td>Standards referencing (IEC, BS, ASTM…)</td><td class="col-ep chk">✓ Auto-referenced in output</td>  <td class="crs">✗ You must know them yourself</td></tr>
+          <tr><td>Structured report sections</td>          <td class="col-ep chk">✓ Correct order, every time</td>     <td class="crs">✗ Varies with every prompt</td></tr>
+          <tr><td>Datasheet parameter extraction</td>      <td class="col-ep chk">✓ Visual cards + tables</td>         <td class="crs">✗ Raw text only</td></tr>
+          <tr><td>Side-by-side technical comparison</td>   <td class="col-ep chk">✓ Built-in compare tool</td>         <td class="crs">✗ Not available</td></tr>
+          <tr><td>One-click report refinement</td>         <td class="col-ep chk">✓ 6 refinement actions</td>          <td class="crs">✗ Requires full re-prompting</td></tr>
+          <tr><td>Engineering-specific workflow</td>       <td class="col-ep chk">✓ Built for engineers</td>           <td class="crs">✗ General-purpose only</td></tr>
+          <tr><td>Ready-to-submit formatting</td>          <td class="col-ep chk">✓ Client-ready HTML export</td>      <td class="crs">✗ Raw, unformatted text</td></tr>
+          <tr><td>Context-aware Q&amp;A on documents</td> <td class="col-ep chk">✓ Full document context</td>         <td class="crs">△ Limited without structure</td></tr>
+          <tr><td>Team &amp; company branding</td>         <td class="col-ep chk">✓ Available on Team plan</td>        <td class="crs">✗ Not available</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pricing plans -->
+  <div class="pricing-header">
+    <h2>Choose your plan</h2>
+    <p>Start free, upgrade when you need more. All paid plans include a 7-day free trial.</p>
+  </div>
   <div class="pricing-grid">
+
     <div class="pricing-card">
       <div class="pricing-tier">Free</div>
       <div class="pricing-price">$0<sub>/month</sub></div>
-      <div class="pricing-desc">Try it — no card needed</div>
+      <div class="pricing-desc">Try the platform. No card required. Best for testing before you commit.</div>
       <ul class="pricing-features">
         <li>10 AI queries per day</li>
         <li>3 report templates</li>
@@ -1142,13 +1376,14 @@ select option { background:var(--surface); color:var(--t1); }
         <li>Copy output to clipboard</li>
         <li>3 saved reports</li>
       </ul>
-      <button class="pricing-cta ghost">Current plan</button>
+      <button class="pricing-cta ghost" onclick="goPage('report')">Start Free →</button>
     </div>
+
     <div class="pricing-card featured">
       <div class="pricing-pop">MOST POPULAR</div>
       <div class="pricing-tier">Professional</div>
       <div class="pricing-price">$19<sub>/month</sub></div>
-      <div class="pricing-desc">For engineers who submit reports regularly</div>
+      <div class="pricing-desc">For working engineers who submit reports regularly. The most complete plan for individuals.</div>
       <ul class="pricing-features">
         <li>Unlimited AI queries</li>
         <li>All 10 report templates</li>
@@ -1156,17 +1391,18 @@ select option { background:var(--surface); color:var(--t1); }
         <li>Visual parameter cards</li>
         <li>Datasheet comparison tool</li>
         <li>One-click refine &amp; revise</li>
-        <li>Download &amp; export outputs</li>
+        <li>HTML &amp; TXT export</li>
         <li>Unlimited saved reports</li>
         <li>Priority response speed</li>
         <li>Email support</li>
       </ul>
       <button class="pricing-cta fill" onclick="toast('Payment integration launching soon!')">Get Professional →</button>
     </div>
+
     <div class="pricing-card">
       <div class="pricing-tier">Student</div>
       <div class="pricing-price">$9<sub>/month</sub></div>
-      <div class="pricing-desc">For engineering students &amp; graduates</div>
+      <div class="pricing-desc">For engineering students and graduates building documentation skills and portfolios.</div>
       <ul class="pricing-features">
         <li>100 AI queries per month</li>
         <li>All report templates</li>
@@ -1177,10 +1413,11 @@ select option { background:var(--surface); color:var(--t1); }
       </ul>
       <button class="pricing-cta ghost" onclick="toast('Coming soon!')">Get Student Plan</button>
     </div>
+
     <div class="pricing-card">
       <div class="pricing-tier">Team</div>
       <div class="pricing-price">$49<sub>/month</sub></div>
-      <div class="pricing-desc">For engineering firms &amp; teams</div>
+      <div class="pricing-desc">For engineering firms and consultancies. Shared workspace, team reports, company branding.</div>
       <ul class="pricing-features">
         <li>5 seats (+$8/extra seat)</li>
         <li>Shared report library</li>
@@ -1189,11 +1426,76 @@ select option { background:var(--surface); color:var(--t1); }
         <li>Invoice / PO billing</li>
         <li>Dedicated account manager</li>
       </ul>
-      <button class="pricing-cta ghost" onclick="toast('Email us for team setup!')">Contact for Teams</button>
+      <button class="pricing-cta ghost" onclick="toast('Email us at hello@engtoolspro.com')">Contact for Teams</button>
+    </div>
+
+    <div class="pricing-card enterprise">
+      <div class="pricing-tier">Enterprise</div>
+      <div class="pricing-price custom">Custom<sub> pricing</sub></div>
+      <div class="pricing-desc">For engineering firms, manufacturers, consultants, and industrial operations at scale.</div>
+      <ul class="pricing-features">
+        <li>Unlimited users</li>
+        <li>Private company standards</li>
+        <li>Engineering knowledge base AI</li>
+        <li>Custom report templates</li>
+        <li>SSO / secure team access</li>
+        <li>API integrations</li>
+        <li>Dedicated onboarding</li>
+        <li>Priority support SLA</li>
+        <li>Private deployment options</li>
+      </ul>
+      <button class="pricing-cta fill-violet" onclick="toast('Contact us at hello@engtoolspro.com')">Contact Sales →</button>
+    </div>
+
+  </div>
+
+  <!-- ROI Calculator -->
+  <div class="roi-section" style="margin-top:56px;">
+    <div class="roi-hd">
+      <h2>How much time could EngTools Pro save you?</h2>
+      <p>Adjust the sliders to estimate your monthly return on investment.</p>
+    </div>
+    <div class="roi-wrap">
+      <div class="roi-inputs">
+        <div class="roi-field">
+          <label>Reports per month</label>
+          <div class="roi-slider-row">
+            <input type="range" id="roi-reports" min="1" max="30" value="10" oninput="calcROI()">
+            <span class="roi-val" id="roi-reports-val">10</span>
+          </div>
+        </div>
+        <div class="roi-field">
+          <label>Hours per report (without EngTools)</label>
+          <div class="roi-slider-row">
+            <input type="range" id="roi-hours" min="1" max="8" value="3" oninput="calcROI()">
+            <span class="roi-val" id="roi-hours-val">3h</span>
+          </div>
+        </div>
+        <div class="roi-field">
+          <label>Engineer hourly rate ($/hour)</label>
+          <div class="roi-slider-row">
+            <input type="range" id="roi-rate" min="20" max="150" value="40" step="5" oninput="calcROI()">
+            <span class="roi-val" id="roi-rate-val">$40</span>
+          </div>
+        </div>
+      </div>
+      <div class="roi-result">
+        <div class="roi-big-box">
+          <div class="roi-big" id="roi-saving-val">$800</div>
+          <div class="roi-big-label">Estimated monthly value saved</div>
+        </div>
+        <div class="roi-rows">
+          <div class="roi-row"><span>Hours saved per month</span><span id="roi-hours-saved">20h</span></div>
+          <div class="roi-row"><span>Professional plan cost</span><span>$19/month</span></div>
+          <div class="roi-row roi-highlight"><span>Net value per month</span><span id="roi-net">$781+</span></div>
+        </div>
+        <button class="btn btn-teal roi-cta" onclick="toast('Payment integration launching soon!')">Start saving time →</button>
+      </div>
     </div>
   </div>
 
-  <div style="margin-top:20px;background:var(--surface);border:1px solid var(--b1);border-radius:var(--r);padding:18px 24px;font-size:12.5px;color:var(--t2);line-height:1.7">
+  <!-- Payment note -->
+  <div style="margin-top:32px;background:var(--surface);border:1px solid var(--b1);border-radius:var(--r);padding:18px 24px;font-size:12.5px;color:var(--t2);line-height:1.7">
     <strong style="color:var(--t1)">Payments &amp; security —</strong> Processed by Stripe. Visa, Mastercard, PayPal, bank transfer. Annual billing saves 20%. 7-day free trial on all paid plans. Cancel any time.
   </div>
 
@@ -1266,6 +1568,7 @@ function init(){
   renderTpls(); renderStds('electrical'); renderSecs('inspection');
   document.getElementById('rpt-field').addEventListener('change', e=>renderStds(e.target.value));
   toggleAppField();
+  calcROI();
 }
 function onFieldChange(){ renderStds(document.getElementById('rpt-field').value); }
 function toggleAppField(){ document.getElementById('ds-app-f').style.display='block'; }
@@ -1643,6 +1946,21 @@ function dlHtml(){
   a.click();
   URL.revokeObjectURL(url);
   toast('Report downloaded ✓');
+}
+
+function calcROI(){
+  const reports = +(document.getElementById('roi-reports')?.value) || 10;
+  const hours   = +(document.getElementById('roi-hours')?.value)   || 3;
+  const rate    = +(document.getElementById('roi-rate')?.value)     || 40;
+  const saved   = Math.round(reports * hours * 0.75);
+  const value   = Math.round(saved * rate);
+  const net     = value - 19;
+  const rv=document.getElementById('roi-reports-val'); if(rv)rv.textContent=reports;
+  const hv=document.getElementById('roi-hours-val');   if(hv)hv.textContent=hours+'h';
+  const rv2=document.getElementById('roi-rate-val');   if(rv2)rv2.textContent='$'+rate;
+  const sv=document.getElementById('roi-saving-val');  if(sv)sv.textContent='$'+value.toLocaleString();
+  const hs=document.getElementById('roi-hours-saved'); if(hs)hs.textContent=saved+'h';
+  const nv=document.getElementById('roi-net');         if(nv)nv.textContent='$'+net.toLocaleString()+'+';
 }
 
 function bumpUsage(){usageN=Math.min(usageN+1,10);}
