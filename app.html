@@ -150,6 +150,11 @@ body {
   font-weight:900; line-height:1.08; letter-spacing:-.5px;
   color:var(--t1); margin-bottom:18px;
 }
+.hero-gradient {
+  background:linear-gradient(90deg, var(--teal) 0%, #fbbf24 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
 .hero-sub {
   font-size:16px; font-weight:400; color:var(--t2);
   line-height:1.72; max-width:560px; margin-bottom:28px;
@@ -157,10 +162,12 @@ body {
 .hero-trusted { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 .trust-label { font-size:11px; font-family:var(--mono); color:var(--t3); text-transform:uppercase; letter-spacing:1px; }
 .trust-tag {
-  font-size:11.5px; color:var(--t2);
-  background:var(--surface); border:1px solid var(--b1);
-  padding:5px 12px; border-radius:20px;
+  font-size:12px; color:var(--t1);
+  background:var(--raised); border:1px solid var(--b2);
+  padding:6px 13px; border-radius:20px;
+  transition:border-color .14s;
 }
+.trust-tag:hover { border-color:var(--b3); }
 
 /* ─────────────────────────────────────────
    CREDIBILITY BAR
@@ -183,7 +190,13 @@ body {
 /* ─────────────────────────────────────────
    STEP SECTIONS
 ───────────────────────────────────────── */
-.step-section { margin-bottom:60px; }
+.step-section { margin-bottom:28px; }
+.section-sep {
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(45,212,191,.6) 30%,rgba(45,212,191,.6) 70%,transparent);
+  box-shadow:0 0 14px rgba(45,212,191,.18),0 0 4px rgba(45,212,191,.3);
+  margin-bottom:48px;
+}
 
 .step-hd {
   display:flex; align-items:flex-start; gap:20px;
@@ -206,7 +219,7 @@ body {
   border-radius:4px; letter-spacing:1.5px; text-transform:uppercase;
   white-space:nowrap; flex-shrink:0; margin-top:4px;
 }
-.sb-teal   { background:var(--td); color:var(--teal); border:1px solid var(--tm); }
+.sb-teal   { background:rgba(45,212,191,.14); color:var(--teal); border:1px solid rgba(45,212,191,.3); font-weight:600; }
 .sb-amber  { background:rgba(251,191,36,.08); color:var(--amber); border:1px solid rgba(251,191,36,.2); }
 .sb-lime   { background:rgba(163,230,53,.08);  color:var(--lime);  border:1px solid rgba(163,230,53,.2); }
 .sb-blue   { background:rgba(96,165,250,.08);  color:var(--blue);  border:1px solid rgba(96,165,250,.2); }
@@ -230,16 +243,16 @@ body {
   content:''; position:absolute;
   top:0; left:0; right:0; height:3px;
   background:var(--card-accent, var(--teal));
-  transform:scaleX(0); transition:transform .2s;
+  opacity:.4; transition:opacity .2s;
 }
 .tpl-card:hover { border-color:var(--b2); transform:translateY(-2px); background:var(--raised); }
-.tpl-card:hover::before { transform:scaleX(1); }
+.tpl-card:hover::before { opacity:.85; }
+.tpl-card.on::before    { opacity:1; }
 .tpl-card.on {
   border-color:var(--teal);
   background:rgba(45,212,191,.055);
   box-shadow:0 0 0 1px var(--teal), var(--tg);
 }
-.tpl-card.on::before { transform:scaleX(1); }
 .tpl-check {
   position:absolute; top:10px; right:10px;
   width:18px; height:18px; border-radius:50%;
@@ -721,7 +734,7 @@ select option { background:var(--surface); color:var(--t1); }
   <!-- Hero -->
   <div class="page-hero">
     <div class="hero-eyebrow">AI Report Generator</div>
-    <h1 class="hero-title">Engineering reports<br>in minutes, not hours.</h1>
+    <h1 class="hero-title">Engineering reports<br><span class="hero-gradient">not hours.</span></h1>
     <p class="hero-sub">EngTools Pro is not just a report generator. It is the AI workspace that helps engineers remove hours of documentation work every week.</p>
     <div class="hero-trusted">
       <span class="trust-label">Used by engineers in</span>
@@ -789,6 +802,7 @@ select option { background:var(--surface); color:var(--t1); }
     </div>
   </div>
 
+  <div class="section-sep"></div>
   <!-- ── STEP 2: Standards ── -->
   <div class="step-section">
     <div class="step-hd">
@@ -808,6 +822,7 @@ select option { background:var(--surface); color:var(--t1); }
     </div>
   </div>
 
+  <div class="section-sep"></div>
   <!-- ── STEP 3: Project Details ── -->
   <div class="step-section">
     <div class="step-hd">
