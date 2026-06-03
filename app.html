@@ -779,6 +779,194 @@ select option { background:var(--surface); color:var(--t1); }
 .pricing-header p  { font-size:14px; color:var(--t2); }
 
 /* ─────────────────────────────────────────
+   PAGE ENTRANCE
+───────────────────────────────────────── */
+.page.on { animation:pageFadeIn .22s ease; }
+@keyframes pageFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+/* ─────────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────────── */
+.dash-greeting { padding:56px 0 36px; border-bottom:1px solid var(--b1); margin-bottom:44px; }
+.dash-time { font-size:11px; font-family:var(--mono); color:var(--t3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; }
+.dash-hello { font-family:var(--display); font-size:clamp(28px,4vw,46px); font-weight:900; color:var(--t1); line-height:1.1; margin-bottom:10px; }
+.dash-sub { font-size:15px; color:var(--t2); }
+
+.dash-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:36px; }
+.dash-stat { background:var(--surface); border:1px solid var(--b1); border-radius:var(--r); padding:24px 20px; transition:all .18s; cursor:default; }
+.dash-stat:hover { border-color:var(--b2); transform:translateY(-2px); }
+.ds-val { font-family:var(--display); font-size:32px; font-weight:900; color:var(--teal); line-height:1; margin-bottom:6px; letter-spacing:-1px; }
+.ds-label { font-size:12px; color:var(--t2); }
+
+.dash-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:44px; }
+.dash-action { background:var(--surface); border:1px solid var(--b1); border-radius:var(--r1); padding:28px 22px 24px; cursor:pointer; transition:all .2s; text-align:left; position:relative; overflow:hidden; }
+.dash-action::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--da-color,var(--teal)); opacity:.45; transition:opacity .2s; }
+.dash-action:hover { border-color:var(--b2); transform:translateY(-3px); box-shadow:0 8px 32px rgba(0,0,0,.22); }
+.dash-action:hover::before { opacity:1; }
+.da-icon  { font-size:28px; margin-bottom:16px; display:block; }
+.da-title { font-size:15px; font-weight:700; color:var(--t1); margin-bottom:6px; }
+.da-desc  { font-size:12.5px; color:var(--t2); line-height:1.55; }
+.da-arrow { position:absolute; bottom:20px; right:20px; font-size:16px; color:var(--t3); transition:all .18s; }
+.dash-action:hover .da-arrow { color:var(--teal); transform:translate(3px,-3px); }
+
+.dash-lower { display:grid; grid-template-columns:1fr 340px; gap:22px; }
+.dash-feed { background:var(--surface); border:1px solid var(--b1); border-radius:var(--r); overflow:hidden; }
+.dash-panel-head { display:flex; align-items:center; justify-content:space-between; padding:16px 22px; background:var(--raised); border-bottom:1px solid var(--b1); }
+.dph-title { font-size:13px; font-weight:600; color:var(--t1); display:flex; align-items:center; gap:8px; }
+.dph-title::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--lime); box-shadow:0 0 6px var(--lime); }
+.dph-clear { font-size:11px; font-family:var(--mono); color:var(--t3); cursor:pointer; transition:color .12s; background:none; border:none; }
+.dph-clear:hover { color:var(--rose); }
+.feed-empty { padding:48px 24px; text-align:center; }
+.fee-icon { font-size:28px; opacity:.25; margin-bottom:10px; }
+.fee-title { font-size:13px; color:var(--t2); margin-bottom:6px; }
+.fee-sub { font-size:12px; color:var(--t3); }
+.activity-item { display:flex; align-items:center; gap:14px; padding:13px 22px; border-bottom:1px solid var(--b1); transition:background .12s; }
+.activity-item:last-child { border-bottom:none; }
+.activity-item:hover { background:rgba(255,255,255,.02); }
+.ai-icon-badge { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.ai-info { flex:1; min-width:0; }
+.ai-label { font-size:13px; font-weight:500; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ai-meta  { font-size:11px; color:var(--t3); margin-top:2px; font-family:var(--mono); }
+.ai-type-tag { font-size:10px; font-family:var(--mono); padding:3px 8px; border-radius:4px; flex-shrink:0; text-transform:uppercase; letter-spacing:.5px; }
+
+.dash-tips { background:var(--surface); border:1px solid var(--b1); border-radius:var(--r); overflow:hidden; }
+.tip-item { padding:16px 22px; border-bottom:1px solid var(--b1); cursor:pointer; transition:background .12s; }
+.tip-item:last-child { border-bottom:none; }
+.tip-item:hover { background:rgba(45,212,191,.03); }
+.tip-q    { font-size:13px; color:var(--t1); margin-bottom:4px; font-weight:500; }
+.tip-hint { font-size:11.5px; color:var(--t3); }
+.tip-cta-head { padding:16px 22px; background:var(--raised); border-bottom:1px solid var(--b1); font-size:13px; font-weight:600; color:var(--t1); display:flex; align-items:center; gap:8px; }
+.tip-cta-head::before { content:'✦'; color:var(--teal); font-size:11px; }
+
+/* ─────────────────────────────────────────
+   STANDARDS HUB
+───────────────────────────────────────── */
+.hub-search-wrap { position:relative; margin-bottom:22px; }
+.hub-search { width:100%; background:var(--surface); border:1px solid var(--b2); border-radius:var(--r); color:var(--t1); font-family:var(--body); font-size:15px; padding:14px 20px 14px 48px; outline:none; transition:border-color .15s,box-shadow .15s; }
+.hub-search:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(45,212,191,.1); }
+.hub-search::placeholder { color:var(--t3); }
+.hub-search-ico { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+.hub-cats { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+.hub-cat { font-size:12px; padding:7px 16px; border-radius:20px; background:var(--surface); border:1px solid var(--b2); color:var(--t2); cursor:pointer; transition:all .12s; font-family:var(--body); font-weight:500; }
+.hub-cat:hover { border-color:var(--b3); color:var(--t1); }
+.hub-cat.on { background:var(--td); border-color:var(--teal); color:var(--teal); }
+.hub-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+.hub-card { background:var(--surface); border:1px solid var(--b1); border-radius:var(--r); padding:20px; cursor:default; transition:all .15s; }
+.hub-card:hover { border-color:var(--b2); transform:translateY(-1px); background:var(--raised); }
+.hub-code  { font-family:var(--mono); font-size:10px; color:var(--teal); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.hub-title { font-size:13.5px; font-weight:600; color:var(--t1); margin-bottom:8px; line-height:1.3; }
+.hub-desc  { font-size:12px; color:var(--t2); line-height:1.55; margin-bottom:12px; }
+.hub-foot  { display:flex; align-items:center; justify-content:space-between; }
+.hub-cat-tag { font-size:10px; font-family:var(--mono); text-transform:uppercase; letter-spacing:.8px; color:var(--t3); }
+.hub-copy-btn { font-size:11px; padding:5px 12px; border-radius:20px; background:var(--td); border:1px solid var(--teal); color:var(--teal); cursor:pointer; transition:all .12s; font-family:var(--body); }
+.hub-copy-btn:hover { background:var(--tm); }
+.hub-no-results { text-align:center; padding:60px 24px; color:var(--t3); font-size:14px; grid-column:1/-1; }
+
+/* ─────────────────────────────────────────
+   COPILOT CHAT
+───────────────────────────────────────── */
+.copilot-btn {
+  position:fixed; bottom:28px; right:28px;
+  background:linear-gradient(135deg,var(--teal) 0%,var(--blue) 100%);
+  color:#000; border:none; border-radius:28px;
+  padding:12px 20px; font-size:13.5px; font-weight:700;
+  cursor:pointer; z-index:200; transition:all .2s;
+  display:flex; align-items:center; gap:9px; font-family:var(--body);
+  box-shadow:0 4px 20px rgba(45,212,191,.25);
+}
+.copilot-btn:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(45,212,191,.35); }
+.cp-pulse { width:7px; height:7px; border-radius:50%; background:rgba(0,0,0,.5); animation:pulse 2s ease-in-out infinite; }
+
+.copilot-panel {
+  position:fixed; right:28px; bottom:90px;
+  width:380px; max-height:520px;
+  background:var(--surface); border:1px solid var(--b2);
+  border-radius:var(--r1); overflow:hidden;
+  display:none; flex-direction:column;
+  z-index:200; box-shadow:0 20px 60px rgba(0,0,0,.45);
+  animation:panelUp .22s ease;
+}
+.copilot-panel.on { display:flex; }
+@keyframes panelUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+.cp-head { display:flex; align-items:center; justify-content:space-between; padding:15px 18px; background:var(--raised); border-bottom:1px solid var(--b1); flex-shrink:0; }
+.cp-identity { display:flex; align-items:center; gap:10px; }
+.cp-avatar { width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--teal),var(--blue)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#000; flex-shrink:0; }
+.cp-name-row .cp-name { font-size:13.5px; font-weight:700; color:var(--t1); display:block; }
+.cp-name-row .cp-online { font-size:10px; color:var(--teal); font-family:var(--mono); display:flex; align-items:center; gap:4px; }
+.cp-name-row .cp-online::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--teal); box-shadow:0 0 5px var(--teal); }
+.cp-close { background:none; border:none; color:var(--t2); font-size:18px; cursor:pointer; line-height:1; padding:2px; transition:color .12s; }
+.cp-close:hover { color:var(--t1); }
+.cp-chips { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid var(--b1); overflow-x:auto; flex-shrink:0; background:rgba(255,255,255,.015); }
+.cp-chip { font-size:11px; padding:5px 12px; border-radius:20px; background:var(--raised); border:1px solid var(--b1); color:var(--t2); cursor:pointer; white-space:nowrap; font-family:var(--body); transition:all .12s; flex-shrink:0; }
+.cp-chip:hover { color:var(--teal); border-color:var(--tm); background:var(--td); }
+.cp-msgs { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:0; }
+.cp-input-row { display:flex; gap:8px; padding:12px 14px; background:var(--raised); border-top:1px solid var(--b1); flex-shrink:0; }
+.cp-in { flex:1; background:var(--surface); border:1px solid var(--b2); border-radius:var(--rs); color:var(--t1); font-family:var(--body); font-size:13px; padding:10px 14px; outline:none; transition:border-color .15s; }
+.cp-in:focus { border-color:var(--teal); }
+.cp-send { background:var(--teal); color:#000; border:none; border-radius:var(--rs); padding:10px 16px; font-weight:700; font-size:12px; cursor:pointer; transition:all .15s; font-family:var(--body); flex-shrink:0; }
+.cp-send:hover { box-shadow:var(--tg); }
+.cp-send:disabled { opacity:.3; cursor:not-allowed; box-shadow:none; }
+
+/* ─────────────────────────────────────────
+   EXPORT MODAL
+───────────────────────────────────────── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:400; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+.modal-overlay.on { display:flex; }
+.modal-box { background:var(--surface); border:1px solid var(--b2); border-radius:var(--r1); width:480px; max-width:calc(100vw - 32px); overflow:hidden; animation:modalPop .2s ease; }
+@keyframes modalPop { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:none} }
+.modal-hd { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--b1); }
+.modal-title { font-family:var(--display); font-size:18px; font-weight:700; color:var(--t1); }
+.modal-close { background:none; border:none; color:var(--t2); font-size:20px; cursor:pointer; line-height:1; padding:2px; transition:color .12s; }
+.modal-close:hover { color:var(--t1); }
+.modal-bd { padding:24px; }
+.export-opts { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.export-opt { background:var(--raised); border:1px solid var(--b1); border-radius:var(--r); padding:18px; cursor:pointer; transition:all .15s; position:relative; }
+.export-opt:hover:not(.soon) { border-color:var(--b2); background:var(--hover); }
+.export-opt.soon { opacity:.55; cursor:not-allowed; }
+.eo-icon { font-size:22px; margin-bottom:8px; display:block; }
+.eo-name { font-size:13.5px; font-weight:600; color:var(--t1); margin-bottom:4px; }
+.eo-desc { font-size:11.5px; color:var(--t2); line-height:1.4; }
+.eo-tag { position:absolute; top:8px; right:8px; font-size:8.5px; font-family:var(--mono); background:rgba(251,191,36,.12); color:var(--amber); border:1px solid rgba(251,191,36,.2); padding:3px 7px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
+
+/* ─────────────────────────────────────────
+   TRUST BADGE
+───────────────────────────────────────── */
+.trust-badge { display:flex; align-items:center; gap:8px; padding:10px 28px; font-size:11px; font-family:var(--mono); color:var(--t3); border-top:1px solid var(--b1); background:rgba(0,0,0,.15); flex-wrap:wrap; }
+.trust-badge::before { content:'⚠'; color:var(--amber); font-size:10px; }
+
+/* ─────────────────────────────────────────
+   SKELETON LOADERS
+───────────────────────────────────────── */
+.skel-wrap { padding:40px 48px; display:none; }
+.skel-wrap.on { display:block; }
+.skel { background:linear-gradient(90deg,var(--raised) 25%,var(--hover) 50%,var(--raised) 75%); background-size:200% 100%; animation:skelAnim 1.5s infinite; border-radius:4px; margin-bottom:14px; }
+@keyframes skelAnim { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skel-h { height:26px; width:55%; margin-bottom:22px; }
+.skel-sub { height:12px; width:35%; border-radius:20px; margin-bottom:28px; }
+.skel-p { height:11px; }
+.skel-p.w90{width:90%} .skel-p.w80{width:80%} .skel-p.w70{width:70%} .skel-p.w60{width:60%}
+
+/* ─────────────────────────────────────────
+   BILLING TOGGLE
+───────────────────────────────────────── */
+.billing-row { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:36px; }
+.billing-opt { font-size:14px; font-weight:500; color:var(--t2); cursor:pointer; transition:color .15s; user-select:none; }
+.billing-opt.on { color:var(--t1); font-weight:600; }
+.billing-track { width:48px; height:26px; background:var(--raised); border:1px solid var(--b2); border-radius:13px; position:relative; cursor:pointer; transition:background .2s,border-color .2s; flex-shrink:0; }
+.billing-track.on { background:var(--teal); border-color:var(--teal); }
+.billing-thumb { width:20px; height:20px; background:#fff; border-radius:50%; position:absolute; top:2px; left:3px; transition:transform .2s; box-shadow:0 1px 4px rgba(0,0,0,.3); }
+.billing-track.on .billing-thumb { transform:translateX(22px); }
+.billing-save-tag { font-size:10px; font-family:var(--mono); background:rgba(163,230,53,.1); color:var(--lime); border:1px solid rgba(163,230,53,.2); padding:3px 8px; border-radius:4px; margin-left:4px; }
+
+/* ─────────────────────────────────────────
+   SOCIAL PROOF
+───────────────────────────────────────── */
+.social-proof { display:flex; gap:24px; flex-wrap:wrap; margin-top:24px; }
+.sp-item { display:flex; align-items:baseline; gap:6px; }
+.sp-num   { font-family:var(--display); font-size:20px; font-weight:900; color:var(--t1); }
+.sp-label { font-size:12px; color:var(--t2); }
+
+/* ─────────────────────────────────────────
    TOAST
 ───────────────────────────────────────── */
 .toast {
@@ -802,17 +990,23 @@ select option { background:var(--surface); color:var(--t1); }
   .sec-grid,.cmp-cols { grid-template-columns:1fr; }
   .tpl-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
   .output-body { padding:28px 24px; }
+  .skel-wrap { padding:28px 24px; }
   .page-hero { padding:48px 0 36px; }
   .trust-metrics { grid-template-columns:repeat(3,1fr); }
   .roi-wrap { grid-template-columns:1fr; }
   .feature-cards { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
-  .vs-table th, .vs-table td { padding:11px 14px; font-size:12.5px; }
+  .vs-table th,.vs-table td { padding:11px 14px; font-size:12.5px; }
+  .dash-stats { grid-template-columns:repeat(2,1fr); }
+  .dash-actions { grid-template-columns:repeat(2,1fr); }
+  .dash-lower { grid-template-columns:1fr; }
+  .copilot-panel { width:calc(100vw - 32px); right:16px; }
+  .hub-grid { grid-template-columns:1fr; }
 }
 @media (max-width:640px) {
   .topbar { padding:0 16px; }
   .ntab-label { display:none; }
-  .ntab { padding:8px 12px; }
-  .logo { margin-right:10px; }
+  .ntab { padding:8px 10px; }
+  .logo { margin-right:8px; }
   .plan-tag { display:none; }
   .step-hd { gap:14px; }
   .step-badge { display:none; }
@@ -830,8 +1024,13 @@ select option { background:var(--surface); color:var(--t1); }
   .roi-wrap { padding:20px; gap:24px; }
   .conviction-bar { padding:18px 20px; }
   .feature-cards { grid-template-columns:1fr; }
-  .vs-table th, .vs-table td { padding:9px 11px; font-size:12px; }
+  .vs-table th,.vs-table td { padding:9px 11px; font-size:12px; }
   .pricing-grid { grid-template-columns:1fr; }
+  .dash-stats,.dash-actions { grid-template-columns:1fr 1fr; }
+  .copilot-btn { bottom:16px; right:16px; padding:11px 16px; font-size:13px; }
+  .copilot-panel { right:8px; bottom:76px; width:calc(100vw - 16px); }
+  .export-opts { grid-template-columns:1fr; }
+  .trust-badge { padding:10px 18px; }
 }
 </style>
 </head>
@@ -849,9 +1048,11 @@ select option { background:var(--surface); color:var(--t1); }
     </div>
   </a>
   <nav class="nav">
-    <button class="ntab on"  onclick="goPage('report')">   <span class="ntab-icon">📄</span><span class="ntab-label">Report Generator</span></button>
-    <button class="ntab"     onclick="goPage('datasheet')"><span class="ntab-icon">🔍</span><span class="ntab-label">Datasheet Analyzer</span></button>
+    <button class="ntab on"  onclick="goPage('dashboard')"><span class="ntab-icon">⬡</span><span class="ntab-label">Dashboard</span></button>
+    <button class="ntab"     onclick="goPage('report')">   <span class="ntab-icon">📄</span><span class="ntab-label">Reports</span></button>
+    <button class="ntab"     onclick="goPage('datasheet')"><span class="ntab-icon">🔍</span><span class="ntab-label">Datasheet</span></button>
     <button class="ntab"     onclick="goPage('compare')">  <span class="ntab-icon">⚖️</span><span class="ntab-label">Compare</span></button>
+    <button class="ntab"     onclick="goPage('standards')"><span class="ntab-icon">📚</span><span class="ntab-label">Standards</span></button>
     <button class="ntab"     onclick="goPage('pricing')">  <span class="ntab-icon">💳</span><span class="ntab-label">Pricing</span></button>
   </nav>
   <div class="bar-end">
@@ -860,13 +1061,180 @@ select option { background:var(--surface); color:var(--t1); }
   </div>
 </header>
 
+<!-- ═══════ COPILOT BUTTON ═══════ -->
+<button class="copilot-btn" onclick="toggleCopilot()" title="Open EngTools Copilot">
+  <span>✦</span> AI Copilot <span class="cp-pulse"></span>
+</button>
+
+<!-- ═══════ COPILOT PANEL ═══════ -->
+<div class="copilot-panel" id="copilot-panel">
+  <div class="cp-head">
+    <div class="cp-identity">
+      <div class="cp-avatar">✦</div>
+      <div class="cp-name-row">
+        <span class="cp-name">EngTools Copilot</span>
+        <span class="cp-online">Online</span>
+      </div>
+    </div>
+    <button class="cp-close" onclick="toggleCopilot()">×</button>
+  </div>
+  <div class="cp-chips">
+    <button class="cp-chip" onclick="askCopilot('Which report type should I use for a site inspection?')">Site inspection?</button>
+    <button class="cp-chip" onclick="askCopilot('What standards apply to HV switchgear?')">HV standards?</button>
+    <button class="cp-chip" onclick="askCopilot('How do I structure a failure analysis report?')">Failure analysis?</button>
+    <button class="cp-chip" onclick="askCopilot('What is IEC 60364 and when does it apply?')">IEC 60364?</button>
+  </div>
+  <div class="cp-msgs" id="cp-msgs">
+    <div class="cmsg">
+      <div class="cav ai">AI</div>
+      <div class="cbub ai">Hello! I'm your engineering documentation assistant. Ask me about report structures, applicable standards, or how to get the most from EngTools Pro.</div>
+    </div>
+  </div>
+  <div class="cp-input-row">
+    <input class="cp-in" id="cp-in" placeholder="Ask about standards, reports, or documentation…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendCopilot();}"/>
+    <button class="cp-send" id="cp-send" onclick="sendCopilot()">→</button>
+  </div>
+</div>
+
+<!-- ═══════ EXPORT MODAL ═══════ -->
+<div class="modal-overlay" id="export-modal" onclick="if(event.target===this)closeExportModal()">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">Export Report</div>
+      <button class="modal-close" onclick="closeExportModal()">×</button>
+    </div>
+    <div class="modal-bd">
+      <div class="export-opts">
+        <div class="export-opt" onclick="dlHtml();closeExportModal()">
+          <span class="eo-icon">🌐</span>
+          <div class="eo-name">HTML Document</div>
+          <div class="eo-desc">Fully styled, client-ready report you can open in any browser or print to PDF.</div>
+        </div>
+        <div class="export-opt" onclick="dlTxt('rpt-body','report');closeExportModal()">
+          <span class="eo-icon">📄</span>
+          <div class="eo-name">Plain Text (.txt)</div>
+          <div class="eo-desc">Raw text for pasting into Word, email, or your own document template.</div>
+        </div>
+        <div class="export-opt" onclick="copyEl('rpt-body');closeExportModal()">
+          <span class="eo-icon">📋</span>
+          <div class="eo-name">Copy to Clipboard</div>
+          <div class="eo-desc">Copy all report text to paste anywhere — email, Confluence, SharePoint.</div>
+        </div>
+        <div class="export-opt soon">
+          <span class="eo-tag">Soon</span>
+          <span class="eo-icon">📝</span>
+          <div class="eo-name">Word Document (.docx)</div>
+          <div class="eo-desc">Editable DOCX with headings, tables, and your company style applied.</div>
+        </div>
+      </div>
+      <p style="font-size:11.5px;color:var(--t3);font-family:var(--mono);">For PDF: open the HTML export in your browser → File → Print → Save as PDF</p>
+    </div>
+  </div>
+</div>
+
 <div class="app-wrap">
 <main>
 
 <!-- ══════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════ -->
+<div id="pg-dashboard" class="page on">
+  <div class="dash-greeting">
+    <div class="dash-time" id="dash-time">Loading…</div>
+    <h1 class="dash-hello" id="dash-hello">Good morning, Engineer</h1>
+    <p class="dash-sub">EngTools Pro — The AI Workspace for Engineers. What are you working on today?</p>
+  </div>
+
+  <div class="dash-stats">
+    <div class="dash-stat">
+      <div class="ds-val" id="stat-reports">0</div>
+      <div class="ds-label">Reports generated</div>
+    </div>
+    <div class="dash-stat">
+      <div class="ds-val">140+</div>
+      <div class="ds-label">Engineering standards</div>
+    </div>
+    <div class="dash-stat">
+      <div class="ds-val">2–4h</div>
+      <div class="ds-label">Saved per report</div>
+    </div>
+    <div class="dash-stat">
+      <div class="ds-val" id="stat-queries">0</div>
+      <div class="ds-label">AI queries this session</div>
+    </div>
+  </div>
+
+  <div class="dash-actions">
+    <div class="dash-action" onclick="goPage('report')" style="--da-color:var(--teal)">
+      <span class="da-icon">📄</span>
+      <div class="da-title">Generate Report</div>
+      <div class="da-desc">Turn rough notes into structured, standards-referenced engineering reports.</div>
+      <span class="da-arrow">↗</span>
+    </div>
+    <div class="dash-action" onclick="goPage('datasheet')" style="--da-color:var(--lime)">
+      <span class="da-icon">🔍</span>
+      <div class="da-title">Analyze Datasheet</div>
+      <div class="da-desc">Extract parameters, check suitability, and assess risks from any component spec.</div>
+      <span class="da-arrow">↗</span>
+    </div>
+    <div class="dash-action" onclick="goPage('compare')" style="--da-color:var(--violet)">
+      <span class="da-icon">⚖️</span>
+      <div class="da-title">Compare Components</div>
+      <div class="da-desc">Side-by-side technical comparison with a clear AI recommendation.</div>
+      <span class="da-arrow">↗</span>
+    </div>
+    <div class="dash-action" onclick="goPage('standards')" style="--da-color:var(--amber)">
+      <span class="da-icon">📚</span>
+      <div class="da-title">Standards Library</div>
+      <div class="da-desc">Browse and search 140+ engineering standards — IEC, BS, ASTM, NFPA, API, ISO.</div>
+      <span class="da-arrow">↗</span>
+    </div>
+  </div>
+
+  <div class="dash-lower">
+    <div class="dash-feed">
+      <div class="dash-panel-head">
+        <div class="dph-title">Recent Activity</div>
+        <button class="dph-clear" onclick="clearActivity()">Clear</button>
+      </div>
+      <div id="activity-feed">
+        <div class="feed-empty">
+          <div class="fee-icon">📋</div>
+          <div class="fee-title">No activity yet</div>
+          <div class="fee-sub">Generate a report or analyze a datasheet to see your history here.</div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-tips">
+      <div class="tip-cta-head">AI Copilot Suggestions</div>
+      <div class="tip-item" onclick="askCopilot('Which report template should I use for an electrical inspection?')">
+        <div class="tip-q">Which template for electrical inspection?</div>
+        <div class="tip-hint">Ask Copilot →</div>
+      </div>
+      <div class="tip-item" onclick="askCopilot('What standards apply to low voltage electrical installations in the UK?')">
+        <div class="tip-q">Standards for LV installations (UK)?</div>
+        <div class="tip-hint">Ask Copilot →</div>
+      </div>
+      <div class="tip-item" onclick="askCopilot('How should I structure a commissioning report?')">
+        <div class="tip-q">How to structure a commissioning report?</div>
+        <div class="tip-hint">Ask Copilot →</div>
+      </div>
+      <div class="tip-item" onclick="askCopilot('What is the difference between IEC 60364 and BS 7671?')">
+        <div class="tip-q">IEC 60364 vs BS 7671 — what's the difference?</div>
+        <div class="tip-hint">Ask Copilot →</div>
+      </div>
+      <div class="tip-item" onclick="askCopilot('What makes a good failure analysis report?')">
+        <div class="tip-q">Key elements of a failure analysis report?</div>
+        <div class="tip-hint">Ask Copilot →</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /pg-dashboard -->
+
+<!-- ══════════════════════════════════════
      REPORT GENERATOR
 ══════════════════════════════════════ -->
-<div id="pg-report" class="page on">
+<div id="pg-report" class="page">
 
   <!-- Hero -->
   <div class="page-hero">
@@ -1051,8 +1419,7 @@ select option { background:var(--surface); color:var(--t1); }
       </div>
       <div class="output-actions">
         <button class="btn btn-ghost" onclick="copyEl('rpt-body')">Copy</button>
-        <button class="btn btn-ghost" onclick="dlTxt('rpt-body','report')">Download .txt</button>
-        <button class="btn btn-ghost" onclick="dlHtml()">⬇ Download HTML</button>
+        <button class="btn btn-ghost" onclick="openExportModal()">⬇ Export…</button>
       </div>
     </div>
     <div class="refine-bar">
@@ -1064,7 +1431,15 @@ select option { background:var(--surface); color:var(--t1); }
       <button class="refine-btn" onclick="refine('Add estimated cost and budget implications for each recommendation')">Add cost estimates</button>
       <button class="refine-btn" onclick="refine('Expand the conclusion with a clear prioritised action plan and timeline')">Expand conclusions</button>
     </div>
+    <div class="skel-wrap" id="rpt-skeleton">
+      <div class="skel skel-h"></div>
+      <div class="skel skel-sub"></div>
+      <div class="skel skel-p w90"></div><div class="skel skel-p w80"></div><div class="skel skel-p w70"></div>
+      <div class="skel skel-sub" style="margin-top:20px"></div>
+      <div class="skel skel-p w80"></div><div class="skel skel-p w90"></div><div class="skel skel-p w60"></div>
+    </div>
     <div class="output-body" id="rpt-body"></div>
+    <div class="trust-badge">AI-generated output · Always verify against applicable standards and site conditions before submission · Model: claude-opus-4-5</div>
     <div class="output-foot">
       <div class="meta-chip">Generated: <span id="m-date2">—</span></div>
       <div class="meta-chip">Words: <span id="m-words2">—</span></div>
@@ -1169,7 +1544,12 @@ select option { background:var(--surface); color:var(--t1); }
         <button class="btn btn-ghost" onclick="dlTxt('ds-body','datasheet-analysis')">Download</button>
       </div>
     </div>
+    <div class="skel-wrap" id="ds-skeleton">
+      <div class="skel skel-h"></div><div class="skel skel-sub"></div>
+      <div class="skel skel-p w90"></div><div class="skel skel-p w80"></div><div class="skel skel-p w70"></div>
+    </div>
     <div class="output-body" id="ds-body"></div>
+    <div class="trust-badge">AI-generated analysis · Verify all parameters against the original datasheet · Model: claude-opus-4-5</div>
   </div>
 
   <div id="ds-qa" style="display:none">
@@ -1236,11 +1616,48 @@ select option { background:var(--surface); color:var(--t1); }
       <div class="output-status">Comparison complete</div>
       <div class="output-actions"><button class="btn btn-ghost" onclick="copyEl('cmp-body')">Copy</button></div>
     </div>
+    <div class="skel-wrap" id="cmp-skeleton">
+      <div class="skel skel-h"></div><div class="skel skel-sub"></div>
+      <div class="skel skel-p w90"></div><div class="skel skel-p w80"></div><div class="skel skel-p w70"></div>
+    </div>
     <div class="output-body" id="cmp-body"></div>
+    <div class="trust-badge">AI-generated comparison · Verify specifications with manufacturer datasheets before making design decisions · Model: claude-opus-4-5</div>
   </div>
 
 </div><!-- /pg-compare -->
 
+
+<!-- ══════════════════════════════════════
+     STANDARDS HUB
+══════════════════════════════════════ -->
+<div id="pg-standards" class="page">
+  <div class="page-hero">
+    <div class="hero-eyebrow">Standards Library</div>
+    <h1 class="hero-title">Engineering standards,<br><span class="hero-gradient">always at hand.</span></h1>
+    <p class="hero-sub">Browse 140+ engineering standards across all disciplines. Click any standard to copy its reference directly into your reports.</p>
+  </div>
+
+  <div class="hub-search-wrap">
+    <span class="hub-search-ico">🔍</span>
+    <input class="hub-search" id="hub-search" placeholder="Search standards by code or title — e.g. IEC 60364, arc flash, piping…" oninput="renderHub()"/>
+  </div>
+
+  <div class="hub-cats">
+    <button class="hub-cat on" data-cat="all" onclick="setHubCat('all')">All</button>
+    <button class="hub-cat" data-cat="electrical" onclick="setHubCat('electrical')">⚡ Electrical</button>
+    <button class="hub-cat" data-cat="mechanical" onclick="setHubCat('mechanical')">⚙️ Mechanical</button>
+    <button class="hub-cat" data-cat="civil" onclick="setHubCat('civil')">🏗️ Civil / Structural</button>
+    <button class="hub-cat" data-cat="software" onclick="setHubCat('software')">💻 Software / Systems</button>
+    <button class="hub-cat" data-cat="chemical" onclick="setHubCat('chemical')">🧪 Chemical / Process</button>
+    <button class="hub-cat" data-cat="petroleum" onclick="setHubCat('petroleum')">🛢️ Petroleum / O&amp;G</button>
+    <button class="hub-cat" data-cat="aerospace" onclick="setHubCat('aerospace')">✈️ Aerospace</button>
+    <button class="hub-cat" data-cat="telecoms" onclick="setHubCat('telecoms')">📡 Telecoms</button>
+  </div>
+
+  <div class="hub-grid" id="hub-grid">
+    <div class="hub-no-results">Loading standards…</div>
+  </div>
+</div><!-- /pg-standards -->
 
 <!-- ══════════════════════════════════════
      PRICING
@@ -1255,6 +1672,12 @@ select option { background:var(--surface); color:var(--t1); }
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
       <button class="btn btn-teal" onclick="goPage('report')">Start Free →</button>
       <button class="btn btn-outline" onclick="goPage('report')">View Example Report</button>
+    </div>
+    <div class="social-proof">
+      <div class="sp-item"><span class="sp-num" data-count="2400" data-suffix="+">2,400+</span><span class="sp-label">reports generated</span></div>
+      <div class="sp-item"><span class="sp-num" data-count="140" data-suffix="+">140+</span><span class="sp-label">engineering standards</span></div>
+      <div class="sp-item"><span class="sp-num" data-count="35" data-suffix="+">35+</span><span class="sp-label">countries</span></div>
+      <div class="sp-item"><span class="sp-num">4.9★</span><span class="sp-label">engineer rating</span></div>
     </div>
   </div>
 
@@ -1363,6 +1786,13 @@ select option { background:var(--surface); color:var(--t1); }
     <h2>Choose your plan</h2>
     <p>Start free, upgrade when you need more. All paid plans include a 7-day free trial.</p>
   </div>
+  <div class="billing-row">
+    <span class="billing-opt on" id="bill-monthly" onclick="toggleBilling()">Monthly</span>
+    <div class="billing-track" id="billing-track" onclick="toggleBilling()">
+      <div class="billing-thumb"></div>
+    </div>
+    <span class="billing-opt" id="bill-annual" onclick="toggleBilling()">Annual <span class="billing-save-tag">Save 20%</span></span>
+  </div>
   <div class="pricing-grid">
 
     <div class="pricing-card">
@@ -1382,7 +1812,7 @@ select option { background:var(--surface); color:var(--t1); }
     <div class="pricing-card featured">
       <div class="pricing-pop">MOST POPULAR</div>
       <div class="pricing-tier">Professional</div>
-      <div class="pricing-price">$19<sub>/month</sub></div>
+      <div class="pricing-price"><span id="price-pro">$19</span><sub id="period-pro">/month</sub></div>
       <div class="pricing-desc">For working engineers who submit reports regularly. The most complete plan for individuals.</div>
       <ul class="pricing-features">
         <li>Unlimited AI queries</li>
@@ -1401,7 +1831,7 @@ select option { background:var(--surface); color:var(--t1); }
 
     <div class="pricing-card">
       <div class="pricing-tier">Student</div>
-      <div class="pricing-price">$9<sub>/month</sub></div>
+      <div class="pricing-price"><span id="price-student">$9</span><sub id="period-student">/month</sub></div>
       <div class="pricing-desc">For engineering students and graduates building documentation skills and portfolios.</div>
       <ul class="pricing-features">
         <li>100 AI queries per month</li>
@@ -1416,7 +1846,7 @@ select option { background:var(--surface); color:var(--t1); }
 
     <div class="pricing-card">
       <div class="pricing-tier">Team</div>
-      <div class="pricing-price">$49<sub>/month</sub></div>
+      <div class="pricing-price"><span id="price-team">$49</span><sub id="period-team">/month</sub></div>
       <div class="pricing-desc">For engineering firms and consultancies. Shared workspace, team reports, company branding.</div>
       <ul class="pricing-features">
         <li>5 seats (+$8/extra seat)</li>
@@ -1569,6 +1999,8 @@ function init(){
   document.getElementById('rpt-field').addEventListener('change', e=>renderStds(e.target.value));
   toggleAppField();
   calcROI();
+  renderDashboard();
+  renderHub();
 }
 function onFieldChange(){ renderStds(document.getElementById('rpt-field').value); }
 function toggleAppField(){ document.getElementById('ds-app-f').style.display='block'; }
@@ -1621,8 +2053,11 @@ function toggleSec(el,s){
 function goPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
-  document.querySelectorAll('.ntab').forEach((b,i)=>b.classList.toggle('on',['report','datasheet','compare','pricing'][i]===id));
+  document.querySelectorAll('.ntab').forEach((b,i)=>b.classList.toggle('on',['dashboard','report','datasheet','compare','standards','pricing'][i]===id));
   window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='dashboard')renderDashboard();
+  if(id==='standards')renderHub();
+  if(id==='pricing')animateSocialProof();
 }
 
 /* ═══════════════════════════════════════
@@ -1648,6 +2083,7 @@ async function genReport(){
   const toneMap={formal:'formal and professional, suitable for client/management',technical:'highly technical, precise, using correct engineering terminology for peer review',regulatory:'regulatory compliance language with precise standard citations, suitable for authority submission',academic:'academic research style with structured analysis and referencing'};
   const langNote={uk:'Use British English spelling.',us:'Use American English spelling.',ng:'Use standard engineering English appropriate for Nigerian regulatory and industry context.'}[lang];
   setLoad('rpt',true,'Writing your report…');
+  showSkeleton('rpt');
   showProg(secsArr);
   const sys=`You are a senior ${field} engineering consultant with 20+ years of professional report writing experience. Write in a ${toneMap[tone]} style. ${langNote}
 Format with Markdown: ## for main sections, ### for subsections, **bold** for key values, tables for data, bullet lists where appropriate.
@@ -1682,12 +2118,15 @@ Write every section fully. Present measurements in tables. Number and prioritise
     if(!text){setLoad('rpt',false);document.getElementById('rpt-prog').classList.remove('on');toast('No content returned — please try again');return;}
     rptLast=text;
     setLoad('rpt',false);
+    hideSkeleton('rpt');
     document.getElementById('rpt-prog').classList.remove('on');
     showRptOut(text,tplObj.n);
+    saveActivity('report',proj||(TPLS.find(t=>t.id===selTpl)||TPLS[0]).n);
     bumpUsage();
     finProg(secsArr);
   }catch(e){
     setLoad('rpt',false);
+    hideSkeleton('rpt');
     document.getElementById('rpt-prog').classList.remove('on');
     toast('Connection error — please try again');
   }
@@ -1779,6 +2218,7 @@ async function analyzeDS(){
   document.getElementById('ds-qa').style.display='none';
   document.getElementById('ds-params-wrap').style.display='none';
   setLoad('ds',true,'Analyzing datasheet…');
+  showSkeleton('ds');
   const modeP={
     extract:`Extract ALL technical parameters. Output:\n1. A table: Parameter | Value | Unit | Condition\n2. Absolute Maximum Ratings section\n3. Recommended Operating Conditions\n4. A JSON block of 6–8 critical params: {"p":[{"n":"VDS max","v":"55","u":"V","f":"max"},{"n":"ID","v":"47","u":"A","f":"ok"}]}\nFlags: "max"=absolute max, "crit"=warning/critical, "ok"=normal`,
     summary:`Write a comprehensive plain-English summary: what it is, primary function, key capabilities, typical applications, major strengths, important limitations. Include a quick-reference table of top 8 parameters.`,
@@ -1796,13 +2236,16 @@ async function analyzeDS(){
       if(m){try{renderParamCards(JSON.parse(m[0]).p);}catch(e){}}
     }
     setLoad('ds',false);
+    hideSkeleton('ds');
     const out=document.getElementById('ds-out');
     out.classList.add('on');
     document.getElementById('ds-body').innerHTML=md(text.replace(/\{"p":\[.*?\]\}/s,'').trim());
     document.getElementById('ds-qa').style.display='block';
     out.scrollIntoView({behavior:'smooth',block:'start'});
+    const dsLabel=document.getElementById('ds-paste').value.trim().split('\n')[0].substring(0,60)||'Datasheet analysis';
+    saveActivity('datasheet',dsLabel);
     bumpUsage();
-  }catch(e){setLoad('ds',false);toast('Connection error — please try again');}
+  }catch(e){setLoad('ds',false);hideSkeleton('ds');toast('Connection error — please try again');}
 }
 
 function renderParamCards(params){
@@ -1872,17 +2315,20 @@ async function cmpDS(){
   const bn=document.getElementById('cmp-b-name').value||'Option B';
   const app=document.getElementById('cmp-app').value;
   setLoad('cmp',true,'Comparing both datasheets…');
+  showSkeleton('cmp');
   try{
     const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:3000,system:'You are a senior engineer specialising in component and design option selection. Compare rigorously with specific values and give a clear, justified recommendation.',messages:[{role:'user',content:`Compare for application: "${app||'general engineering use'}"\n\n## ${an}:\n${a}\n\n## ${bn}:\n${b}\n\n---\nProvide:\n1. **Side-by-Side Comparison Table** (Parameter | ${an} | ${bn} | Winner)\n2. **Key Differences** for this specific application\n3. **${an}: Pros & Cons**\n4. **${bn}: Pros & Cons**\n5. **Overall Recommendation** with specific values justifying the choice\n6. **Risk Factors** to watch with the recommended option`}]})});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
     setLoad('cmp',false);
+    hideSkeleton('cmp');
     const out=document.getElementById('cmp-out');
     out.classList.add('on');
     document.getElementById('cmp-body').innerHTML=md(text);
     out.scrollIntoView({behavior:'smooth',block:'start'});
+    saveActivity('compare',(an+' vs '+bn).substring(0,60));
     bumpUsage();
-  }catch(e){setLoad('cmp',false);toast('Connection error');}
+  }catch(e){setLoad('cmp',false);hideSkeleton('cmp');toast('Connection error');}
 }
 function clearCmp(){['cmp-a','cmp-b','cmp-a-name','cmp-b-name','cmp-app'].forEach(id=>document.getElementById(id).value='');document.getElementById('cmp-out').classList.remove('on');}
 
@@ -1947,6 +2393,255 @@ function dlHtml(){
   URL.revokeObjectURL(url);
   toast('Report downloaded ✓');
 }
+
+/* ═══════════════════════════════════════
+   STANDARDS HUB DATA
+═══════════════════════════════════════ */
+const STDS_INFO = {
+  'IEC 60364':{'title':'Electrical Installations of Buildings','desc':'Requirements for design, installation, and verification of low-voltage electrical installations.','cat':'electrical'},
+  'BS 7671 (18th Ed.)':{'title':'Wiring Regulations (UK)','desc':'UK national standard for electrical wiring. Mandatory for all UK electrical installations.','cat':'electrical'},
+  'IEC 60947':{'title':'Low-Voltage Switchgear and Controlgear','desc':'Requirements for switchgear and controlgear up to 1,000V AC or 1,500V DC.','cat':'electrical'},
+  'IEEE 1584':{'title':'Arc Flash Hazard Calculations','desc':'Guide for performing arc flash hazard calculations in electrical systems.','cat':'electrical'},
+  'IEC 61010':{'title':'Safety Requirements for Electrical Equipment','desc':'Safety for electrical equipment used in measurement, control, and laboratory applications.','cat':'electrical'},
+  'NFPA 70 (NEC)':{'title':'National Electrical Code','desc':'US standard for safe installation of electrical wiring and equipment.','cat':'electrical'},
+  'IEC 60034':{'title':'Rotating Electrical Machines','desc':'Requirements for rotating electrical machines including motors and generators.','cat':'electrical'},
+  'IEC 60529 (IP)':{'title':'Degrees of Protection — IP Ratings','desc':'Classification system for the degree of protection provided by enclosures against solids and liquids.','cat':'electrical'},
+  'IEC 62368':{'title':'Audio/Video and IT Equipment Safety','desc':'Hazard-based safety standard replacing IEC 60065 and IEC 60950.','cat':'electrical'},
+  'IEC 61000':{'title':'Electromagnetic Compatibility (EMC)','desc':'Requirements for electromagnetic compatibility of electrical and electronic equipment.','cat':'electrical'},
+  'ASME B31.3':{'title':'Process Piping','desc':'Requirements for materials, design, fabrication, and examination of process piping systems.','cat':'mechanical'},
+  'ISO 9001':{'title':'Quality Management Systems','desc':'Requirements for a quality management system applicable to any organisation.','cat':'mechanical'},
+  'ASTM A36':{'title':'Structural Steel','desc':'Standard specification for structural carbon steel shapes, plates, and bars.','cat':'mechanical'},
+  'BS EN 1993 (EC3)':{'title':'Design of Steel Structures (Eurocode 3)','desc':'European standard for the design of steel structures and components.','cat':'mechanical'},
+  'ISO 286':{'title':'Limits and Fits for Shafts and Holes','desc':'ISO system of limits and fits for interchangeable manufactured parts.','cat':'mechanical'},
+  'ASME VIII Div.1':{'title':'Pressure Vessels','desc':'Rules for construction of pressure vessels with internal pressures up to 3,000 psig.','cat':'mechanical'},
+  'API 510':{'title':'Pressure Vessel Inspection Code','desc':'Inspection, rating, repair, and alteration of pressure vessels in service.','cat':'mechanical'},
+  'ISO 4414':{'title':'Pneumatic Fluid Power Safety','desc':'Safety requirements for pneumatic fluid power systems and components.','cat':'mechanical'},
+  'BS PD 5500':{'title':'Unfired Fusion Welded Pressure Vessels (UK)','desc':'UK specification for unfired fusion welded pressure vessels.','cat':'mechanical'},
+  'BS EN 1990 (EC0)':{'title':'Basis of Structural Design (Eurocode 0)','desc':'Principles and requirements for safety, serviceability, and durability of structures.','cat':'civil'},
+  'BS EN 1992 (EC2)':{'title':'Design of Concrete Structures (Eurocode 2)','desc':'Design rules for concrete structures including buildings and civil engineering works.','cat':'civil'},
+  'BS EN 1997 (EC7)':{'title':'Geotechnical Design (Eurocode 7)','desc':'Rules for geotechnical design including foundations and retaining structures.','cat':'civil'},
+  'ACI 318':{'title':'Building Code for Structural Concrete','desc':'Requirements for structural concrete design and construction in the US.','cat':'civil'},
+  'AASHTO LRFD':{'title':'Bridge Design Specifications','desc':'Load and resistance factor design specifications for highway bridges.','cat':'civil'},
+  'BS 8110':{'title':'Structural Use of Concrete (UK)','desc':'UK code of practice for the structural use of concrete.','cat':'civil'},
+  'ASTM C150':{'title':'Portland Cement','desc':'Standard specification for Portland cement types and properties.','cat':'civil'},
+  'ISO 25010':{'title':'Systems and Software Quality','desc':'Quality model for software product and systems quality characteristics.','cat':'software'},
+  'IEC 62443':{'title':'Industrial Cybersecurity','desc':'Security for industrial automation and control systems (IACS).','cat':'software'},
+  'IEEE 829':{'title':'Software Test Documentation','desc':'Standard for the format of documents used in software testing.','cat':'software'},
+  'ISO/IEC 27001':{'title':'Information Security Management','desc':'Requirements for establishing, implementing, and maintaining an ISMS.','cat':'software'},
+  'MISRA C':{'title':'C Language Coding Standard','desc':'Guidelines for the use of the C language in critical systems.','cat':'software'},
+  'DO-178C':{'title':'Software in Airborne Systems','desc':'Guidelines for the development of software for airborne systems.','cat':'software'},
+  'IEC 61508':{'title':'Functional Safety of E/E/PE Systems','desc':'Functional safety of electrical, electronic and programmable electronic safety-related systems.','cat':'software'},
+  'ISO 15288':{'title':'Systems and Software Engineering Life Cycle','desc':'Requirements for the life cycle of systems and software products.','cat':'software'},
+  'ATEX 2014/34/EU':{'title':'Equipment for Explosive Atmospheres','desc':'EU directive for equipment and protective systems in potentially explosive atmospheres.','cat':'chemical'},
+  'IEC 60079':{'title':'Explosive Atmospheres','desc':'Requirements for electrical and non-electrical equipment in explosive atmospheres.','cat':'chemical'},
+  'API RP 505':{'title':'Classification of Hazardous Areas (O&G)','desc':'Recommended practice for classification of locations for electrical installations at petroleum facilities.','cat':'chemical'},
+  'API 650':{'title':'Welded Steel Tanks for Oil Storage','desc':'Design, fabrication, erection, and inspection of vertical, cylindrical, aboveground storage tanks.','cat':'petroleum'},
+  'API 5CT':{'title':'Casing and Tubing','desc':'Specification for casing and tubing used in oil and gas wells.','cat':'petroleum'},
+  'API 6A':{'title':'Wellhead and Christmas Tree Equipment','desc':'Specification for wellhead and tree equipment including pressure ratings and testing.','cat':'petroleum'},
+  'ISO 13628':{'title':'Petroleum — Subsea Production Systems','desc':'Requirements for the design, operation and maintenance of subsea production systems.','cat':'petroleum'},
+  'NACE MR0175':{'title':'Sulphide Stress Cracking Prevention','desc':'Materials requirements for equipment in sour oilfield environments.','cat':'petroleum'},
+  'API RP 14C':{'title':'Analysis, Design of Safety Systems (Offshore)','desc':'Recommended practice for analysis, design, installation, and testing of platform safety systems.','cat':'petroleum'},
+  'API 520/521':{'title':'Pressure Relieving Devices','desc':'Sizing, selection, and installation of pressure-relieving devices in refineries.','cat':'petroleum'},
+  'AS9100':{'title':'Quality Management — Aerospace','desc':'Quality management systems standard for the aviation, space, and defence industry.','cat':'aerospace'},
+  'DO-160G':{'title':'Airborne Equipment Environmental Conditions','desc':'Environmental conditions and test procedures for airborne equipment.','cat':'aerospace'},
+  'MIL-STD-810':{'title':'Environmental Engineering Considerations','desc':'Environmental conditions and test procedures for equipment suitability.','cat':'aerospace'},
+  'FAR Part 25':{'title':'Airworthiness Standards: Transport Category','desc':'Federal Aviation Regulations for airworthiness standards for transport category aircraft.','cat':'aerospace'},
+  'ARP4761':{'title':'Safety Assessment of Civil Airborne Systems','desc':'Guidelines for performing safety assessment processes on civil airborne systems.','cat':'aerospace'},
+  'ITU-T G.984':{'title':'Gigabit Passive Optical Network (GPON)','desc':'Characteristics of gigabit-capable passive optical networks.','cat':'telecoms'},
+  'ETSI EN 300 132':{'title':'Power Supply Interface at Telecom Networks','desc':'Environmental engineering power supply interface at the input to telecom and datacom equipment.','cat':'telecoms'},
+  'IEC 60950':{'title':'Safety of IT Equipment','desc':'Safety of information technology equipment including electrical business equipment.','cat':'telecoms'},
+  'IEEE 802.3':{'title':'Ethernet Standard','desc':'IEEE standard for Ethernet LAN media access control and Physical Layer specifications.','cat':'telecoms'},
+  'TIA-568':{'title':'Commercial Building Wiring Standards','desc':'Telecommunications cabling standards for commercial buildings.','cat':'telecoms'},
+  'GR-63-CORE':{'title':'NEBS Physical Protection Requirements','desc':'Network Equipment Building System physical protection requirements for telecom equipment.','cat':'telecoms'},
+  'ITU-T G.657':{'title':'Bending-Insensitive Single-Mode Fibre','desc':'Characteristics of a bending-loss insensitive single-mode optical fibre and cable.','cat':'telecoms'},
+};
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+function renderDashboard(){
+  const h=new Date().getHours();
+  const greeting=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const timeStr=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const el=document.getElementById('dash-hello');
+  const tel=document.getElementById('dash-time');
+  if(el)el.textContent=greeting+', Engineer';
+  if(tel)tel.textContent=timeStr;
+  const acts=getActivities();
+  const rCount=acts.filter(a=>a.type==='report').length;
+  const sv=document.getElementById('stat-reports');
+  if(sv)sv.textContent=rCount;
+  const qv=document.getElementById('stat-queries');
+  if(qv)qv.textContent=usageN;
+  renderActivityFeed(acts);
+}
+
+function getActivities(){
+  try{return JSON.parse(localStorage.getItem('ep_activities')||'[]');}catch{return [];}
+}
+
+function saveActivity(type,label){
+  const acts=getActivities();
+  acts.unshift({type,label,time:Date.now()});
+  if(acts.length>20)acts.pop();
+  try{localStorage.setItem('ep_activities',JSON.stringify(acts));}catch{}
+}
+
+function clearActivity(){
+  try{localStorage.removeItem('ep_activities');}catch{}
+  renderActivityFeed([]);
+  document.getElementById('stat-reports').textContent='0';
+}
+
+function relTime(ts){
+  const d=Date.now()-ts;
+  if(d<60000)return'Just now';
+  if(d<3600000)return Math.floor(d/60000)+'m ago';
+  if(d<86400000)return Math.floor(d/3600000)+'h ago';
+  return Math.floor(d/86400000)+'d ago';
+}
+
+function renderActivityFeed(acts){
+  const feed=document.getElementById('activity-feed');
+  if(!feed)return;
+  if(!acts||!acts.length){
+    feed.innerHTML=`<div class="feed-empty"><div class="fee-icon">📋</div><div class="fee-title">No activity yet</div><div class="fee-sub">Generate a report or analyze a datasheet to see your history here.</div></div>`;
+    return;
+  }
+  const typeInfo={
+    report:{icon:'📄',bg:'rgba(45,212,191,.1)',tag:'Report',tagColor:'var(--teal)',tagBg:'rgba(45,212,191,.08)'},
+    datasheet:{icon:'🔍',bg:'rgba(163,230,53,.1)',tag:'Datasheet',tagColor:'var(--lime)',tagBg:'rgba(163,230,53,.08)'},
+    compare:{icon:'⚖️',bg:'rgba(167,139,250,.1)',tag:'Compare',tagColor:'var(--violet)',tagBg:'rgba(167,139,250,.08)'},
+  };
+  feed.innerHTML=acts.slice(0,8).map(a=>{
+    const t=typeInfo[a.type]||typeInfo.report;
+    return `<div class="activity-item">
+      <div class="ai-icon-badge" style="background:${t.bg}">${t.icon}</div>
+      <div class="ai-info">
+        <div class="ai-label">${escHtml(a.label)}</div>
+        <div class="ai-meta">${relTime(a.time)}</div>
+      </div>
+      <span class="ai-type-tag" style="color:${t.tagColor};background:${t.tagBg};border:1px solid ${t.tagColor}20">${t.tag}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   STANDARDS HUB
+═══════════════════════════════════════ */
+let hubCat='all';
+function renderHub(){
+  const search=(document.getElementById('hub-search')?.value||'').toLowerCase();
+  const grid=document.getElementById('hub-grid');
+  if(!grid)return;
+  const catColors={electrical:'var(--teal)',mechanical:'var(--blue)',civil:'var(--amber)',software:'var(--violet)',chemical:'var(--rose)',petroleum:'var(--amber)',aerospace:'var(--blue)',telecoms:'var(--lime)'};
+  const entries=Object.entries(STDS_INFO).filter(([code,s])=>{
+    const mc=hubCat==='all'||s.cat===hubCat;
+    const ms=!search||code.toLowerCase().includes(search)||s.title.toLowerCase().includes(search)||s.desc.toLowerCase().includes(search);
+    return mc&&ms;
+  });
+  if(!entries.length){
+    grid.innerHTML=`<div class="hub-no-results">No standards found${search?` matching "${search}"`:''}. Try a different search.</div>`;
+    return;
+  }
+  grid.innerHTML=entries.map(([code,s])=>`
+    <div class="hub-card">
+      <div class="hub-code">${escHtml(code)}</div>
+      <div class="hub-title">${escHtml(s.title)}</div>
+      <div class="hub-desc">${escHtml(s.desc)}</div>
+      <div class="hub-foot">
+        <span class="hub-cat-tag" style="color:${catColors[s.cat]||'var(--t3)'}">● ${s.cat}</span>
+        <button class="hub-copy-btn" onclick="copyStandard('${code.replace(/'/g,"\\'")}')">Copy reference</button>
+      </div>
+    </div>`).join('');
+}
+function setHubCat(cat){
+  hubCat=cat;
+  document.querySelectorAll('.hub-cat').forEach(b=>b.classList.toggle('on',b.dataset.cat===cat));
+  renderHub();
+}
+function copyStandard(code){
+  navigator.clipboard.writeText(code).then(()=>toast('Copied: '+code+' ✓'));
+}
+
+/* ═══════════════════════════════════════
+   COPILOT
+═══════════════════════════════════════ */
+let cpHistory=[];let cpTid=0;
+function toggleCopilot(){document.getElementById('copilot-panel').classList.toggle('on');}
+function askCopilot(q){
+  document.getElementById('cp-in').value=q;
+  document.getElementById('copilot-panel').classList.add('on');
+  setTimeout(sendCopilot,50);
+}
+async function sendCopilot(){
+  const inp=document.getElementById('cp-in');
+  const q=inp.value.trim();if(!q)return;
+  inp.value='';
+  addCpMsg('you',q);
+  cpHistory.push({role:'user',content:q});
+  const tid=addCpTyping();
+  document.getElementById('cp-send').disabled=true;
+  try{
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:600,system:`You are EngTools Copilot — an expert AI assistant embedded in EngTools Pro, an AI engineering documentation platform. Help engineers with: choosing the correct report template, understanding engineering standards (IEC, BS, ASTM, NFPA, API, ISO, IEEE), documentation best practices, and getting the most from EngTools Pro. Be concise, practical, and technically precise. Keep responses under 150 words. Format with short paragraphs or bullet points.`,messages:cpHistory.slice(-10)})});
+    const d=await r.json();
+    const text=d.content?.find(c=>c.type==='text')?.text||'Sorry, I could not respond to that.';
+    cpHistory.push({role:'assistant',content:text});
+    removeCpTyping(tid);addCpMsg('ai',text);
+  }catch(e){removeCpTyping(tid);addCpMsg('ai','Connection error — please try again.');}
+  document.getElementById('cp-send').disabled=false;
+}
+function addCpMsg(role,text){
+  const m=document.getElementById('cp-msgs');
+  const d=document.createElement('div');d.className='cmsg';
+  d.innerHTML=`<div class="cav ${role}">${role==='ai'?'AI':'You'}</div><div class="cbub ${role}">${md(text)}</div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function addCpTyping(){const id=++cpTid;const m=document.getElementById('cp-msgs');const d=document.createElement('div');d.className='cmsg';d.id='cpt'+id;d.innerHTML=`<div class="cav ai">AI</div><div class="cbub ai"><span class="td"></span><span class="td"></span><span class="td"></span></div>`;m.appendChild(d);m.scrollTop=m.scrollHeight;return id;}
+function removeCpTyping(id){document.getElementById('cpt'+id)?.remove();}
+
+/* ═══════════════════════════════════════
+   BILLING TOGGLE
+═══════════════════════════════════════ */
+let billingAnnual=false;
+function toggleBilling(){
+  billingAnnual=!billingAnnual;
+  document.getElementById('billing-track').classList.toggle('on',billingAnnual);
+  document.getElementById('bill-monthly').classList.toggle('on',!billingAnnual);
+  document.getElementById('bill-annual').classList.toggle('on',billingAnnual);
+  const p={pro:billingAnnual?'$15':'$19',student:billingAnnual?'$7':'$9',team:billingAnnual?'$39':'$49'};
+  const per=billingAnnual?'/month, billed annually':'/month';
+  document.getElementById('price-pro').textContent=p.pro;
+  document.getElementById('price-student').textContent=p.student;
+  document.getElementById('price-team').textContent=p.team;
+  ['pro','student','team'].forEach(k=>document.getElementById('period-'+k).textContent=per);
+}
+
+/* ═══════════════════════════════════════
+   SOCIAL PROOF ANIMATION
+═══════════════════════════════════════ */
+function animateSocialProof(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    if(el.dataset.animated)return;
+    el.dataset.animated='1';
+    const target=parseInt(el.dataset.count);
+    const suffix=el.dataset.suffix||'';
+    let cur=0;const step=target/50;
+    const t=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=Math.round(cur).toLocaleString()+suffix;if(cur>=target)clearInterval(t);},25);
+  });
+}
+
+/* ═══════════════════════════════════════
+   EXPORT MODAL
+═══════════════════════════════════════ */
+function openExportModal(){if(!rptLast){toast('Generate a report first');return;}document.getElementById('export-modal').classList.add('on');}
+function closeExportModal(){document.getElementById('export-modal').classList.remove('on');}
+
+/* ═══════════════════════════════════════
+   SKELETON HELPERS
+═══════════════════════════════════════ */
+function showSkeleton(id){document.getElementById(id+'-skeleton')?.classList.add('on');}
+function hideSkeleton(id){document.getElementById(id+'-skeleton')?.classList.remove('on');}
 
 function calcROI(){
   const reports = +(document.getElementById('roi-reports')?.value) || 10;
