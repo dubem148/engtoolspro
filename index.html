@@ -2,6 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="description" content="Generate professional engineering reports, analyze datasheets, and access 140+ standards — powered by AI. Built for electrical, mechanical, civil, and software engineers."/>
+<meta property="og:title"       content="EngTools Pro — AI Workspace for Engineers"/>
+<meta property="og:description" content="Generate professional engineering reports, analyze datasheets, and access 140+ standards — powered by AI."/>
+<meta property="og:image"       content="https://engtoolspro.com/og-image.png"/>
+<meta property="og:url"         content="https://engtoolspro.com/"/>
+<meta property="og:type"        content="website"/>
+<meta name="twitter:card"       content="summary_large_image"/>
+<meta name="twitter:title"      content="EngTools Pro — AI Workspace for Engineers"/>
+<meta name="twitter:description"content="Generate professional engineering reports, analyze datasheets, and access 140+ standards — powered by AI."/>
+<meta name="twitter:image"      content="https://engtoolspro.com/og-image.png"/>
+<!-- Google Analytics 4 — replace GA_MEASUREMENT_ID with your real property ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GA_MEASUREMENT_ID');</script>
+<!-- Vercel Analytics -->
+<script defer src="/_vercel/insights/script.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>EngTools Pro — AI-Powered Engineering Suite</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -816,6 +832,7 @@ footer {
   .proof-bar { padding: 40px 20px 0; }
 }
 </style>
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('ep_theme')||'dark');})();</script>
 </head>
 <body>
 <canvas id="bg-canvas"></canvas>
@@ -875,7 +892,7 @@ footer {
 
     <div class="hero-trust">
       <div class="hero-trust-item">Free forever plan</div>
-      <div class="hero-trust-item">Professional from $39/mo</div>
+      <div class="hero-trust-item">Professional from $19/mo</div>
       <div class="hero-trust-item">Cancel any time</div>
     </div>
   </div>
@@ -1176,7 +1193,7 @@ footer {
 <section class="section" id="pricing">
   <div class="section-label">Pricing</div>
   <h2 class="section-h2">Less than one hour<br/>of your billing rate.</h2>
-  <p class="section-sub">A professional engineer billing at $50–150/hr saves 2–4 hours per report. At $39/month, EngTools Pro pays for itself in the first use.</p>
+  <p class="section-sub">A professional engineer billing at $50–150/hr saves 2–4 hours per report. At $19/month, EngTools Pro pays for itself in the first use.</p>
 
   <div class="pricing-toggle">
     <span>Monthly</span>
@@ -1193,7 +1210,7 @@ footer {
       <div class="pc-price">$0<sub>/mo</sub></div>
       <div class="pc-desc">Try it with no commitment. No card needed.</div>
       <ul class="pc-feats">
-        <li>10 AI queries per day</li>
+        <li>10 reports per month</li>
         <li>3 report templates</li>
         <li>Datasheet analyzer</li>
         <li>Copy output</li>
@@ -1201,64 +1218,63 @@ footer {
         <li class="no">PDF upload</li>
         <li class="no">Comparison tool</li>
       </ul>
-      <button class="pc-cta ghost" onclick="window.location.href='app.html'">Start free →</button>
+      <button class="pc-cta ghost" onclick="window.location.href='signup.html'">Start free →</button>
     </div>
 
     <div class="pc">
       <div class="pc-tier">Student</div>
-      <div class="pc-price"><span class="orig" id="stu-orig">$15</span><span id="stu-price">$12</span><sub>/mo</sub></div>
+      <div class="pc-price"><span id="stu-price">$9</span><sub>/mo</sub></div>
       <div class="pc-desc">For engineering students and recent graduates.</div>
       <ul class="pc-feats">
-        <li>150 AI queries per month</li>
+        <li>150 reports per month</li>
         <li>All 10 report templates</li>
         <li>Standards referencing</li>
         <li>Datasheet analyzer</li>
         <li>Download outputs</li>
-        <li>20 saved reports</li>
+        <li>Unlimited saved reports</li>
         <li class="no">PDF upload</li>
       </ul>
-      <button class="pc-cta ghost" onclick="showToast('Launching soon — join the waitlist!')">Get Student Plan</button>
+      <button class="pc-cta ghost" onclick="subscribePlan('student')">Get Student Plan</button>
     </div>
 
     <div class="pc featured">
       <div class="pc-pop">MOST POPULAR</div>
       <div class="pc-tier">Professional</div>
-      <div class="pc-price"><span class="orig" id="pro-orig">$49</span><span id="pro-price">$39</span><sub>/mo</sub></div>
+      <div class="pc-price"><span id="pro-price">$19</span><sub>/mo</sub></div>
       <div class="pc-desc">For working engineers who submit reports regularly.</div>
       <ul class="pc-feats">
-        <li>Unlimited AI queries</li>
+        <li>Unlimited reports</li>
         <li>All 10 report templates</li>
         <li>60+ engineering standards</li>
-        <li>PDF upload & extraction</li>
+        <li>PDF upload &amp; extraction</li>
         <li>Visual parameter cards</li>
         <li>Datasheet comparison tool</li>
-        <li>One-click refine & revise</li>
+        <li>One-click refine &amp; revise</li>
         <li>Download + print to PDF</li>
         <li>Unlimited saved reports</li>
         <li>Priority response speed</li>
         <li>Email support</li>
       </ul>
-      <button class="pc-cta fill" onclick="showToast('Payment integration launching soon!')">Get Professional →</button>
+      <button class="pc-cta fill" onclick="subscribePlan('pro')">Get Professional →</button>
     </div>
 
     <div class="pc">
-      <div class="pc-tier">Enterprise</div>
-      <div class="pc-price"><span id="ent-price">$299</span><sub>/mo</sub></div>
-      <div class="pc-desc">For engineering firms and large teams.</div>
+      <div class="pc-tier">Team</div>
+      <div class="pc-price"><span id="team-price">$49</span><sub>/mo</sub></div>
+      <div class="pc-desc">For engineering teams and consultancies.</div>
       <ul class="pc-feats">
-        <li>Unlimited seats</li>
+        <li>Unlimited reports</li>
+        <li>Up to 5 team members</li>
         <li>Shared report library</li>
+        <li>All Professional features</li>
         <li>Company branding on reports</li>
-        <li>API access & integrations</li>
-        <li>Custom templates</li>
-        <li>Invoice / PO billing</li>
-        <li>Dedicated account manager</li>
-        <li>SLA & priority support</li>
+        <li>Priority support</li>
+        <li>Team usage dashboard</li>
       </ul>
-      <button class="pc-cta ghost" onclick="showToast('Email us: hello@engtoolspro.com')">Contact Sales →</button>
+      <button class="pc-cta ghost" onclick="subscribePlan('team')">Get Team Plan →</button>
     </div>
   </div>
-  <div class="pricing-note">All prices in USD · Stripe-secured payments · 7-day free trial on all paid plans · Cancel any time</div>
+  <div class="pricing-note">All prices in USD · Stripe-secured payments · Cancel any time</div>
 </section>
 
 <div class="divider"></div>
@@ -1301,10 +1317,24 @@ footer {
     <h2 class="cta-h2" style="font-family:var(--display)">Stop writing reports<br/><span style="font-style:italic;font-weight:300;background:linear-gradient(120deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">from scratch.</span></h2>
     <p class="cta-sub">Join thousands of engineers worldwide — from the US, UK, Ireland, Nigeria, and beyond — who use EngTools Pro to work faster, produce better reports, and spend more time on actual engineering.</p>
     <div class="cta-actions">
-      <button class="hero-btn-primary" onclick="window.location.href='app.html'">✦ Start for free</button>
+      <button class="hero-btn-primary" onclick="window.location.href='signup.html'">Start for free</button>
       <button class="hero-btn-secondary" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See pricing →</button>
     </div>
     <div class="cta-note">No credit card · Free plan forever · Upgrade when you're ready</div>
+
+    <!-- WAITLIST FORM -->
+    <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--edge);">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;">Join the waitlist for early access &amp; updates</p>
+      <form id="waitlist-form" onsubmit="submitWaitlist(event)" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:440px;margin:0 auto;">
+        <input type="email" id="waitlist-email" placeholder="your@email.com" required
+          style="flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--edge2);border-radius:8px;color:var(--text);font-family:var(--body);font-size:14px;padding:11px 14px;outline:none;"/>
+        <button type="submit" id="waitlist-btn"
+          style="padding:11px 22px;border-radius:8px;background:var(--teal);color:#000;border:none;font-family:var(--body);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;">
+          Join waitlist
+        </button>
+      </form>
+      <div id="waitlist-msg" style="display:none;margin-top:10px;font-size:13px;color:var(--teal);"></div>
+    </div>
   </div>
 </section>
 
@@ -1475,18 +1505,61 @@ setTimeout(termTick, 1200);
 /* BILLING TOGGLE */
 let annual = false;
 const prices = {
-  stu: { monthly: 12, annual: 10 },
-  pro: { monthly: 39, annual: 31 },
-  ent: { monthly: 299, annual: 239 }
+  stu:  { monthly: 9,  annual: 7  },
+  pro:  { monthly: 19, annual: 15 },
+  team: { monthly: 49, annual: 39 }
 };
 function toggleBilling() {
   annual = !annual;
   document.getElementById('billing-toggle').classList.toggle('on', annual);
-  document.getElementById('stu-price').textContent = '$' + (annual ? prices.stu.annual : prices.stu.monthly);
-  document.getElementById('stu-orig').textContent = '$' + (annual ? 15 : 15);
-  document.getElementById('pro-price').textContent = '$' + (annual ? prices.pro.annual : prices.pro.monthly);
-  document.getElementById('pro-orig').textContent = '$' + (annual ? 49 : 49);
-  document.getElementById('ent-price').textContent = '$' + (annual ? prices.ent.annual : prices.ent.monthly);
+  if (document.getElementById('stu-price'))  document.getElementById('stu-price').textContent  = '$' + (annual ? prices.stu.annual  : prices.stu.monthly);
+  if (document.getElementById('pro-price'))  document.getElementById('pro-price').textContent  = '$' + (annual ? prices.pro.annual  : prices.pro.monthly);
+  if (document.getElementById('team-price')) document.getElementById('team-price').textContent = '$' + (annual ? prices.team.annual : prices.team.monthly);
+}
+
+/* STRIPE SUBSCRIBE */
+async function subscribePlan(plan) {
+  // If not signed in, send to signup
+  const token = window._currentUser?.access_token;
+  if (!token) { window.location.href = '/signup'; return; }
+  const btn = event?.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+  try {
+    const r = await fetch('/api/stripe-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    });
+    const data = await r.json();
+    if (data.url) { window.location.href = data.url; }
+    else { showToast(data.error || 'Could not start checkout. Please try again.'); if (btn) { btn.disabled = false; btn.textContent = 'Get Plan →'; } }
+  } catch { showToast('Network error. Please try again.'); if (btn) { btn.disabled = false; } }
+}
+
+/* WAITLIST */
+async function submitWaitlist(e) {
+  e.preventDefault();
+  const email = document.getElementById('waitlist-email').value.trim();
+  const btn   = document.getElementById('waitlist-btn');
+  const msg   = document.getElementById('waitlist-msg');
+  btn.disabled    = true;
+  btn.textContent = 'Joining…';
+  try {
+    const r = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'landing-cta' })
+    });
+    const data = await r.json();
+    msg.style.display   = 'block';
+    msg.style.color     = data.success ? 'var(--teal)' : 'var(--rose)';
+    msg.textContent     = data.success ? "You're on the list! We'll be in touch." : (data.error || 'Something went wrong.');
+    if (data.success) document.getElementById('waitlist-form').reset();
+  } catch {
+    msg.style.display = 'block'; msg.style.color = 'var(--rose)'; msg.textContent = 'Network error. Please try again.';
+  }
+  btn.disabled    = false;
+  btn.textContent = 'Join waitlist';
 }
 
 /* FAQ */

@@ -1,15 +1,31 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/api/(.*)",        "dest": "/api/$1" },
-    { "src": "/",                "dest": "/index.html" },
-    { "src": "/login",           "dest": "/login.html" },
-    { "src": "/signup",          "dest": "/signup.html" },
-    { "src": "/dashboard",       "dest": "/dashboard.html" },
-    { "src": "/app",             "dest": "/app.html" },
-    { "src": "/login.html",      "dest": "/login.html" },
-    { "src": "/signup.html",     "dest": "/signup.html" },
-    { "src": "/dashboard.html",  "dest": "/dashboard.html" },
-    { "src": "/app.html",        "dest": "/app.html" }
+    { "src": "/api/(.*)",           "dest": "/api/$1" },
+    { "src": "/",                   "dest": "/index.html" },
+    { "src": "/login",              "dest": "/login.html" },
+    { "src": "/signup",             "dest": "/signup.html" },
+    { "src": "/dashboard",          "dest": "/dashboard.html" },
+    { "src": "/app",                "dest": "/app.html" },
+    { "src": "/admin",              "dest": "/admin.html" },
+    { "src": "/login.html",         "dest": "/login.html" },
+    { "src": "/signup.html",        "dest": "/signup.html" },
+    { "src": "/dashboard.html",     "dest": "/dashboard.html" },
+    { "src": "/app.html",           "dest": "/app.html" },
+    { "src": "/admin.html",         "dest": "/admin.html" },
+    { "src": "/sitemap.xml",        "dest": "/sitemap.xml" },
+    { "src": "/robots.txt",         "dest": "/robots.txt" },
+    { "src": "/favicon.svg",        "dest": "/favicon.svg" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options",        "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy",        "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy",     "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
   ]
 }

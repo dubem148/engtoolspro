@@ -4,6 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Create Account — EngTools Pro</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="description" content="Create your free EngTools Pro account — AI-powered engineering reports, datasheets, and standards in one workspace."/>
+<meta property="og:title" content="Create Account — EngTools Pro"/>
+<meta property="og:description" content="Start generating professional engineering reports for free. No credit card required."/>
+<meta property="og:url" content="https://engtoolspro.com/signup"/>
+<meta property="og:type" content="website"/>
+<script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -14,6 +21,7 @@
   --edge:rgba(20,240,204,0.08);--edge2:rgba(20,240,204,0.18);
   --display:'Fraunces',serif;--body:'DM Sans',sans-serif;--mono:'Fira Code',monospace;
 }
+[data-theme="light"]{--void:#f4f6fb;--navy:#edf0f7;--surface:#fff;--raised:#f0f3fa;--text:#0d1220;--muted:#3d5070;--faint:#8b9dc3;--edge:rgba(30,50,100,.07);--edge2:rgba(30,50,100,.15);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:var(--body);background:var(--void);color:var(--text);
@@ -175,6 +183,7 @@ select option{background:var(--navy)}
   </div>
 </div>
 
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('ep_theme')||'dark');})();</script>
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 

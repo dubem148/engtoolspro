@@ -4,9 +4,20 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>EngTools Pro — AI Workspace for Engineers</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="description" content="AI-powered engineering workspace — generate professional reports, analyze datasheets, and reference 140+ standards."/>
+<meta property="og:title" content="EngTools Pro — AI Workspace for Engineers"/>
+<meta property="og:description" content="AI-powered engineering workspace — generate professional reports, analyze datasheets, and reference 140+ standards."/>
+<meta property="og:url" content="https://engtoolspro.com/app"/>
+<meta property="og:type" content="website"/>
+<!-- Google Analytics 4 — replace GA_MEASUREMENT_ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GA_MEASUREMENT_ID');</script>
+<script defer src="/_vercel/insights/script.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
 /* ─────────────────────────────────────────
    DESIGN TOKENS
@@ -45,6 +56,27 @@
   --rs: 8px;
   --rx: 5px;
 }
+
+/* ─────────────────────────────────────────
+   LIGHT MODE
+───────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:      #f4f6fb;
+  --bg2:     #edf0f7;
+  --surface: #ffffff;
+  --raised:  #f0f3fa;
+  --hover:   #e4e9f5;
+  --b1: rgba(30,50,100,.07);
+  --b2: rgba(30,50,100,.12);
+  --b3: rgba(30,50,100,.22);
+  --t1: #0d1220;
+  --t2: #3d5070;
+  --t3: #8b9dc3;
+  --td: rgba(45,212,191,.08);
+  --tm: rgba(45,212,191,.15);
+}
+[data-theme="light"] body { background-image: radial-gradient(ellipse 90% 40% at 50% 0%, rgba(45,212,191,.04) 0%, transparent 70%); }
+[data-theme="light"] .topbar { background:rgba(244,246,251,.92); }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; }
@@ -778,45 +810,7 @@ select option { background:var(--surface); color:var(--t1); }
 .pricing-header h2 { font-family:var(--display); font-size:clamp(20px,3vw,28px); font-weight:700; color:var(--t1); margin-bottom:8px; }
 .pricing-header p  { font-size:14px; color:var(--t2); }
 
-/* ─────────────────────────────────────────
-   AUTH SCREENS
-───────────────────────────────────────── */
-.auth-screen {
-  position:fixed; inset:0; z-index:900;
-  background:var(--bg);
-  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(45,212,191,.07) 0%,transparent 70%);
-  display:flex; align-items:center; justify-content:center;
-}
-.auth-screen.hidden { display:none; }
-.auth-card {
-  width:420px; max-width:calc(100vw - 32px);
-  background:var(--surface); border:1px solid var(--b2);
-  border-radius:var(--r1); padding:40px;
-  box-shadow:0 24px 64px rgba(0,0,0,.45);
-  animation:modalPop .25s ease;
-}
-.auth-logo { display:flex; align-items:center; gap:10px; margin-bottom:32px; }
-.auth-logo-gem { width:32px; height:32px; background:var(--teal); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:12px; font-weight:700; color:#000; }
-.auth-logo-name { font-size:15px; font-weight:700; color:var(--t1); }
-.auth-title { font-family:var(--display); font-size:26px; font-weight:800; color:var(--t1); margin-bottom:6px; }
-.auth-sub { font-size:14px; color:var(--t2); margin-bottom:28px; line-height:1.6; }
-.auth-field { margin-bottom:16px; }
-.auth-label { display:block; font-size:11px; font-family:var(--mono); color:var(--t2); text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; }
-.auth-input { width:100%; background:var(--raised); border:1px solid var(--b2); border-radius:var(--rs); color:var(--t1); font-family:var(--body); font-size:14px; padding:12px 16px; outline:none; transition:border-color .15s,box-shadow .15s; }
-.auth-input:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(45,212,191,.1); }
-.auth-btn { width:100%; height:48px; background:linear-gradient(90deg,var(--teal),var(--blue)); border:none; border-radius:var(--rs); color:#000; font-family:var(--body); font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; transition:all .15s; position:relative; overflow:hidden; }
-.auth-btn::after { content:''; position:absolute; top:0; left:-100%; width:50%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent); animation:shimmer 2.5s infinite; }
-.auth-btn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(45,212,191,.28); }
-.auth-switch { text-align:center; margin-top:20px; font-size:13.5px; color:var(--t2); }
-.auth-link { color:var(--teal); text-decoration:none; cursor:pointer; font-weight:600; }
-.auth-link:hover { text-decoration:underline; }
-.auth-forgot { font-size:12px; color:var(--t3); cursor:pointer; float:right; }
-.auth-forgot:hover { color:var(--t2); }
-.auth-divider { display:flex; align-items:center; gap:12px; margin:18px 0; }
-.auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:var(--b1); }
-.auth-divider span { font-size:11px; color:var(--t3); font-family:var(--mono); }
-.auth-error { background:rgba(251,113,133,.1); border:1px solid rgba(251,113,133,.25); border-radius:var(--rs); padding:10px 14px; font-size:13px; color:var(--rose); margin-bottom:14px; display:none; }
-.auth-error.on { display:block; }
+/* AUTH SCREENS removed — auth handled by login.html / signup.html */
 
 /* ─────────────────────────────────────────
    ACCOUNT DROPDOWN
@@ -1193,6 +1187,30 @@ select option { background:var(--surface); color:var(--t1); }
   .copilot-panel { right:8px; bottom:76px; width:calc(100vw - 16px); }
   .export-opts { grid-template-columns:1fr; }
   .trust-badge { padding:10px 18px; }
+  /* Nav: horizontal scroll so all tabs remain accessible */
+  .nav { overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px; }
+  .nav::-webkit-scrollbar { display:none; }
+  /* Standards chips: larger tap targets */
+  .std-chip { padding:10px 14px; min-height:44px; display:inline-flex; align-items:center; }
+  /* Datasheet: single column form */
+  .ds-row,.cmp-row { grid-template-columns:1fr; }
+  /* Dashboard stats: 2 columns on mid-range, 1 on very small */
+  .dash-stats { grid-template-columns:1fr 1fr; }
+  /* Usage bar: full width */
+  .usage-wrap { padding:16px; }
+  /* Reports header: stack */
+  .rpt-header-row { flex-direction:column; gap:12px; align-items:flex-start; }
+  /* Reduce bar-end clutter */
+  .cta-upgrade { display:none; }
+}
+@media (max-width:480px) {
+  .dash-stats { grid-template-columns:1fr; }
+  .dash-actions { grid-template-columns:1fr; }
+  .stat-card { padding:16px; }
+  .page-inner { padding:0 12px 40px; }
+  .copilot-panel { right:4px; width:calc(100vw - 8px); max-height:55vh; }
+  .hub-cats { gap:6px; }
+  .hub-cat { padding:7px 12px; font-size:12px; }
 }
 </style>
 </head>
@@ -1210,15 +1228,16 @@ select option { background:var(--surface); color:var(--t1); }
     </div>
   </a>
   <nav class="nav">
-    <button class="ntab on"  onclick="goPage('dashboard')"><span class="ntab-icon">⬡</span><span class="ntab-label">Dashboard</span></button>
-    <button class="ntab"     onclick="goPage('report')">   <span class="ntab-icon">📄</span><span class="ntab-label">Reports</span></button>
-    <button class="ntab"     onclick="goPage('datasheet')"><span class="ntab-icon">🔍</span><span class="ntab-label">Datasheet</span></button>
-    <button class="ntab"     onclick="goPage('compare')">  <span class="ntab-icon">⚖️</span><span class="ntab-label">Compare</span></button>
-    <button class="ntab"     onclick="goPage('standards')"><span class="ntab-icon">📚</span><span class="ntab-label">Standards</span></button>
-    <button class="ntab"     onclick="goPage('team')">     <span class="ntab-icon">👥</span><span class="ntab-label">Team</span></button>
-    <button class="ntab"     onclick="goPage('pricing')">  <span class="ntab-icon">💳</span><span class="ntab-label">Pricing</span></button>
+    <button class="ntab on"  onclick="goPage('dashboard')"><span class="ntab-icon"><i data-lucide="layout-dashboard" style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Dashboard</span></button>
+    <button class="ntab"     onclick="goPage('report')">   <span class="ntab-icon"><i data-lucide="file-text"         style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Reports</span></button>
+    <button class="ntab"     onclick="goPage('datasheet')"><span class="ntab-icon"><i data-lucide="cpu"               style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Datasheet</span></button>
+    <button class="ntab"     onclick="goPage('compare')">  <span class="ntab-icon"><i data-lucide="scale"             style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Compare</span></button>
+    <button class="ntab"     onclick="goPage('standards')"><span class="ntab-icon"><i data-lucide="book-open"         style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Standards</span></button>
+    <button class="ntab"     onclick="goPage('team')">     <span class="ntab-icon"><i data-lucide="users"             style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Team</span></button>
+    <button class="ntab"     onclick="goPage('pricing')">  <span class="ntab-icon"><i data-lucide="credit-card"       style="width:15px;height:15px;vertical-align:middle"></i></span><span class="ntab-label">Pricing</span></button>
   </nav>
   <div class="bar-end">
+    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--b2);border-radius:var(--rs);padding:7px 10px;cursor:pointer;font-size:14px;color:var(--t2);transition:all .15s;line-height:1;" aria-label="Toggle colour theme">&#9788;</button>
     <button class="cta-upgrade" onclick="goPage('pricing')" style="font-size:12px;padding:8px 16px;">Upgrade →</button>
     <div class="account-wrap">
       <button class="account-btn" onclick="toggleAccountMenu()">
@@ -1234,80 +1253,18 @@ select option { background:var(--surface); color:var(--t1); }
           <div class="acct-name" id="dd-name" style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:3px;">Engineer</div>
           <div class="dd-user-email" id="dd-email">engineer@engtoolspro.com</div>
         </div>
-        <div class="dd-item" onclick="toast('Profile settings coming soon');toggleAccountMenu()">👤 My Profile</div>
-        <div class="dd-item" onclick="goPage('pricing');toggleAccountMenu()">⬆️ Upgrade Plan</div>
-        <div class="dd-item" onclick="goPage('team');toggleAccountMenu()">👥 Team Workspace</div>
+        <div class="dd-item" onclick="toast('Profile settings coming soon');toggleAccountMenu()"><i data-lucide="user" style="width:14px;height:14px"></i> My Profile</div>
+        <div class="dd-item" onclick="goPage('pricing');toggleAccountMenu()"><i data-lucide="arrow-up-circle" style="width:14px;height:14px"></i> Upgrade Plan</div>
+        <div class="dd-item" onclick="goPage('team');toggleAccountMenu()"><i data-lucide="users" style="width:14px;height:14px"></i> Team Workspace</div>
         <div class="dd-divider"></div>
-        <div class="dd-item" onclick="goPage('about');toggleAccountMenu()">ℹ️ About EngTools Pro</div>
-        <div class="dd-item" onclick="goPage('contact');toggleAccountMenu()">✉️ Contact Support</div>
+        <div class="dd-item" onclick="goPage('about');toggleAccountMenu()"><i data-lucide="info" style="width:14px;height:14px"></i> About EngTools Pro</div>
+        <div class="dd-item" onclick="goPage('contact');toggleAccountMenu()"><i data-lucide="mail" style="width:14px;height:14px"></i> Contact Support</div>
         <div class="dd-divider"></div>
-        <div class="dd-item dd-danger" onclick="doLogout()">→ Sign Out</div>
+        <div class="dd-item dd-danger" onclick="doLogout()"><i data-lucide="log-out" style="width:14px;height:14px"></i> Sign Out</div>
       </div>
     </div>
   </div>
 </header>
-
-<!-- ═══════ AUTH — LOGIN ═══════ -->
-<div class="auth-screen" id="auth-login">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-gem">EP</div>
-      <span class="auth-logo-name">EngTools Pro</span>
-    </div>
-    <h1 class="auth-title">Welcome back</h1>
-    <p class="auth-sub">Sign in to your AI engineering workspace.</p>
-    <div class="auth-error" id="login-error">Invalid email or password. Please try again.</div>
-    <div class="auth-field">
-      <label class="auth-label">Email address</label>
-      <input class="auth-input" id="login-email" type="email" placeholder="you@yourcompany.com" onkeydown="if(event.key==='Enter')doLogin()"/>
-    </div>
-    <div class="auth-field">
-      <label class="auth-label">Password <span class="auth-forgot" onclick="switchAuth('forgot')">Forgot password?</span></label>
-      <input class="auth-input" id="login-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
-    </div>
-    <button class="auth-btn" onclick="doLogin()">Sign In →</button>
-    <div class="auth-divider"><span>or</span></div>
-    <button class="auth-btn" style="background:var(--surface);border:1px solid var(--b2);color:var(--t1);font-size:14px;" onclick="doGuestLogin()">Continue as Guest (Demo)</button>
-    <div class="auth-switch">No account? <span class="auth-link" onclick="switchAuth('signup')">Create free account</span></div>
-  </div>
-</div>
-
-<!-- ═══════ AUTH — SIGN UP ═══════ -->
-<div class="auth-screen hidden" id="auth-signup">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-gem">EP</div>
-      <span class="auth-logo-name">EngTools Pro</span>
-    </div>
-    <h1 class="auth-title">Create account</h1>
-    <p class="auth-sub">Start generating professional engineering reports in minutes. Free forever — no card needed.</p>
-    <div class="auth-error" id="signup-error">Please fill in all fields.</div>
-    <div class="g2" style="gap:12px">
-      <div class="auth-field"><label class="auth-label">First name</label><input class="auth-input" id="signup-fname" type="text" placeholder="Sarah"/></div>
-      <div class="auth-field"><label class="auth-label">Last name</label><input class="auth-input" id="signup-lname" type="text" placeholder="Mitchell"/></div>
-    </div>
-    <div class="auth-field"><label class="auth-label">Work email</label><input class="auth-input" id="signup-email" type="email" placeholder="sarah@yourcompany.com"/></div>
-    <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="signup-pw" type="password" placeholder="Minimum 6 characters" onkeydown="if(event.key==='Enter')doSignup()"/></div>
-    <button class="auth-btn" onclick="doSignup()">Create Free Account →</button>
-    <div class="auth-switch" style="margin-top:14px;font-size:11.5px;color:var(--t3);">By signing up you agree to our <span class="auth-link" onclick="goPage('terms');hideAuth()">Terms</span> and <span class="auth-link" onclick="goPage('privacy');hideAuth()">Privacy Policy</span>.</div>
-    <div class="auth-switch">Already have an account? <span class="auth-link" onclick="switchAuth('login')">Sign in</span></div>
-  </div>
-</div>
-
-<!-- ═══════ AUTH — FORGOT PASSWORD ═══════ -->
-<div class="auth-screen hidden" id="auth-forgot">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-gem">EP</div>
-      <span class="auth-logo-name">EngTools Pro</span>
-    </div>
-    <h1 class="auth-title">Reset password</h1>
-    <p class="auth-sub">Enter your email and we'll send you a reset link.</p>
-    <div class="auth-field"><label class="auth-label">Email address</label><input class="auth-input" id="forgot-email" type="email" placeholder="you@yourcompany.com"/></div>
-    <button class="auth-btn" onclick="doForgot()">Send Reset Link →</button>
-    <div class="auth-switch"><span class="auth-link" onclick="switchAuth('login')">← Back to sign in</span></div>
-  </div>
-</div>
 
 <!-- ═══════ COPILOT BUTTON ═══════ -->
 <button class="copilot-btn" onclick="toggleCopilot()" title="Open AI EngTools Pro">
@@ -1922,15 +1879,15 @@ select option { background:var(--surface); color:var(--t1); }
   </div>
 
   <div class="hub-cats">
-    <button class="hub-cat on" data-cat="all" onclick="setHubCat('all')">All</button>
-    <button class="hub-cat" data-cat="electrical" onclick="setHubCat('electrical')">⚡ Electrical</button>
-    <button class="hub-cat" data-cat="mechanical" onclick="setHubCat('mechanical')">⚙️ Mechanical</button>
-    <button class="hub-cat" data-cat="civil" onclick="setHubCat('civil')">🏗️ Civil / Structural</button>
-    <button class="hub-cat" data-cat="software" onclick="setHubCat('software')">💻 Software / Systems</button>
-    <button class="hub-cat" data-cat="chemical" onclick="setHubCat('chemical')">🧪 Chemical / Process</button>
-    <button class="hub-cat" data-cat="petroleum" onclick="setHubCat('petroleum')">🛢️ Petroleum / O&amp;G</button>
-    <button class="hub-cat" data-cat="aerospace" onclick="setHubCat('aerospace')">✈️ Aerospace</button>
-    <button class="hub-cat" data-cat="telecoms" onclick="setHubCat('telecoms')">📡 Telecoms</button>
+    <button class="hub-cat on" data-cat="all"        onclick="setHubCat('all')">All</button>
+    <button class="hub-cat" data-cat="electrical"    onclick="setHubCat('electrical')">Electrical</button>
+    <button class="hub-cat" data-cat="mechanical"    onclick="setHubCat('mechanical')">Mechanical</button>
+    <button class="hub-cat" data-cat="civil"         onclick="setHubCat('civil')">Civil / Structural</button>
+    <button class="hub-cat" data-cat="software"      onclick="setHubCat('software')">Software / Systems</button>
+    <button class="hub-cat" data-cat="chemical"      onclick="setHubCat('chemical')">Chemical / Process</button>
+    <button class="hub-cat" data-cat="petroleum"     onclick="setHubCat('petroleum')">Petroleum / O&amp;G</button>
+    <button class="hub-cat" data-cat="aerospace"     onclick="setHubCat('aerospace')">Aerospace</button>
+    <button class="hub-cat" data-cat="telecoms"      onclick="setHubCat('telecoms')">Telecoms</button>
   </div>
 
   <div class="hub-grid" id="hub-grid">
@@ -2468,21 +2425,50 @@ select option { background:var(--surface); color:var(--t1); }
 
 <div class="toast" id="toast-el"></div>
 
+<!-- ═══════ SUPABASE AUTH MODULE ═══════ -->
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPA_URL = 'https://jykqcothsmogauvfnuvh.supabase.co';
+const SUPA_KEY = 'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J';
+window._supabase = createClient(SUPA_URL, SUPA_KEY);
+const { data: { session } } = await window._supabase.auth.getSession();
+if (!session) {
+  window.location.href = '/login?redirect=/app';
+} else {
+  const { data: profile } = await window._supabase
+    .from('profiles').select('*').eq('id', session.user.id).single();
+  window._currentUser = {
+    id:                   session.user.id,
+    email:                session.user.email,
+    name:                 profile?.full_name || session.user.email.split('@')[0],
+    plan:                 profile?.plan || 'free',
+    monthly_reports_used: profile?.monthly_reports_used || 0,
+    access_token:         session.access_token
+  };
+  // Refresh token automatically
+  window._supabase.auth.onAuthStateChange((event, newSession) => {
+    if (newSession && window._currentUser) {
+      window._currentUser.access_token = newSession.access_token;
+    }
+  });
+}
+</script>
+
 <script>
 /* ═══════════════════════════════════════
    DATA
 ═══════════════════════════════════════ */
 const TPLS = [
-  {id:'inspection',  e:'🔎',n:'Inspection',      h:'Site / equipment findings'},
-  {id:'failure',     e:'💥',n:'Failure Analysis', h:'Root cause investigation'},
-  {id:'commissioning',e:'✅',n:'Commissioning',   h:'System test & handover'},
-  {id:'design',      e:'📐',n:'Design Report',    h:'Engineering design & calcs'},
-  {id:'feasibility', e:'📊',n:'Feasibility Study',h:'Technical viability check'},
-  {id:'test',        e:'🧪',n:'Test Report',      h:'Verification & validation'},
-  {id:'site',        e:'🗺️',n:'Site Survey',      h:'Field survey & assessment'},
-  {id:'maintenance', e:'🔧',n:'Maintenance',      h:'Planned / corrective work'},
-  {id:'progress',    e:'📈',n:'Progress Report',  h:'Project status & milestones'},
-  {id:'incident',    e:'⚠️',n:'Incident Report',  h:'Safety incident investigation'},
+  {id:'inspection',   e:'search',        n:'Inspection',      h:'Site / equipment findings'},
+  {id:'failure',      e:'zap',           n:'Failure Analysis',h:'Root cause investigation'},
+  {id:'commissioning',e:'check-circle',  n:'Commissioning',   h:'System test & handover'},
+  {id:'design',       e:'ruler',         n:'Design Report',   h:'Engineering design & calcs'},
+  {id:'feasibility',  e:'bar-chart-2',   n:'Feasibility Study',h:'Technical viability check'},
+  {id:'test',         e:'flask-conical', n:'Test Report',     h:'Verification & validation'},
+  {id:'site',         e:'map',           n:'Site Survey',     h:'Field survey & assessment'},
+  {id:'maintenance',  e:'wrench',        n:'Maintenance',     h:'Planned / corrective work'},
+  {id:'progress',     e:'trending-up',   n:'Progress Report', h:'Project status & milestones'},
+  {id:'incident',     e:'alert-triangle',n:'Incident Report', h:'Safety incident investigation'},
 ];
 
 const TPL_COLORS = {
@@ -2519,7 +2505,7 @@ const SECS = {
    STATE
 ═══════════════════════════════════════ */
 let selTpl='inspection', selStds=new Set(['IEC 60364','BS 7671 (18th Ed.)']), selSecs=new Set();
-let dsCtx='', qaHist=[], usageN=3, rptLast='';
+let dsCtx='', qaHist=[], usageN=0, rptLast='';
 let dsFiles=[], dsContent='';
 
 /* ═══════════════════════════════════════
@@ -2535,6 +2521,7 @@ function init(){
   renderProjectCards();
   renderHub();
   initAuth();
+  if(window.lucide) lucide.createIcons();
 }
 function onFieldChange(){ renderStds(document.getElementById('rpt-field').value); }
 function toggleAppField(){ document.getElementById('ds-app-f').style.display='block'; }
@@ -2546,10 +2533,11 @@ function renderTpls(){
   document.getElementById('tpl-grid').innerHTML = TPLS.map(t=>`
     <div class="tpl-card ${t.id===selTpl?'on':''}" onclick="pickTpl('${t.id}')" style="--card-accent:${TPL_COLORS[t.id]||'#2dd4bf'}">
       <div class="tpl-check">✓</div>
-      <span class="tpl-em">${t.e}</span>
+      <span class="tpl-em"><i data-lucide="${t.e}" style="width:22px;height:22px;stroke:${TPL_COLORS[t.id]||'#2dd4bf'}"></i></span>
       <div class="tpl-name">${t.n}</div>
       <div class="tpl-sub">${t.h}</div>
     </div>`).join('');
+  if(window.lucide) lucide.createIcons();
 }
 function pickTpl(id){ selTpl=id; renderTpls(); renderSecs(id); }
 
@@ -2648,7 +2636,7 @@ ${extra?'ADDITIONAL REQUIREMENTS: '+extra:''}
 
 Write every section fully. Present measurements in tables. Number and prioritise all recommendations (CRITICAL / HIGH / MEDIUM / LOW). The report must be complete, polished, and ready to submit.`;
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]});
     const d=await r.json();
     if(d.error){setLoad('rpt',false);document.getElementById('rpt-prog').classList.remove('on');toast('API error: '+d.error.message);return;}
     const text=d.content?.find(c=>c.type==='text')?.text;
@@ -2711,7 +2699,7 @@ async function refine(instruction){
   if(!rptLast){toast('Generate a report first');return;}
   setLoad('rpt',true,'Refining your report…');
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:4000,system:'You are a senior engineering report editor. Revise as instructed, keeping all existing content and Markdown formatting. Return the complete revised report.',messages:[{role:'user',content:`REPORT:\n\n${rptLast}\n\n---\nINSTRUCTION: ${instruction}\n\nReturn the complete revised report.`}]})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:4000,system:'You are a senior engineering report editor. Revise as instructed, keeping all existing content and Markdown formatting. Return the complete revised report.',messages:[{role:'user',content:`REPORT:\n\n${rptLast}\n\n---\nINSTRUCTION: ${instruction}\n\nReturn the complete revised report.`}]});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||rptLast;
     rptLast=text;
@@ -2767,7 +2755,7 @@ async function analyzeDS(){
     application:`Provide detailed application notes: recommended topologies, layout considerations, thermal management, decoupling requirements, protection circuitry, and common design mistakes.`,
   };
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:3000,system:`You are an expert ${type} application engineer. Analyze precisely, cite specific values. Use ## for sections, **bold** for critical values, tables for structured data.`,messages:[{role:'user',content:`DATASHEET:\n\n${content}\n\n---\n${modeP[mode]}`}]})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:3000,system:`You are an expert ${type} application engineer. Analyze precisely, cite specific values. Use ## for sections, **bold** for critical values, tables for structured data.`,messages:[{role:'user',content:`DATASHEET:\n\n${content}\n\n---\n${modeP[mode]}`}]});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
     qaHist=[{role:'user',content:`Datasheet:\n${content}`},{role:'assistant',content:text}];
@@ -2825,7 +2813,7 @@ async function qsend(){
   qaHist.push({role:'user',content:q});
   const tid=addQTyping();
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1200,system:'You are an expert component/datasheet engineer. Answer precisely based on the provided datasheet. Cite specific values. Use tables where helpful. Be concise but complete.',messages:qaHist.slice(-14)})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:1200,system:'You are an expert component/datasheet engineer. Answer precisely based on the provided datasheet. Cite specific values. Use tables where helpful. Be concise but complete.',messages:qaHist.slice(-14)});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'No response.';
     qaHist.push({role:'assistant',content:text});
@@ -2858,7 +2846,7 @@ async function cmpDS(){
   setLoad('cmp',true,'Comparing both datasheets…');
   showSkeleton('cmp');
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:3000,system:'You are a senior engineer specialising in component and design option selection. Compare rigorously with specific values and give a clear, justified recommendation.',messages:[{role:'user',content:`Compare for application: "${app||'general engineering use'}"\n\n## ${an}:\n${a}\n\n## ${bn}:\n${b}\n\n---\nProvide:\n1. **Side-by-Side Comparison Table** (Parameter | ${an} | ${bn} | Winner)\n2. **Key Differences** for this specific application\n3. **${an}: Pros & Cons**\n4. **${bn}: Pros & Cons**\n5. **Overall Recommendation** with specific values justifying the choice\n6. **Risk Factors** to watch with the recommended option`}]})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:3000,system:'You are a senior engineer specialising in component and design option selection. Compare rigorously with specific values and give a clear, justified recommendation.',messages:[{role:'user',content:`Compare for application: "${app||'general engineering use'}"\n\n## ${an}:\n${a}\n\n## ${bn}:\n${b}\n\n---\nProvide:\n1. **Side-by-Side Comparison Table** (Parameter | ${an} | ${bn} | Winner)\n2. **Key Differences** for this specific application\n3. **${an}: Pros & Cons**\n4. **${bn}: Pros & Cons**\n5. **Overall Recommendation** with specific values justifying the choice\n6. **Risk Factors** to watch with the recommended option`}]});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Error.';
     setLoad('cmp',false);
@@ -2943,72 +2931,27 @@ function dlHtml(){
 let currentUser = null;
 
 function initAuth(){
-  const saved = localStorage.getItem('ep_user');
-  if(saved){try{currentUser=JSON.parse(saved);showApp();}catch{showAuthScreen('login');}
-  }else{showAuthScreen('login');}
-}
-function showAuthScreen(screen){
-  document.getElementById('auth-login').classList.toggle('hidden',screen!=='login');
-  document.getElementById('auth-signup').classList.toggle('hidden',screen!=='signup');
-  document.getElementById('auth-forgot').classList.toggle('hidden',screen!=='forgot');
-}
-function switchAuth(screen){ showAuthScreen(screen); }
-function hideAuth(){
-  ['auth-login','auth-signup','auth-forgot'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  currentUser = window._currentUser || null;
+  if(!currentUser){ return; } // module script already redirected to /login
+  showApp();
+  loadProjects().then(()=>{ renderProjectCards(); renderDashboard(); });
 }
 function showApp(){
-  hideAuth();
-  if(currentUser){
-    const initials=(currentUser.name||'E')[0].toUpperCase();
-    ['acct-avatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
-    const nameEl=document.getElementById('acct-name');if(nameEl)nameEl.textContent=currentUser.name||'Engineer';
-    const ddName=document.getElementById('dd-name');if(ddName)ddName.textContent=currentUser.name||'Engineer';
-    const ddEmail=document.getElementById('dd-email');if(ddEmail)ddEmail.textContent=currentUser.email||'engineer@engtoolspro.com';
-    const tmName=document.getElementById('team-member-name');if(tmName)tmName.textContent=(currentUser.name||'Engineer')+' (You)';
-    const tmEmail=document.getElementById('team-member-email');if(tmEmail)tmEmail.textContent=currentUser.email||'';
-  }
+  if(!currentUser) return;
+  const initials=(currentUser.name||'E')[0].toUpperCase();
+  const acctAv=document.getElementById('acct-avatar');if(acctAv)acctAv.textContent=initials;
+  const nameEl=document.getElementById('acct-name');if(nameEl)nameEl.textContent=currentUser.name||'Engineer';
+  const ddName=document.getElementById('dd-name');if(ddName)ddName.textContent=currentUser.name||'Engineer';
+  const ddEmail=document.getElementById('dd-email');if(ddEmail)ddEmail.textContent=currentUser.email||'';
+  const tmName=document.getElementById('team-member-name');if(tmName)tmName.textContent=(currentUser.name||'Engineer')+' (You)';
+  const tmEmail=document.getElementById('team-member-email');if(tmEmail)tmEmail.textContent=currentUser.email||'';
+  // Update plan badge
+  const planTag=document.querySelector('.plan-tag');
+  if(planTag){const pMap={free:'Free',student:'Student',pro:'Pro',team:'Team'};planTag.textContent=pMap[currentUser.plan]||'Free';}
 }
-function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const pw=document.getElementById('login-pw').value;
-  const errEl=document.getElementById('login-error');
-  if(!email||!pw){errEl.classList.add('on');errEl.textContent='Please enter your email and password.';return;}
-  const stored=localStorage.getItem('ep_user');
-  if(stored){
-    const u=JSON.parse(stored);
-    if(u.email===email&&u.pw===pw){currentUser=u;errEl.classList.remove('on');showApp();return;}
-  }
-  errEl.classList.add('on');errEl.textContent='Invalid email or password. Try "Continue as Guest" for a demo.';
-}
-function doSignup(){
-  const fname=document.getElementById('signup-fname').value.trim();
-  const lname=document.getElementById('signup-lname').value.trim();
-  const email=document.getElementById('signup-email').value.trim();
-  const pw=document.getElementById('signup-pw').value;
-  const errEl=document.getElementById('signup-error');
-  if(!fname||!email||!pw){errEl.classList.add('on');errEl.textContent='Please fill in all required fields.';return;}
-  if(pw.length<6){errEl.classList.add('on');errEl.textContent='Password must be at least 6 characters.';return;}
-  currentUser={name:fname+(lname?' '+lname:''),email,pw,plan:'free',created:Date.now()};
-  localStorage.setItem('ep_user',JSON.stringify(currentUser));
-  errEl.classList.remove('on');
-  showApp();
-  toast('Welcome to EngTools Pro, '+fname+' ✓');
-}
-function doGuestLogin(){
-  currentUser={name:'Engineer',email:'engineer@engtoolspro.com',plan:'free',guest:true};
-  showApp();
-}
-function doForgot(){
-  const email=document.getElementById('forgot-email').value.trim();
-  if(!email){toast('Please enter your email address');return;}
-  toast('Reset link sent to '+email+' ✓');
-  switchAuth('login');
-}
-function doLogout(){
-  if(currentUser&&!currentUser.guest){}
-  currentUser=null;
-  toggleAccountMenu();
-  showAuthScreen('login');
+async function doLogout(){
+  if(window._supabase) await window._supabase.auth.signOut();
+  window.location.href='/login';
 }
 
 /* ═══════════════════════════════════════
@@ -3023,29 +2966,69 @@ document.addEventListener('click',function(e){
 });
 
 /* ═══════════════════════════════════════
-   PROJECTS (localStorage)
+   PROJECTS (Supabase)
 ═══════════════════════════════════════ */
-function getProjects(){
-  try{return JSON.parse(localStorage.getItem('ep_projects')||'[]');}catch{return [];}
+let _projectsCache = [];
+
+function getProjects(){ return _projectsCache; }
+
+async function loadProjects(){
+  if(!window._supabase || !currentUser?.id){
+    _projectsCache = JSON.parse(localStorage.getItem('ep_projects')||'[]');
+    return;
+  }
+  const { data } = await window._supabase.from('reports')
+    .select('*').eq('user_id',currentUser.id)
+    .eq('is_deleted',false).order('created_at',{ascending:false});
+  _projectsCache = (data||[]).map(r=>({
+    id:r.id, type:r.report_type||'report', title:r.title||'Untitled',
+    content:r.content||'',
+    meta:{template:r.field||r.report_type, created:r.created_at},
+    updated:new Date(r.created_at).getTime()
+  }));
 }
-function saveProject(type,title,content,meta={}){
-  const projects=getProjects();
+
+async function saveProject(type,title,content,meta={}){
+  const wordCount=(content||'').trim().split(/\s+/).length;
+  if(window._supabase && currentUser?.id){
+    const { data } = await window._supabase.from('reports').insert({
+      user_id:currentUser.id, title, report_type:type,
+      field:meta.template||meta.org||type, content:content||'', word_count:wordCount
+    }).select().single();
+    if(data){
+      _projectsCache.unshift({id:data.id,type,title,content:content||'',meta:{...meta,created:data.created_at},updated:Date.now()});
+      return data.id;
+    }
+  }
+  // Fallback to localStorage
   const id=Date.now().toString();
-  projects.unshift({id,type,title,content:content||'',meta:{...meta,created:new Date().toISOString()},updated:Date.now()});
-  if(projects.length>30)projects.pop();
-  try{localStorage.setItem('ep_projects',JSON.stringify(projects));}catch{}
+  _projectsCache.unshift({id,type,title,content:content||'',meta:{...meta,created:new Date().toISOString()},updated:Date.now()});
+  if(_projectsCache.length>30)_projectsCache.pop();
+  try{localStorage.setItem('ep_projects',JSON.stringify(_projectsCache));}catch{}
   return id;
 }
-function deleteProject(id,e){
+
+async function deleteProject(id,e){
   if(e){e.stopPropagation();}
-  const projects=getProjects().filter(p=>p.id!==id);
-  localStorage.setItem('ep_projects',JSON.stringify(projects));
+  _projectsCache = _projectsCache.filter(p=>p.id!==id);
+  if(window._supabase && currentUser?.id){
+    await window._supabase.from('reports').update({is_deleted:true}).eq('id',id).eq('user_id',currentUser.id);
+  } else {
+    localStorage.setItem('ep_projects',JSON.stringify(_projectsCache));
+  }
   renderProjectCards();
   renderDashboard();
   toast('Project deleted');
 }
-function clearProjects(){
-  localStorage.removeItem('ep_projects');
+
+async function clearProjects(){
+  if(window._supabase && currentUser?.id){
+    const ids=_projectsCache.map(p=>p.id);
+    if(ids.length) await window._supabase.from('reports').update({is_deleted:true}).in('id',ids).eq('user_id',currentUser.id);
+  } else {
+    localStorage.removeItem('ep_projects');
+  }
+  _projectsCache=[];
   renderProjectCards();
   renderDashboard();
   toast('All projects cleared');
@@ -3085,9 +3068,9 @@ function renderProjectCards(){
     return;
   }
   const typeInfo={
-    report:{icon:'📄',color:'var(--teal)',bg:'rgba(45,212,191,.1)',badge:'Report',badgeStyle:'background:rgba(45,212,191,.08);color:var(--teal);border:1px solid rgba(45,212,191,.2)'},
-    datasheet:{icon:'🔍',color:'var(--lime)',bg:'rgba(163,230,53,.1)',badge:'Datasheet',badgeStyle:'background:rgba(163,230,53,.08);color:var(--lime);border:1px solid rgba(163,230,53,.2)'},
-    compare:{icon:'⚖️',color:'var(--violet)',bg:'rgba(167,139,250,.1)',badge:'Compare',badgeStyle:'background:rgba(167,139,250,.08);color:var(--violet);border:1px solid rgba(167,139,250,.2)'},
+    report:   {icon:'file-text',color:'var(--teal)',  bg:'rgba(45,212,191,.1)',  badge:'Report',    badgeStyle:'background:rgba(45,212,191,.08);color:var(--teal);border:1px solid rgba(45,212,191,.2)'},
+    datasheet:{icon:'cpu',      color:'var(--lime)',  bg:'rgba(163,230,53,.1)',  badge:'Datasheet', badgeStyle:'background:rgba(163,230,53,.08);color:var(--lime);border:1px solid rgba(163,230,53,.2)'},
+    compare:  {icon:'scale',    color:'var(--violet)',bg:'rgba(167,139,250,.1)', badge:'Compare',   badgeStyle:'background:rgba(167,139,250,.08);color:var(--violet);border:1px solid rgba(167,139,250,.2)'},
   };
   grid.innerHTML=projects.slice(0,6).map(p=>{
     const t=typeInfo[p.type]||typeInfo.report;
@@ -3128,7 +3111,7 @@ async function sendStdAI(){
   m.appendChild(td);m.scrollTop=m.scrollHeight;
   document.getElementById('std-ai-send').disabled=true;
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:600,system:`You are an expert engineering standards consultant. Answer questions about engineering standards including IEC, BS, ASTM, NFPA, API, ISO, IEEE, and more. Be precise, cite specific clauses where possible, and give practical engineering guidance. Keep responses concise and actionable.`,messages:stdAiHist.slice(-8)})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:600,system:`You are an expert engineering standards consultant. Answer questions about engineering standards including IEC, BS, ASTM, NFPA, API, ISO, IEEE, and more. Be precise, cite specific clauses where possible, and give practical engineering guidance. Keep responses concise and actionable.`,messages:stdAiHist.slice(-8)});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Sorry, I could not respond.';
     stdAiHist.push({role:'assistant',content:text});
@@ -3230,20 +3213,22 @@ const STDS_INFO = {
 function renderDashboard(){
   const h=new Date().getHours();
   const greeting=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const firstName=(currentUser?.name||'Engineer').split(' ')[0];
   const timeStr=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const el=document.getElementById('dash-hello');
   const tel=document.getElementById('dash-time');
-  if(el)el.textContent=greeting+', Engineer';
+  if(el)el.textContent=greeting+', '+firstName;
   if(tel)tel.textContent=timeStr;
   const acts=getActivities();
-  const rCount=acts.filter(a=>a.type==='report').length;
   const sv=document.getElementById('stat-reports');
   const totalRpts=getProjects().filter(p=>p.type==='report').length;
-  if(sv)sv.textContent=totalRpts||rCount;
-  const qv=document.getElementById('stat-queries');
-  if(qv)qv.textContent=usageN;
-  const ud=document.getElementById('usage-display');if(ud)ud.textContent=usageN+' / 10';
-  const uf=document.getElementById('usage-fill-bar');if(uf)uf.style.width=(usageN*10)+'%';
+  if(sv)sv.textContent=totalRpts;
+  // Sync usage from currentUser
+  if(currentUser?.monthly_reports_used !== undefined) usageN=currentUser.monthly_reports_used;
+  const limit=getPlanLimit();
+  const qv=document.getElementById('stat-queries');if(qv)qv.textContent=usageN;
+  const ud=document.getElementById('usage-display');if(ud)ud.textContent=usageN+' / '+(limit===-1?'∞':limit);
+  const uf=document.getElementById('usage-fill-bar');if(uf)uf.style.width=(limit===-1?20:Math.min(usageN/limit*100,100))+'%';
   renderActivityFeed(acts);
 }
 
@@ -3280,14 +3265,14 @@ function renderActivityFeed(acts){
     return;
   }
   const typeInfo={
-    report:{icon:'📄',bg:'rgba(45,212,191,.1)',tag:'Report',tagColor:'var(--teal)',tagBg:'rgba(45,212,191,.08)'},
-    datasheet:{icon:'🔍',bg:'rgba(163,230,53,.1)',tag:'Datasheet',tagColor:'var(--lime)',tagBg:'rgba(163,230,53,.08)'},
-    compare:{icon:'⚖️',bg:'rgba(167,139,250,.1)',tag:'Compare',tagColor:'var(--violet)',tagBg:'rgba(167,139,250,.08)'},
+    report:   {icon:'file-text', bg:'rgba(45,212,191,.1)',  tag:'Report',    tagColor:'var(--teal)',   tagBg:'rgba(45,212,191,.08)'},
+    datasheet:{icon:'cpu',       bg:'rgba(163,230,53,.1)',  tag:'Datasheet', tagColor:'var(--lime)',   tagBg:'rgba(163,230,53,.08)'},
+    compare:  {icon:'scale',     bg:'rgba(167,139,250,.1)', tag:'Compare',   tagColor:'var(--violet)', tagBg:'rgba(167,139,250,.08)'},
   };
   feed.innerHTML=acts.slice(0,8).map(a=>{
     const t=typeInfo[a.type]||typeInfo.report;
     return `<div class="activity-item">
-      <div class="ai-icon-badge" style="background:${t.bg}">${t.icon}</div>
+      <div class="ai-icon-badge" style="background:${t.bg}"><i data-lucide="${t.icon}" style="width:16px;height:16px"></i></div>
       <div class="ai-info">
         <div class="ai-label">${escHtml(a.label)}</div>
         <div class="ai-meta">${relTime(a.time)}</div>
@@ -3295,6 +3280,7 @@ function renderActivityFeed(acts){
       <span class="ai-type-tag" style="color:${t.tagColor};background:${t.tagBg};border:1px solid ${t.tagColor}20">${t.tag}</span>
     </div>`;
   }).join('');
+  if(window.lucide) lucide.createIcons();
 }
 
 /* ═══════════════════════════════════════
@@ -3354,7 +3340,7 @@ async function sendCopilot(){
   const tid=addCpTyping();
   document.getElementById('cp-send').disabled=true;
   try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:600,system:`You are EngTools Copilot — an expert AI assistant embedded in EngTools Pro, an AI engineering documentation platform. Help engineers with: choosing the correct report template, understanding engineering standards (IEC, BS, ASTM, NFPA, API, ISO, IEEE), documentation best practices, and getting the most from EngTools Pro. Be concise, practical, and technically precise. Keep responses under 150 words. Format with short paragraphs or bullet points.`,messages:cpHistory.slice(-10)})});
+    const r=await apiCall({model:'claude-opus-4-5',max_tokens:600,system:`You are EngTools Copilot — an expert AI assistant embedded in EngTools Pro, an AI engineering documentation platform. Help engineers with: choosing the correct report template, understanding engineering standards (IEC, BS, ASTM, NFPA, API, ISO, IEEE), documentation best practices, and getting the most from EngTools Pro. Be concise, practical, and technically precise. Keep responses under 150 words. Format with short paragraphs or bullet points.`,messages:cpHistory.slice(-10)});
     const d=await r.json();
     const text=d.content?.find(c=>c.type==='text')?.text||'Sorry, I could not respond to that.';
     cpHistory.push({role:'assistant',content:text});
@@ -3430,14 +3416,45 @@ function calcROI(){
 }
 
 function bumpUsage(){
-  usageN=Math.min(usageN+1,10);
-  const ud=document.getElementById('usage-display');if(ud)ud.textContent=usageN+' / 10';
-  const uf=document.getElementById('usage-fill-bar');if(uf)uf.style.width=(usageN*10)+'%';
+  if(currentUser) currentUser.monthly_reports_used=(currentUser.monthly_reports_used||0)+1;
+  usageN=Math.min(usageN+1,usageN+1);
+  const limit=getPlanLimit();
+  const ud=document.getElementById('usage-display');if(ud)ud.textContent=usageN+' / '+(limit===-1?'∞':limit);
+  const uf=document.getElementById('usage-fill-bar');if(uf)uf.style.width=(limit===-1?'20':(usageN/limit*100))+'%';
   const sv=document.getElementById('stat-queries');if(sv)sv.textContent=usageN;
+}
+function getPlanLimit(){
+  const m={free:10,student:150,pro:-1,team:-1};
+  return m[currentUser?.plan||'free']??10;
+}
+async function apiCall(body){
+  const token=window._currentUser?.access_token||'';
+  return fetch('/api/claude',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify(body)
+  });
 }
 
 let toastT;
 function toast(msg){const el=document.getElementById('toast-el');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),3200);}
+
+/* ═══════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════ */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  const btn=document.getElementById('theme-toggle');
+  if(btn) btn.innerHTML = theme==='light' ? '&#9790;' : '&#9788;';
+}
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme')||'dark';
+  const next=current==='dark'?'light':'dark';
+  localStorage.setItem('ep_theme',next);
+  applyTheme(next);
+}
+// Initialise theme from localStorage
+(function(){ applyTheme(localStorage.getItem('ep_theme')||'dark'); })();
 
 init();
 </script>

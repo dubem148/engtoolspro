@@ -1,0 +1,12 @@
+{
+  "name": "engtoolspro",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "stripe": "^14.25.0"
+  }
+}

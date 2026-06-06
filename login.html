@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Sign In — EngTools Pro</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="robots" content="noindex"/>
+<script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -14,6 +17,7 @@
   --edge:rgba(20,240,204,0.08);--edge2:rgba(20,240,204,0.18);
   --display:'Fraunces',serif;--body:'DM Sans',sans-serif;--mono:'Fira Code',monospace;
 }
+[data-theme="light"]{--void:#f4f6fb;--navy:#edf0f7;--surface:#fff;--raised:#f0f3fa;--text:#0d1220;--muted:#3d5070;--faint:#8b9dc3;--edge:rgba(30,50,100,.07);--edge2:rgba(30,50,100,.15);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:var(--body);background:var(--void);color:var(--text);
@@ -93,6 +97,7 @@ input::placeholder{color:var(--faint)}
 </style>
 </head>
 <body>
+<button onclick="(function(){const t=document.documentElement.getAttribute('data-theme')||'dark';const n=t==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('ep_theme',n);this.innerHTML=n==='light'?'&#9790;':'&#9788;';}).call(this)" style="position:fixed;top:16px;right:16px;z-index:50;background:none;border:1px solid var(--edge2);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--muted);line-height:1;" title="Toggle theme">&#9788;</button>
 <div class="card">
   <a class="logo" href="index.html">
     <div class="logo-gem">E</div>
@@ -105,6 +110,7 @@ input::placeholder{color:var(--faint)}
   <div class="error-msg" id="error-msg"></div>
   <div class="success-msg" id="success-msg"></div>
 
+  <!-- Login form -->
   <form id="login-form" onsubmit="handleLogin(event)">
     <div class="field">
       <label>Email address</label>
@@ -114,9 +120,22 @@ input::placeholder{color:var(--faint)}
       <label>Password</label>
       <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
     </div>
-    <div class="forgot"><a href="#">Forgot password?</a></div>
+    <div class="forgot"><a href="#" id="forgot-link">Forgot password?</a></div>
     <button class="btn" id="submit-btn" type="submit">Sign in →</button>
   </form>
+
+  <!-- Forgot password panel (hidden by default) -->
+  <div id="forgot-panel" style="display:none;">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Enter your email and we'll send you a reset link.</p>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="forgot-email" placeholder="you@company.com" autocomplete="email"/>
+    </div>
+    <button class="btn" id="forgot-btn" type="button" onclick="handleForgot()">Send reset link →</button>
+    <div style="margin-top:14px;text-align:center;">
+      <a href="#" id="back-to-login" style="font-size:13px;color:var(--muted);text-decoration:none;" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--muted)'">← Back to sign in</a>
+    </div>
+  </div>
 
   <div class="divider"><span>NEW HERE?</span></div>
   <div class="switch">
@@ -124,6 +143,7 @@ input::placeholder{color:var(--faint)}
   </div>
 </div>
 
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('ep_theme')||'dark');})();</script>
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -166,6 +186,51 @@ input::placeholder{color:var(--faint)}
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect') || 'dashboard.html';
     setTimeout(() => window.location.href = redirect, 800);
+  };
+
+  // ── Forgot password toggle ─────────────────────────────────
+  document.getElementById('forgot-link').addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('login-form').style.display   = 'none';
+    document.getElementById('forgot-panel').style.display = 'block';
+    document.getElementById('error-msg').classList.remove('show');
+    document.getElementById('success-msg').classList.remove('show');
+  });
+
+  document.getElementById('back-to-login').addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('forgot-panel').style.display = 'none';
+    document.getElementById('login-form').style.display   = 'block';
+    document.getElementById('error-msg').classList.remove('show');
+    document.getElementById('success-msg').classList.remove('show');
+  });
+
+  window.handleForgot = async function() {
+    const email  = document.getElementById('forgot-email').value.trim();
+    const errEl  = document.getElementById('error-msg');
+    const okEl   = document.getElementById('success-msg');
+    const btn    = document.getElementById('forgot-btn');
+
+    errEl.classList.remove('show');
+    if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.classList.add('show'); return; }
+
+    btn.disabled    = true;
+    btn.textContent = 'Sending…';
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/app'
+    });
+
+    btn.disabled    = false;
+    btn.textContent = 'Send reset link →';
+
+    if (error) {
+      errEl.textContent = error.message;
+      errEl.classList.add('show');
+    } else {
+      okEl.textContent = 'Reset link sent! Check your inbox (and spam folder).';
+      okEl.classList.add('show');
+    }
   };
 </script>
 </body>

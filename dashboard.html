@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Dashboard — EngTools Pro</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<meta name="robots" content="noindex"/>
+<script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -99,7 +102,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .toast.show{opacity:1;transform:none}
 .toast::before{content:'●';color:var(--teal);font-size:8px}
 @media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.topbar{padding:0 16px}.main{padding:20px 16px}}
+[data-theme="light"]{--void:#f4f6fb;--surface:#fff;--raised:#f0f3fa;--text:#0d1220;--muted:#3d5070;--faint:#8b9dc3;background:var(--void);}
 </style>
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('ep_theme')||'dark');})();</script>
 </head>
 <body>
 
@@ -164,9 +169,22 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="upgrade-banner" id="upgrade-banner">
     <div class="ub-text">
       <h3>Unlock unlimited reports ✦</h3>
-      <p>Professional plan — <strong>$39/month</strong> · Unlimited queries · All 10 templates · PDF upload · Save reports · Priority speed</p>
+      <p>Professional plan — <strong>$19/month</strong> · Unlimited reports · All 10 templates · PDF upload · Save reports · Priority speed</p>
     </div>
-    <button class="btn-upgrade" onclick="window.location.href='pricing.html'">Upgrade to Pro →</button>
+    <button class="btn-upgrade" onclick="window.location.href='app.html#pricing'">Upgrade to Pro →</button>
+  </div>
+
+  <!-- SUBSCRIPTION STATUS -->
+  <div class="sec-head" style="margin-top:32px;">
+    <div class="sec-title">Account <em>settings</em></div>
+  </div>
+  <div class="stat" style="max-width:480px;margin-bottom:16px;" id="subscription-card">
+    <div class="stat-label">Current subscription</div>
+    <div class="stat-value" id="sub-plan" style="font-size:20px;color:var(--violet)">Free</div>
+    <div class="stat-sub" id="sub-detail">10 reports/month · Upgrade to remove limits</div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-upgrade" id="manage-sub-btn" style="padding:9px 18px;font-size:13px;" onclick="manageSub()">Manage subscription →</button>
+    </div>
   </div>
 
   <!-- REPORTS -->
@@ -226,25 +244,45 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     // Hide upgrade banner for paid users
     if (profile.plan !== 'free') document.getElementById('upgrade-banner').style.display = 'none';
 
-    // Usage
-    const today = new Date().toISOString().split('T')[0];
-    const used  = profile.daily_queries_reset < today ? 0 : (profile.daily_queries_used || 0);
-    const limit = { free:10, student:100, pro:9999, enterprise:9999 }[profile.plan] || 10;
-    const pct   = Math.min(100, (used / limit) * 100);
-    const limitLabel = limit >= 9999 ? '∞' : limit;
+    // Monthly usage
+    const resetDate  = new Date(profile.monthly_reset_date || new Date());
+    const now        = new Date();
+    const sameMonth  = resetDate.getFullYear() === now.getFullYear() && resetDate.getMonth() === now.getMonth();
+    const used       = sameMonth ? (profile.monthly_reports_used || 0) : 0;
+    const limitMap   = { free:10, student:150, pro:-1, team:-1 };
+    const limit      = limitMap[profile.plan] ?? 10;
+    const limitLabel = limit === -1 ? '∞' : limit;
+    const pct        = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
 
     document.getElementById('s-queries').textContent     = used;
-    document.getElementById('s-limit-label').textContent = `of ${limitLabel} today`;
-    document.getElementById('usage-label').textContent   = `${used} / ${limitLabel} used today`;
+    document.getElementById('s-limit-label').textContent = `of ${limitLabel} this month`;
+    document.getElementById('usage-label').textContent   = `${used} / ${limitLabel} used this month`;
     document.getElementById('usage-fill').style.width    = pct + '%';
     document.getElementById('usage-max').textContent     = limitLabel;
 
     if (pct > 80) document.getElementById('usage-fill').style.background = 'linear-gradient(90deg,var(--amber),var(--rose))';
+
+    // Subscription card
+    const planNames   = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
+    const planDetails = { free:'10 reports/month · Upgrade to remove limits', student:'150 reports/month', pro:'Unlimited reports · All features', team:'Unlimited reports · Team collaboration' };
+    document.getElementById('sub-plan').textContent  = planNames[profile.plan]  || 'Free Plan';
+    document.getElementById('sub-detail').textContent= planDetails[profile.plan]|| '';
+    if (profile.stripe_subscription_id) {
+      document.getElementById('manage-sub-btn').textContent = 'Manage billing →';
+    }
   }
 
   // ── SHOW UPGRADE SUCCESS TOAST ──────────────────────
   const params = new URLSearchParams(window.location.search);
-  if (params.get('upgraded') === '1') showToast('🎉 Welcome to Pro! Your account has been upgraded.');
+  if (params.get('upgraded') === '1') showToast('Welcome to Pro! Your account has been upgraded.');
+
+  window.manageSub = () => {
+    if (profile?.stripe_subscription_id) {
+      window.location.href = '/api/stripe-portal?token=' + session.access_token;
+    } else {
+      window.location.href = '/app';
+    }
+  };
 
   // ── LOAD REPORTS ────────────────────────────────────
   const { data: reports, error: rErr } = await supabase
