@@ -203,11 +203,41 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  // Uses the shared auth helper — identical code path as app.html.
   import { loadUser } from '/js/auth.js';
 
-  const authUser = await loadUser('/login?redirect=/dashboard');
-  if (!authUser) return; // loadUser already redirected
+  // ── Toast (defined first — called throughout) ─────────
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+  window.showToast = showToast;
+
+  // Helper: null-safe element text setter
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+    else console.warn('[Dashboard] element not found:', id);
+  }
+
+  // ── Auth ─────────────────────────────────────────────
+  console.log('[Dashboard] loading user…');
+  let authUser;
+  try {
+    authUser = await loadUser('/login?redirect=/dashboard');
+  } catch (e) {
+    console.error('[Dashboard] loadUser threw:', e);
+    document.getElementById('report-list').innerHTML =
+      '<div style="padding:24px;color:#fb7185;font-size:13px">Authentication error. <a href="/login" style="color:#2dd4bf">Sign in again</a></div>';
+    return;
+  }
+  if (!authUser) return;
+
+  console.log('[Dashboard] authUser | id:', authUser.id, '| email:', authUser.email, '| plan:', authUser.plan);
 
   const supabase    = authUser.supabase;
   const displayName = authUser.displayName;
@@ -215,94 +245,122 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   const firstName   = authUser.firstName;
   const plan        = authUser.plan;
 
-  // ── Topbar ────────────────────────────────────────────
-  document.getElementById('user-av').textContent   = initials;
-  document.getElementById('user-name').textContent = displayName;
+  // ── Populate UI — wrapped so one failure can't freeze the whole page ──
+  try {
+    setText('user-av',    initials);
+    setText('user-name',  displayName);
+    setText('first-name', firstName);
 
-  // Plan badge — populated from real profile data
-  const pb        = document.getElementById('plan-badge');
-  const planLabels = { free:'FREE', student:'STUDENT', pro:'PRO', team:'TEAM' };
-  const planBadge  = { free:'badge-free', student:'badge-student', pro:'badge-pro', team:'badge-pro' };
-  pb.textContent   = planLabels[plan] || plan.toUpperCase();
-  pb.className     = 'plan-badge ' + (planBadge[plan] || 'badge-free');
+    const pb = document.getElementById('plan-badge');
+    if (pb) {
+      const planLabels = { free:'FREE', student:'STUDENT', pro:'PRO', team:'TEAM' };
+      const planBadge  = { free:'badge-free', student:'badge-student', pro:'badge-pro', team:'badge-pro' };
+      pb.textContent = planLabels[plan] || plan.toUpperCase();
+      pb.className   = 'plan-badge ' + (planBadge[plan] || 'badge-free');
+    }
 
-  // ── Welcome heading ───────────────────────────────────
-  document.getElementById('first-name').textContent = firstName;
+    setText('s-reports', authUser.total_reports);
+    setText('s-plan',    plan.charAt(0).toUpperCase() + plan.slice(1));
+    setText('s-since',   new Date(authUser.created_at).toLocaleDateString('en-GB', { month:'short', year:'numeric' }));
 
-  // ── Stats — all from authUser (real Supabase data) ───────
-  document.getElementById('s-reports').textContent = authUser.total_reports;
-  document.getElementById('s-plan').textContent    = plan.charAt(0).toUpperCase() + plan.slice(1);
-  document.getElementById('s-since').textContent   = new Date(authUser.created_at)
-    .toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    const resetDate = new Date(authUser.monthly_reset_date || new Date());
+    const now       = new Date();
+    const sameMonth = resetDate.getFullYear() === now.getFullYear() && resetDate.getMonth() === now.getMonth();
+    const used      = sameMonth ? (authUser.monthly_reports_used || 0) : 0;
+    const limitMap  = { free:10, student:150, pro:-1, team:-1 };
+    const limit     = limitMap[plan] ?? 10;
+    const limitLabel = limit === -1 ? '∞' : limit;
+    const pct        = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
 
-  // ── Usage bar ─────────────────────────────────────────
-  const resetDate  = new Date(authUser.monthly_reset_date || new Date());
-  const now        = new Date();
-  const sameMonth  = resetDate.getFullYear() === now.getFullYear() && resetDate.getMonth() === now.getMonth();
-  const used       = sameMonth ? authUser.monthly_reports_used : 0;
-  const limitMap   = { free:10, student:150, pro:-1, team:-1 };
-  const limit      = limitMap[plan] ?? 10;
-  const limitLabel = limit === -1 ? '∞' : limit;
-  const pct        = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
+    setText('s-queries',      used);
+    setText('s-limit-label',  `of ${limitLabel} this month`);
+    setText('usage-label',    `${used} / ${limitLabel} used this month`);
+    setText('usage-max',      limitLabel);
 
-  document.getElementById('s-queries').textContent     = used;
-  document.getElementById('s-limit-label').textContent = `of ${limitLabel} this month`;
-  document.getElementById('usage-label').textContent   = `${used} / ${limitLabel} used this month`;
-  document.getElementById('usage-fill').style.width    = pct + '%';
-  document.getElementById('usage-max').textContent     = limitLabel;
+    const fillEl = document.getElementById('usage-fill');
+    if (fillEl) {
+      fillEl.style.width = pct + '%';
+      if (pct > 80) fillEl.style.background = 'linear-gradient(90deg,var(--amber),var(--rose))';
+    }
 
-  if (pct > 80) document.getElementById('usage-fill').style.background = 'linear-gradient(90deg,var(--amber),var(--rose))';
+    if (plan !== 'free') {
+      const ub = document.getElementById('upgrade-banner');
+      if (ub) ub.style.display = 'none';
+    }
 
-  // ── Upgrade banner ────────────────────────────────────
-  if (plan !== 'free') document.getElementById('upgrade-banner').style.display = 'none';
+    const planNames   = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
+    const planDetails = { free:'10 reports/month · Upgrade to remove limits', student:'150 reports/month', pro:'Unlimited reports · All features', team:'Unlimited reports · Team collaboration' };
+    setText('sub-plan',   planNames[plan]   || plan);
+    setText('sub-detail', planDetails[plan] || '');
 
-  // ── Subscription card ─────────────────────────────────
-  const planNames   = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
-  const planDetails = { free:'10 reports/month · Upgrade to remove limits', student:'150 reports/month', pro:'Unlimited reports · All features', team:'Unlimited reports · Team collaboration' };
-  const subPlanEl   = document.getElementById('sub-plan');
-  const subDetail   = document.getElementById('sub-detail');
-  if (subPlanEl)  subPlanEl.textContent  = planNames[plan]   || plan;
-  if (subDetail)  subDetail.textContent  = planDetails[plan] || '';
-  if (authUser.stripe_subscription_id) {
-    const btn = document.getElementById('manage-sub-btn');
-    if (btn) btn.textContent = 'Manage billing →';
+    if (authUser.stripe_subscription_id) {
+      const btn = document.getElementById('manage-sub-btn');
+      if (btn) btn.textContent = 'Manage billing →';
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('upgraded') === '1') showToast('Welcome to Pro! Your account has been upgraded.');
+
+  } catch (uiErr) {
+    console.error('[Dashboard] UI setup error:', uiErr);
+    // Don't return — still try to load reports below
   }
 
-  // ── SHOW UPGRADE SUCCESS TOAST ──────────────────────
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('upgraded') === '1') showToast('Welcome to Pro! Your account has been upgraded.');
-
   window.manageSub = () => {
-    if (authUser.stripe_subscription_id) {
-      window.location.href = '/api/stripe-portal?token=' + authUser.access_token;
-    } else {
-      window.location.href = '/app';
-    }
+    window.location.href = authUser.stripe_subscription_id
+      ? '/api/stripe-portal?token=' + authUser.access_token
+      : '/app';
   };
 
-  // ── LOAD REPORTS ────────────────────────────────────
+  // ── Sign out ─────────────────────────────────────────
+  const signOutBtn = document.getElementById('signout-btn');
+  if (signOutBtn) signOutBtn.onclick = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/';
+  };
+
+  // ── Load reports ─────────────────────────────────────
+  const list = document.getElementById('report-list');
+
+  console.log('[Dashboard] fetching reports | user_id:', authUser.id);
+
   const { data: reports, error: rErr } = await supabase
     .from('reports')
-    .select('*')
+    .select('id, title, report_type, field, word_count, created_at')
     .eq('user_id', authUser.id)
     .eq('is_deleted', false)
     .order('created_at', { ascending: false });
 
-  const list = document.getElementById('report-list');
-  const icons = { inspection:'🔎',failure:'💥',commissioning:'✅',design:'📐',feasibility:'📊',test:'🧪',site:'🗺️',maintenance:'🔧',progress:'📈',incident:'⚠️' };
+  console.log('[Dashboard] reports result | count:', reports?.length ?? 'null',
+    '| error:', rErr ? JSON.stringify(rErr) : 'none');
+
+  if (rErr) {
+    console.error('[Dashboard] reports SELECT error:', rErr.code, rErr.message, rErr.details);
+    list.innerHTML = `<div style="padding:24px;color:#fb7185;font-size:13px;font-family:monospace">
+      Failed to load reports: ${rErr.message}<br>
+      Code: ${rErr.code}<br>
+      <small>Check browser console for details. Ensure the reports table exists in Supabase.</small>
+    </div>`;
+    return;
+  }
 
   if (!reports || reports.length === 0) {
+    console.log('[Dashboard] no reports found for user');
     list.innerHTML = `
       <div class="empty">
         <div class="empty-icon">📄</div>
         <div class="empty-title">No reports yet</div>
-        <p class="empty-sub">Generate your first AI engineering report.<br/>It takes less than 2 minutes.</p>
-        <button class="btn-upgrade" onclick="window.location.href='app.html'">Create first report ✦</button>
+        <p class="empty-sub">Generate your first AI engineering report.<br>It takes less than 2 minutes.</p>
+        <button class="btn-upgrade" onclick="window.location.href='/app'">Create first report →</button>
       </div>`;
-  } else {
+    return;
+  }
+
+  console.log('[Dashboard] rendering', reports.length, 'reports');
+
+  try {
     list.innerHTML = reports.map(r => `
       <div class="report-card" onclick="openReport('${r.id}')">
-        <div class="r-icon">${icons[r.report_type] || '📄'}</div>
         <div class="r-info">
           <div class="r-title">${r.title || 'Untitled Report'}</div>
           <div class="r-meta">
@@ -317,27 +375,27 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <button class="btn-sm del" onclick="delReport('${r.id}', this)">Delete</button>
         </div>
       </div>`).join('');
+  } catch (renderErr) {
+    console.error('[Dashboard] report render error:', renderErr);
+    list.innerHTML = '<div style="padding:24px;color:#fb7185;font-size:13px">Error rendering reports. Check console.</div>';
   }
 
-  // ── ACTIONS ─────────────────────────────────────────
-  document.getElementById('signout-btn').onclick = async () => {
-    await supabase.auth.signOut();
-    window.location.href = 'index.html';
-  };
-
+  // ── Report actions ────────────────────────────────────
   window.openReport = async (id) => {
-    const { data } = await supabase.from('reports').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('reports').select('*').eq('id', id).single();
+    if (error) { console.error('[Dashboard] openReport error:', error); return; }
     if (data) {
       sessionStorage.setItem('open_report', JSON.stringify(data));
-      window.location.href = 'app.html?report=' + id;
+      window.location.href = '/app?report=' + id;
     }
   };
 
   window.dlReport = async (id) => {
-    const { data } = await supabase.from('reports').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('reports').select('content, title').eq('id', id).single();
+    if (error) { console.error('[Dashboard] dlReport error:', error); return; }
     if (data) {
       const a = document.createElement('a');
-      a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.content);
+      a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.content || '');
       a.download = (data.title || 'report').replace(/[^a-z0-9]/gi,'_') + '.txt';
       a.click();
       showToast('Report downloaded ✓');
@@ -346,21 +404,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
   window.delReport = async (id, btn) => {
     if (!confirm('Delete this report? This cannot be undone.')) return;
-    await supabase.from('reports').update({ is_deleted: true }).eq('id', id);
-    btn.closest('.report-card').remove();
+    const { error } = await supabase.from('reports').update({ is_deleted: true }).eq('id', id);
+    if (error) { console.error('[Dashboard] delReport error:', error); showToast('Delete failed'); return; }
+    btn.closest('.report-card')?.remove();
     showToast('Report deleted');
   };
-
-  // ── TOAST ────────────────────────────────────────────
-  let toastTimer;
-  function showToast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
-  }
-  window.showToast = showToast;
 </script>
 </body>
 </html>

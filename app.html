@@ -3059,22 +3059,51 @@ async function loadProjects(){
 
 async function saveProject(type,title,content,meta={}){
   const wordCount=(content||'').trim().split(/\s+/).length;
+
   if(window._supabase && currentUser?.id){
-    console.log('[EngTools] saveProject: saving to Supabase | user_id:', currentUser.id, '| type:', type, '| title:', title);
-    const { data, error } = await window._supabase.from('reports').insert({
-      user_id:currentUser.id, title, report_type:type,
-      field:meta.template||meta.org||type, content:content||'', word_count:wordCount
-    }).select().single();
-    if(error){ console.error('[EngTools] saveProject Supabase error:', error.message, error); }
+    console.log('[EngTools] saveProject: INSERT | user_id:', currentUser.id, '| type:', type, '| title:', title, '| words:', wordCount);
+
+    const { data, error } = await window._supabase
+      .from('reports')
+      .insert({
+        user_id:     currentUser.id,
+        title,
+        report_type: type,
+        field:       meta.template || meta.org || type,
+        content:     content || '',
+        word_count:  wordCount
+      })
+      .select('id, created_at')
+      .single();
+
+    if(error){
+      // Log the full error so the developer can see exactly what failed
+      console.error('[EngTools] saveProject INSERT error | code:', error.code, '| message:', error.message, '| details:', error.details, '| hint:', error.hint);
+      // Show the user a specific message if it's a table-not-found error
+      if(error.code === '42P01'){
+        toast('Setup required: the reports table does not exist in Supabase. Run supabase-setup.sql.');
+      } else if(error.code === '42501' || error.message?.includes('security policy')){
+        toast('Permission error saving report. Check Supabase RLS policies.');
+      } else {
+        toast('Report generated but could not be saved to your account: ' + error.message);
+      }
+    }
+
     if(data){
-      console.log('[EngTools] saveProject: saved to Supabase | report_id:', data.id);
-      _projectsCache.unshift({id:data.id,type,title,content:content||'',meta:{...meta,created:data.created_at},updated:Date.now()});
+      console.log('[EngTools] saveProject: saved to Supabase | report_id:', data.id, '| created_at:', data.created_at);
+      _projectsCache.unshift({
+        id: data.id, type, title, content: content||'',
+        meta: {...meta, created: data.created_at},
+        updated: Date.now()
+      });
       return data.id;
     }
   } else {
-    console.warn('[EngTools] saveProject: falling back to localStorage | supabase:', !!window._supabase, '| currentUser.id:', currentUser?.id||'NULL');
+    console.warn('[EngTools] saveProject: no Supabase client or user | _supabase:', !!window._supabase, '| currentUser.id:', currentUser?.id||'NULL');
   }
-  // Fallback to localStorage
+
+  // Fallback — only reached if Supabase is unavailable
+  console.warn('[EngTools] saveProject: using localStorage fallback');
   const id=Date.now().toString();
   _projectsCache.unshift({id,type,title,content:content||'',meta:{...meta,created:new Date().toISOString()},updated:Date.now()});
   if(_projectsCache.length>30)_projectsCache.pop();
