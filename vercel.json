@@ -13,6 +13,7 @@
     { "src": "/dashboard.html",     "dest": "/dashboard.html" },
     { "src": "/app.html",           "dest": "/app.html" },
     { "src": "/admin.html",         "dest": "/admin.html" },
+    { "src": "/js/(.*)",            "dest": "/js/$1" },
     { "src": "/sitemap.xml",        "dest": "/sitemap.xml" },
     { "src": "/robots.txt",         "dest": "/robots.txt" },
     { "src": "/favicon.svg",        "dest": "/favicon.svg" }

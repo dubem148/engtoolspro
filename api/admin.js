@@ -6,7 +6,8 @@ async function requireAdmin(req, admin) {
   if (!token) return null;
   const { data: { user }, error } = await admin.auth.getUser(token);
   if (error || !user) return null;
-  if (user.email !== process.env.ADMIN_EMAIL) return null;
+  // Role is stored in app_metadata — only writable by service role, never by users
+  if (user.app_metadata?.role !== 'admin') return null;
   return user;
 }
 

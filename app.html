@@ -1241,17 +1241,17 @@ select option { background:var(--surface); color:var(--t1); }
     <button class="cta-upgrade" onclick="goPage('pricing')" style="font-size:12px;padding:8px 16px;">Upgrade →</button>
     <div class="account-wrap">
       <button class="account-btn" onclick="toggleAccountMenu()">
-        <div class="account-avatar" id="acct-avatar">E</div>
+        <div class="account-avatar" id="acct-avatar"></div>
         <div class="acct-name-row">
-          <span class="acct-name" id="acct-name">Engineer</span>
-          <span class="acct-plan">Free Plan</span>
+          <span class="acct-name" id="acct-name"></span>
+          <span class="acct-plan" id="acct-plan-label"></span>
         </div>
         <span class="acct-caret">▾</span>
       </button>
       <div class="account-dropdown" id="account-dropdown">
         <div class="dd-user-block">
-          <div class="acct-name" id="dd-name" style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:3px;">Engineer</div>
-          <div class="dd-user-email" id="dd-email">engineer@engtoolspro.com</div>
+          <div class="acct-name" id="dd-name" style="font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:3px;"></div>
+          <div class="dd-user-email" id="dd-email"></div>
         </div>
         <div class="dd-item" onclick="toast('Profile settings coming soon');toggleAccountMenu()"><i data-lucide="user" style="width:14px;height:14px"></i> My Profile</div>
         <div class="dd-item" onclick="goPage('pricing');toggleAccountMenu()"><i data-lucide="arrow-up-circle" style="width:14px;height:14px"></i> Upgrade Plan</div>
@@ -1345,8 +1345,8 @@ select option { background:var(--surface); color:var(--t1); }
 ══════════════════════════════════════ -->
 <div id="pg-dashboard" class="page on">
   <div class="dash-greeting">
-    <div class="dash-time" id="dash-time">Loading…</div>
-    <h1 class="dash-hello" id="dash-hello">Good morning, Engineer</h1>
+    <div class="dash-time" id="dash-time"></div>
+    <h1 class="dash-hello" id="dash-hello"></h1>
     <p class="dash-sub">EngTools Pro — The AI Workspace for Engineers. What are you working on today?</p>
   </div>
 
@@ -2241,7 +2241,7 @@ select option { background:var(--surface); color:var(--t1); }
   <div class="team-stat-grid">
     <div class="team-stat"><div class="team-stat-val" id="team-rpt-count">0</div><div class="team-stat-label">Reports generated</div></div>
     <div class="team-stat"><div class="team-stat-val">1</div><div class="team-stat-label">Team members</div></div>
-    <div class="team-stat"><div class="team-stat-val">Free</div><div class="team-stat-label">Current plan</div></div>
+    <div class="team-stat"><div class="team-stat-val" id="team-plan-val"></div><div class="team-stat-label">Current plan</div></div>
     <div class="team-stat"><div class="team-stat-val">140+</div><div class="team-stat-label">Standards available</div></div>
   </div>
 
@@ -2250,10 +2250,10 @@ select option { background:var(--surface); color:var(--t1); }
       <div class="team-panel" style="margin-bottom:20px;">
         <div class="team-panel-head">👥 Team Members</div>
         <div class="member-row">
-          <div class="member-av" style="background:var(--teal)">E</div>
+          <div class="member-av" id="team-member-av" style="background:var(--teal)"></div>
           <div class="member-info">
-            <div class="member-name" id="team-member-name">Engineer (You)</div>
-            <div class="member-email" id="team-member-email">engineer@engtoolspro.com</div>
+            <div class="member-name" id="team-member-name"></div>
+            <div class="member-email" id="team-member-email"></div>
           </div>
           <span class="member-role-tag" style="background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.2);">Owner</span>
         </div>
@@ -2427,30 +2427,20 @@ select option { background:var(--surface); color:var(--t1); }
 
 <!-- ═══════ SUPABASE AUTH MODULE ═══════ -->
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-const SUPA_URL = 'https://jykqcothsmogauvfnuvh.supabase.co';
-const SUPA_KEY = 'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J';
-window._supabase = createClient(SUPA_URL, SUPA_KEY);
-const { data: { session } } = await window._supabase.auth.getSession();
-if (!session) {
-  window.location.href = '/login?redirect=/app';
-} else {
-  const { data: profile } = await window._supabase
-    .from('profiles').select('*').eq('id', session.user.id).single();
-  window._currentUser = {
-    id:                   session.user.id,
-    email:                session.user.email,
-    name:                 profile?.full_name || session.user.email.split('@')[0],
-    plan:                 profile?.plan || 'free',
-    monthly_reports_used: profile?.monthly_reports_used || 0,
-    access_token:         session.access_token
-  };
-  // Refresh token automatically
-  window._supabase.auth.onAuthStateChange((event, newSession) => {
-    if (newSession && window._currentUser) {
-      window._currentUser.access_token = newSession.access_token;
-    }
-  });
+import { loadUser } from '/js/auth.js';
+
+// loadUser() uses the shared auth helper — same code path as dashboard.html.
+// It calls getSession(), fetches the profile, and returns a normalised user object.
+// If there is no active session it redirects to /login automatically.
+const user = await loadUser('/login?redirect=/app');
+
+if (user) {
+  // Expose on window so the non-module script can access them
+  window._currentUser = user;
+  window._supabase    = user.supabase;
+
+  // Signal the non-module script that auth is ready
+  document.dispatchEvent(new CustomEvent('supabase:ready'));
 }
 </script>
 
@@ -2517,9 +2507,9 @@ function init(){
   document.getElementById('rpt-field').addEventListener('change', e=>renderStds(e.target.value));
   toggleAppField();
   calcROI();
-  renderDashboard();
-  renderProjectCards();
   renderHub();
+  // renderDashboard and renderProjectCards are called inside initAuth()
+  // AFTER currentUser is set — never before.
   initAuth();
   if(window.lucide) lucide.createIcons();
 }
@@ -2589,6 +2579,8 @@ function goPage(id){
    REPORT GENERATOR
 ═══════════════════════════════════════ */
 async function genReport(){
+  if(!preflightAuth('genReport')) return;
+  console.log('[EngTools] genReport: starting | user_id:', currentUser?.id, '| plan:', currentUser?.plan, '| template:', selTpl);
   const notes=document.getElementById('rpt-notes').value.trim();
   if(!notes){toast('Please enter your notes and findings first');return;}
   const proj=document.getElementById('rpt-proj').value||'Engineering Project';
@@ -2638,25 +2630,46 @@ Write every section fully. Present measurements in tables. Number and prioritise
   try{
     const r=await apiCall({model:'claude-opus-4-5',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]});
     const d=await r.json();
-    if(d.error){setLoad('rpt',false);document.getElementById('rpt-prog').classList.remove('on');toast('API error: '+d.error.message);return;}
+    if(d.error){
+      console.error('[EngTools] genReport: API error response:', d.error, '| full response:', d);
+      setLoad('rpt',false);
+      document.getElementById('rpt-prog').classList.remove('on');
+      toast('API error: '+(d.error.message||JSON.stringify(d.error)));
+      return;
+    }
     const text=d.content?.find(c=>c.type==='text')?.text;
-    if(!text){setLoad('rpt',false);document.getElementById('rpt-prog').classList.remove('on');toast('No content returned — please try again');return;}
+    if(!text){
+      console.error('[EngTools] genReport: no text in response:', d);
+      setLoad('rpt',false);
+      document.getElementById('rpt-prog').classList.remove('on');
+      toast('No content returned — please try again');
+      return;
+    }
+    console.log('[EngTools] genReport: success | user_id:', currentUser?.id, '| words:', text.split(/\s+/).length);
     rptLast=text;
     setLoad('rpt',false);
     hideSkeleton('rpt');
     document.getElementById('rpt-prog').classList.remove('on');
     showRptOut(text,tplObj.n);
     const tplName2=(TPLS.find(t=>t.id===selTpl)||TPLS[0]).n;
-  const projTitle=document.getElementById('rpt-proj')?.value||tplName2;
-  saveActivity('report',projTitle);
-  saveProject('report',projTitle,text,{template:tplName2,org:document.getElementById('rpt-org')?.value||''});
+    const projTitle=document.getElementById('rpt-proj')?.value||tplName2;
+    saveActivity('report',projTitle);
+    saveProject('report',projTitle,text,{template:tplName2,org:document.getElementById('rpt-org')?.value||''});
     bumpUsage();
     finProg(secsArr);
   }catch(e){
+    console.error('[EngTools] genReport catch:', e.message, e);
     setLoad('rpt',false);
     hideSkeleton('rpt');
     document.getElementById('rpt-prog').classList.remove('on');
-    toast('Connection error — please try again');
+    if(e.isAuthError){
+      toast('Your session has expired. Please sign in again.');
+      setTimeout(()=>{ window.location.href='/login?redirect=/app'; }, 2000);
+    } else if(e.isRateLimit){
+      toast(e.message);
+    } else {
+      toast('Connection error — please try again');
+    }
   }
 }
 
@@ -2736,6 +2749,7 @@ function renderPills(){document.getElementById('ds-pills').innerHTML=dsFiles.map
 function rmFile(i){dsFiles.splice(i,1);dsContent='';renderPills();}
 
 async function analyzeDS(){
+  if(!preflightAuth('analyzeDS')) return;
   const paste=document.getElementById('ds-paste').value.trim();
   const content=dsContent||paste;
   if(!content){toast('Upload a file or paste datasheet content');return;}
@@ -2774,7 +2788,13 @@ async function analyzeDS(){
     saveActivity('datasheet',dsLabel);
     saveProject('datasheet',dsLabel,text,{mode,type});
     bumpUsage();
-  }catch(e){setLoad('ds',false);hideSkeleton('ds');toast('Connection error — please try again');}
+  }catch(e){
+    console.error('[EngTools] analyzeDS catch:', e.message, e);
+    setLoad('ds',false);hideSkeleton('ds');
+    if(e.isAuthError){ toast('Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    else if(e.isRateLimit){ toast(e.message); }
+    else { toast('Connection error — please try again'); }
+  }
 }
 
 function renderParamCards(params){
@@ -2804,6 +2824,7 @@ function clearDS(){
    QA CHAT
 ═══════════════════════════════════════ */
 async function qsend(){
+  if(!preflightAuth('qsend')) return;
   const inp=document.getElementById('qa-in');
   const q=inp.value.trim();
   if(!q||!dsCtx)return;
@@ -2838,6 +2859,7 @@ function removeQTyping(id){document.getElementById('qt'+id)?.remove();}
    COMPARE
 ═══════════════════════════════════════ */
 async function cmpDS(){
+  if(!preflightAuth('cmpDS')) return;
   const a=document.getElementById('cmp-a').value.trim(),b=document.getElementById('cmp-b').value.trim();
   if(!a||!b){toast('Paste content for both options');return;}
   const an=document.getElementById('cmp-a-name').value||'Option A';
@@ -2859,7 +2881,13 @@ async function cmpDS(){
     saveActivity('compare',cmpLabel);
     saveProject('compare',cmpLabel,text,{optionA:an,optionB:bn});
     bumpUsage();
-  }catch(e){setLoad('cmp',false);hideSkeleton('cmp');toast('Connection error');}
+  }catch(e){
+    console.error('[EngTools] cmpDS catch:', e.message, e);
+    setLoad('cmp',false);hideSkeleton('cmp');
+    if(e.isAuthError){ toast('Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    else if(e.isRateLimit){ toast(e.message); }
+    else { toast('Connection error — please try again'); }
+  }
 }
 function clearCmp(){['cmp-a','cmp-b','cmp-a-name','cmp-b-name','cmp-app'].forEach(id=>document.getElementById(id).value='');document.getElementById('cmp-out').classList.remove('on');}
 
@@ -2932,22 +2960,63 @@ let currentUser = null;
 
 function initAuth(){
   currentUser = window._currentUser || null;
-  if(!currentUser){ return; } // module script already redirected to /login
+  if(!currentUser){
+    console.error('[EngTools] initAuth: window._currentUser is null — redirecting to login');
+    window.location.href = '/login?redirect=/app';
+    return;
+  }
+  console.log('[EngTools] initAuth: currentUser set | id:', currentUser.id, '| email:', currentUser.email, '| plan:', currentUser.plan, '| token:', !!currentUser.access_token);
+
+  // Render immediately with the authenticated user.
+  // showApp() fills topbar. renderDashboard() fills greeting and stats.
+  // Both run HERE — after currentUser is set — never before.
   showApp();
-  loadProjects().then(()=>{ renderProjectCards(); renderDashboard(); });
+  renderDashboard();
+  renderProjectCards(); // renders empty cache initially
+
+  // Load reports from Supabase, then re-render with real data
+  loadProjects().then(()=>{
+    renderProjectCards();
+    renderDashboard();
+  });
 }
 function showApp(){
   if(!currentUser) return;
-  const initials=(currentUser.name||'E')[0].toUpperCase();
-  const acctAv=document.getElementById('acct-avatar');if(acctAv)acctAv.textContent=initials;
-  const nameEl=document.getElementById('acct-name');if(nameEl)nameEl.textContent=currentUser.name||'Engineer';
-  const ddName=document.getElementById('dd-name');if(ddName)ddName.textContent=currentUser.name||'Engineer';
-  const ddEmail=document.getElementById('dd-email');if(ddEmail)ddEmail.textContent=currentUser.email||'';
-  const tmName=document.getElementById('team-member-name');if(tmName)tmName.textContent=(currentUser.name||'Engineer')+' (You)';
-  const tmEmail=document.getElementById('team-member-email');if(tmEmail)tmEmail.textContent=currentUser.email||'';
-  // Update plan badge
-  const planTag=document.querySelector('.plan-tag');
-  if(planTag){const pMap={free:'Free',student:'Student',pro:'Pro',team:'Team'};planTag.textContent=pMap[currentUser.plan]||'Free';}
+
+  // Display name: use full_name if set, otherwise the email prefix, otherwise the email
+  const displayName = currentUser.name || currentUser.email.split('@')[0];
+  // Initials from real data only
+  const initials = displayName ? displayName.slice(0,2).toUpperCase() : '??';
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+
+  // Topbar account button
+  set('acct-avatar', initials);
+  set('acct-name',   displayName);
+
+  // Plan label — only populated from profile data
+  const pMap = { free:'Free Plan', student:'Student', pro:'Professional', team:'Team' };
+  const planLabel = pMap[currentUser.plan] || 'Free Plan';
+  set('acct-plan-label', planLabel);
+
+  // Account dropdown — always shows real email
+  set('dd-name',  currentUser.name || currentUser.email);
+  set('dd-email', currentUser.email);
+
+  // Team section
+  const tmAv = document.getElementById('team-member-av');
+  if(tmAv) tmAv.textContent = initials;
+  set('team-member-name',  (currentUser.name || displayName) + ' (You)');
+  set('team-member-email', currentUser.email);
+
+  // Top-bar plan tag
+  const planTag = document.querySelector('.plan-tag');
+  const planShort = { free:'Free', student:'Student', pro:'Pro', team:'Team' };
+  if(planTag) planTag.textContent = planShort[currentUser.plan] || currentUser.plan;
+
+  // Team page plan stat
+  const teamPlanEl = document.getElementById('team-plan-val');
+  if(teamPlanEl) teamPlanEl.textContent = planShort[currentUser.plan] || currentUser.plan;
 }
 async function doLogout(){
   if(window._supabase) await window._supabase.auth.signOut();
@@ -2991,14 +3060,19 @@ async function loadProjects(){
 async function saveProject(type,title,content,meta={}){
   const wordCount=(content||'').trim().split(/\s+/).length;
   if(window._supabase && currentUser?.id){
-    const { data } = await window._supabase.from('reports').insert({
+    console.log('[EngTools] saveProject: saving to Supabase | user_id:', currentUser.id, '| type:', type, '| title:', title);
+    const { data, error } = await window._supabase.from('reports').insert({
       user_id:currentUser.id, title, report_type:type,
       field:meta.template||meta.org||type, content:content||'', word_count:wordCount
     }).select().single();
+    if(error){ console.error('[EngTools] saveProject Supabase error:', error.message, error); }
     if(data){
+      console.log('[EngTools] saveProject: saved to Supabase | report_id:', data.id);
       _projectsCache.unshift({id:data.id,type,title,content:content||'',meta:{...meta,created:data.created_at},updated:Date.now()});
       return data.id;
     }
+  } else {
+    console.warn('[EngTools] saveProject: falling back to localStorage | supabase:', !!window._supabase, '| currentUser.id:', currentUser?.id||'NULL');
   }
   // Fallback to localStorage
   const id=Date.now().toString();
@@ -3097,6 +3171,7 @@ function setHubView(view){
   document.querySelectorAll('.hub-tab').forEach((b,i)=>b.classList.toggle('on',i===(view==='browse'?0:1)));
 }
 async function sendStdAI(){
+  if(!preflightAuth('sendStdAI')) return;
   const inp=document.getElementById('std-ai-in');
   const q=inp.value.trim();if(!q)return;
   inp.value='';
@@ -3119,7 +3194,12 @@ async function sendStdAI(){
     const ad=document.createElement('div');ad.className='cmsg';
     ad.innerHTML=`<div class="cav ai">AI</div><div class="cbub ai">${md(text)}</div>`;
     m.appendChild(ad);m.scrollTop=m.scrollHeight;
-  }catch(e){document.getElementById('stdt'+tid)?.remove();}
+  }catch(e){
+    console.error('[EngTools] sendStdAI catch:', e.message, e);
+    document.getElementById('stdt'+tid)?.remove();
+    if(e.isAuthError){ toast('Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    else if(e.isRateLimit){ toast(e.message); }
+  }
   document.getElementById('std-ai-send').disabled=false;
 }
 function askStdAI(q){document.getElementById('std-ai-in').value=q;sendStdAI();}
@@ -3213,7 +3293,9 @@ const STDS_INFO = {
 function renderDashboard(){
   const h=new Date().getHours();
   const greeting=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-  const firstName=(currentUser?.name||'Engineer').split(' ')[0];
+  // Use real name — fall back to email prefix, never a fake generic name
+  const displayName = currentUser?.name || currentUser?.email?.split('@')[0] || '';
+  const firstName = displayName.split(' ')[0];
   const timeStr=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const el=document.getElementById('dash-hello');
   const tel=document.getElementById('dash-time');
@@ -3332,6 +3414,7 @@ function askCopilot(q){
   setTimeout(sendCopilot,50);
 }
 async function sendCopilot(){
+  if(!preflightAuth('sendCopilot')) return;
   const inp=document.getElementById('cp-in');
   const q=inp.value.trim();if(!q)return;
   inp.value='';
@@ -3345,7 +3428,13 @@ async function sendCopilot(){
     const text=d.content?.find(c=>c.type==='text')?.text||'Sorry, I could not respond to that.';
     cpHistory.push({role:'assistant',content:text});
     removeCpTyping(tid);addCpMsg('ai',text);
-  }catch(e){removeCpTyping(tid);addCpMsg('ai','Connection error — please try again.');}
+  }catch(e){
+    console.error('[EngTools] sendCopilot catch:', e.message, e);
+    removeCpTyping(tid);
+    if(e.isAuthError){ addCpMsg('ai','Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    else if(e.isRateLimit){ addCpMsg('ai',e.message); }
+    else { addCpMsg('ai','Connection error — please try again.'); }
+  }
   document.getElementById('cp-send').disabled=false;
 }
 function addCpMsg(role,text){
@@ -3427,13 +3516,69 @@ function getPlanLimit(){
   const m={free:10,student:150,pro:-1,team:-1};
   return m[currentUser?.plan||'free']??10;
 }
+function preflightAuth(context){
+  const user  = window._currentUser || currentUser;
+  const token = user?.access_token;
+  console.log('[EngTools] preflightAuth ['+context+'] | user_id:', user?.id||'NULL', '| email:', user?.email||'NULL', '| token:', token?'present':'MISSING');
+  if(!user || !token){
+    console.error('[EngTools] preflightAuth FAILED for', context, '— no session');
+    toast('Your session has expired. Please sign in again.');
+    setTimeout(()=>{ window.location.href='/login?redirect=/app'; }, 2000);
+    return false;
+  }
+  return true;
+}
+
 async function apiCall(body){
-  const token=window._currentUser?.access_token||'';
-  return fetch('/api/claude',{
+  // Always get the current session from Supabase at call time.
+  // This ensures the SDK auto-refreshes an expired access_token before we use it.
+  let token = '';
+  if(window._supabase){
+    const { data: { session } } = await window._supabase.auth.getSession();
+    if(session?.access_token){
+      token = session.access_token;
+      // Keep the cached value in sync
+      if(window._currentUser) window._currentUser.access_token = token;
+      if(currentUser)         currentUser.access_token         = token;
+    }
+  }
+  // Last-resort fallback to cached value
+  if(!token) token = window._currentUser?.access_token || currentUser?.access_token || '';
+
+  console.log('[EngTools] apiCall | user_id:', window._currentUser?.id || currentUser?.id || 'NONE', '| email:', window._currentUser?.email || currentUser?.email || 'NONE', '| token:', token ? token.slice(0,20)+'…' : 'MISSING');
+
+  if(!token){
+    console.error('[EngTools] apiCall: no access token — session not restored');
+    const err = new Error('Your session has expired. Please sign in again.');
+    err.isAuthError = true;
+    throw err;
+  }
+
+  const resp = await fetch('/api/claude',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
     body:JSON.stringify(body)
   });
+
+  // Handle auth failure at the HTTP level immediately
+  if(resp.status === 401){
+    const data = await resp.json().catch(()=>({}));
+    console.error('[EngTools] apiCall: 401 Unauthorized | server message:', data.error);
+    const err = new Error('Your session has expired. Please sign in again.');
+    err.isAuthError = true;
+    throw err;
+  }
+
+  // Handle plan quota exceeded
+  if(resp.status === 429){
+    const data = await resp.json().catch(()=>({}));
+    console.warn('[EngTools] apiCall: 429 Rate limit | plan:', data.plan, '| used:', data.used, '| limit:', data.limit);
+    const err = new Error(data.error || 'Monthly report limit reached. Please upgrade your plan.');
+    err.isRateLimit = true;
+    throw err;
+  }
+
+  return resp;
 }
 
 let toastT;
@@ -3453,10 +3598,14 @@ function toggleTheme(){
   localStorage.setItem('ep_theme',next);
   applyTheme(next);
 }
-// Initialise theme from localStorage
+// Initialise theme from localStorage immediately (no auth dependency)
 (function(){ applyTheme(localStorage.getItem('ep_theme')||'dark'); })();
 
-init();
+// init() must only run AFTER the Supabase module has resolved _currentUser.
+// The module script dispatches 'supabase:ready' once auth + profile fetch complete.
+document.addEventListener('supabase:ready', function() {
+  init();
+}, { once: true });
 </script>
 </body>
 </html>

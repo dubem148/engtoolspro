@@ -115,9 +115,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </a>
   <div class="topbar-end">
     <div class="user-pill">
-      <div class="user-av" id="user-av">—</div>
-      <span id="user-name" style="font-size:13px;font-weight:500">Loading…</span>
-      <span class="plan-badge badge-free" id="plan-badge">Free</span>
+      <div class="user-av" id="user-av"></div>
+      <span id="user-name" style="font-size:13px;font-weight:500"></span>
+      <span class="plan-badge" id="plan-badge"></span>
     </div>
     <button class="btn-app" onclick="window.location.href='app.html'">Open App ✦</button>
     <button class="btn-out" id="signout-btn">Sign out</button>
@@ -127,7 +127,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="main">
 
   <div class="welcome">
-    <h1>Good to see you, <em id="first-name">Engineer</em></h1>
+    <h1>Good to see you, <em id="first-name"></em></h1>
     <p>Here's your EngTools Pro dashboard — your reports, usage, and account all in one place.</p>
   </div>
 
@@ -135,23 +135,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="stats">
     <div class="stat">
       <div class="stat-label">Reports generated</div>
-      <div class="stat-value" id="s-reports" style="color:var(--teal)">0</div>
+      <div class="stat-value" id="s-reports" style="color:var(--teal)"></div>
       <div class="stat-sub">all time</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Queries today</div>
-      <div class="stat-value" id="s-queries" style="color:var(--gold)">0</div>
-      <div class="stat-sub" id="s-limit-label">of 10 today</div>
+      <div class="stat-label">Reports this month</div>
+      <div class="stat-value" id="s-queries" style="color:var(--gold)"></div>
+      <div class="stat-sub" id="s-limit-label"></div>
     </div>
     <div class="stat">
       <div class="stat-label">Current plan</div>
-      <div class="stat-value" id="s-plan" style="font-size:22px;color:var(--violet)">Free</div>
+      <div class="stat-value" id="s-plan" style="font-size:22px;color:var(--violet)"></div>
       <div class="stat-sub">upgrade any time</div>
     </div>
     <div class="stat">
       <div class="stat-label">Member since</div>
-      <div class="stat-value" id="s-since" style="font-size:18px;color:var(--lime)">—</div>
-      <div class="stat-sub">welcome aboard ✦</div>
+      <div class="stat-value" id="s-since" style="font-size:18px;color:var(--lime)"></div>
+      <div class="stat-sub">welcome aboard</div>
     </div>
   </div>
 
@@ -180,8 +180,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
   <div class="stat" style="max-width:480px;margin-bottom:16px;" id="subscription-card">
     <div class="stat-label">Current subscription</div>
-    <div class="stat-value" id="sub-plan" style="font-size:20px;color:var(--violet)">Free</div>
-    <div class="stat-sub" id="sub-detail">10 reports/month · Upgrade to remove limits</div>
+    <div class="stat-value" id="sub-plan" style="font-size:20px;color:var(--violet)"></div>
+    <div class="stat-sub" id="sub-detail"></div>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn-upgrade" id="manage-sub-btn" style="padding:9px 18px;font-size:13px;" onclick="manageSub()">Manage subscription →</button>
     </div>
@@ -203,73 +203,69 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  // Uses the shared auth helper — identical code path as app.html.
+  import { loadUser } from '/js/auth.js';
 
-  const supabase = createClient(
-    'https://jykqcothsmogauvfnuvh.supabase.co',
-    'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J'
-  );
+  const authUser = await loadUser('/login?redirect=/dashboard');
+  if (!authUser) return; // loadUser already redirected
 
-  // ── AUTH GUARD ──────────────────────────────────────
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.href = 'login.html?redirect=dashboard.html';
-  }
-  const user = session.user;
+  const supabase    = authUser.supabase;
+  const displayName = authUser.displayName;
+  const initials    = displayName.slice(0, 2).toUpperCase();
+  const firstName   = authUser.firstName;
+  const plan        = authUser.plan;
 
-  // ── LOAD PROFILE ────────────────────────────────────
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  // ── Topbar ────────────────────────────────────────────
+  document.getElementById('user-av').textContent   = initials;
+  document.getElementById('user-name').textContent = displayName;
 
-  if (profile) {
-    const name     = profile.full_name || user.email;
-    const initials = name.slice(0,2).toUpperCase();
-    const firstName = name.split(' ')[0];
+  // Plan badge — populated from real profile data
+  const pb        = document.getElementById('plan-badge');
+  const planLabels = { free:'FREE', student:'STUDENT', pro:'PRO', team:'TEAM' };
+  const planBadge  = { free:'badge-free', student:'badge-student', pro:'badge-pro', team:'badge-pro' };
+  pb.textContent   = planLabels[plan] || plan.toUpperCase();
+  pb.className     = 'plan-badge ' + (planBadge[plan] || 'badge-free');
 
-    document.getElementById('user-av').textContent    = initials;
-    document.getElementById('user-name').textContent  = name;
-    document.getElementById('first-name').textContent = firstName;
-    document.getElementById('s-reports').textContent  = profile.total_reports_generated || 0;
-    document.getElementById('s-plan').textContent     = profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1);
-    document.getElementById('s-since').textContent    = new Date(user.created_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+  // ── Welcome heading ───────────────────────────────────
+  document.getElementById('first-name').textContent = firstName;
 
-    // Plan badge
-    const pb = document.getElementById('plan-badge');
-    pb.textContent  = profile.plan.toUpperCase();
-    pb.className    = 'plan-badge badge-' + (profile.plan === 'free' ? 'free' : profile.plan === 'student' ? 'student' : 'pro');
+  // ── Stats — all from authUser (real Supabase data) ───────
+  document.getElementById('s-reports').textContent = authUser.total_reports;
+  document.getElementById('s-plan').textContent    = plan.charAt(0).toUpperCase() + plan.slice(1);
+  document.getElementById('s-since').textContent   = new Date(authUser.created_at)
+    .toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
 
-    // Hide upgrade banner for paid users
-    if (profile.plan !== 'free') document.getElementById('upgrade-banner').style.display = 'none';
+  // ── Usage bar ─────────────────────────────────────────
+  const resetDate  = new Date(authUser.monthly_reset_date || new Date());
+  const now        = new Date();
+  const sameMonth  = resetDate.getFullYear() === now.getFullYear() && resetDate.getMonth() === now.getMonth();
+  const used       = sameMonth ? authUser.monthly_reports_used : 0;
+  const limitMap   = { free:10, student:150, pro:-1, team:-1 };
+  const limit      = limitMap[plan] ?? 10;
+  const limitLabel = limit === -1 ? '∞' : limit;
+  const pct        = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
 
-    // Monthly usage
-    const resetDate  = new Date(profile.monthly_reset_date || new Date());
-    const now        = new Date();
-    const sameMonth  = resetDate.getFullYear() === now.getFullYear() && resetDate.getMonth() === now.getMonth();
-    const used       = sameMonth ? (profile.monthly_reports_used || 0) : 0;
-    const limitMap   = { free:10, student:150, pro:-1, team:-1 };
-    const limit      = limitMap[profile.plan] ?? 10;
-    const limitLabel = limit === -1 ? '∞' : limit;
-    const pct        = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
+  document.getElementById('s-queries').textContent     = used;
+  document.getElementById('s-limit-label').textContent = `of ${limitLabel} this month`;
+  document.getElementById('usage-label').textContent   = `${used} / ${limitLabel} used this month`;
+  document.getElementById('usage-fill').style.width    = pct + '%';
+  document.getElementById('usage-max').textContent     = limitLabel;
 
-    document.getElementById('s-queries').textContent     = used;
-    document.getElementById('s-limit-label').textContent = `of ${limitLabel} this month`;
-    document.getElementById('usage-label').textContent   = `${used} / ${limitLabel} used this month`;
-    document.getElementById('usage-fill').style.width    = pct + '%';
-    document.getElementById('usage-max').textContent     = limitLabel;
+  if (pct > 80) document.getElementById('usage-fill').style.background = 'linear-gradient(90deg,var(--amber),var(--rose))';
 
-    if (pct > 80) document.getElementById('usage-fill').style.background = 'linear-gradient(90deg,var(--amber),var(--rose))';
+  // ── Upgrade banner ────────────────────────────────────
+  if (plan !== 'free') document.getElementById('upgrade-banner').style.display = 'none';
 
-    // Subscription card
-    const planNames   = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
-    const planDetails = { free:'10 reports/month · Upgrade to remove limits', student:'150 reports/month', pro:'Unlimited reports · All features', team:'Unlimited reports · Team collaboration' };
-    document.getElementById('sub-plan').textContent  = planNames[profile.plan]  || 'Free Plan';
-    document.getElementById('sub-detail').textContent= planDetails[profile.plan]|| '';
-    if (profile.stripe_subscription_id) {
-      document.getElementById('manage-sub-btn').textContent = 'Manage billing →';
-    }
+  // ── Subscription card ─────────────────────────────────
+  const planNames   = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
+  const planDetails = { free:'10 reports/month · Upgrade to remove limits', student:'150 reports/month', pro:'Unlimited reports · All features', team:'Unlimited reports · Team collaboration' };
+  const subPlanEl   = document.getElementById('sub-plan');
+  const subDetail   = document.getElementById('sub-detail');
+  if (subPlanEl)  subPlanEl.textContent  = planNames[plan]   || plan;
+  if (subDetail)  subDetail.textContent  = planDetails[plan] || '';
+  if (authUser.stripe_subscription_id) {
+    const btn = document.getElementById('manage-sub-btn');
+    if (btn) btn.textContent = 'Manage billing →';
   }
 
   // ── SHOW UPGRADE SUCCESS TOAST ──────────────────────
@@ -277,8 +273,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   if (params.get('upgraded') === '1') showToast('Welcome to Pro! Your account has been upgraded.');
 
   window.manageSub = () => {
-    if (profile?.stripe_subscription_id) {
-      window.location.href = '/api/stripe-portal?token=' + session.access_token;
+    if (authUser.stripe_subscription_id) {
+      window.location.href = '/api/stripe-portal?token=' + authUser.access_token;
     } else {
       window.location.href = '/app';
     }
@@ -288,7 +284,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   const { data: reports, error: rErr } = await supabase
     .from('reports')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', authUser.id)
     .eq('is_deleted', false)
     .order('created_at', { ascending: false });
 

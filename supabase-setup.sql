@@ -122,3 +122,18 @@ CREATE INDEX IF NOT EXISTS reports_user_id_idx       ON reports (user_id);
 CREATE INDEX IF NOT EXISTS reports_is_deleted_idx    ON reports (is_deleted);
 CREATE INDEX IF NOT EXISTS reports_created_at_idx    ON reports (created_at DESC);
 CREATE INDEX IF NOT EXISTS waitlist_created_at_idx   ON waitlist (created_at DESC);
+
+-- ── 8. ADMIN ROLE ────────────────────────────────────────────
+-- Sets app_metadata.role = 'admin' for the admin account.
+-- app_metadata can ONLY be written by the service role — users cannot set this themselves.
+-- Run this once after chidubem1.anudu@gmail.com has signed up.
+--
+-- The admin API endpoints check user.app_metadata.role === 'admin' server-side.
+-- No email comparison. No hardcoded passwords. Pure Supabase RBAC.
+
+UPDATE auth.users
+SET raw_app_meta_data = COALESCE(raw_app_meta_data, '{}'::jsonb) || '{"role": "admin"}'::jsonb
+WHERE email = 'chidubem1.anudu@gmail.com';
+
+-- Verify the update applied:
+-- SELECT id, email, raw_app_meta_data FROM auth.users WHERE email = 'chidubem1.anudu@gmail.com';
