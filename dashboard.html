@@ -119,7 +119,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <span id="user-name" style="font-size:13px;font-weight:500"></span>
       <span class="plan-badge" id="plan-badge"></span>
     </div>
-    <button class="btn-app" onclick="window.location.href='app.html'">Open App ✦</button>
     <button class="btn-out" id="signout-btn">Sign out</button>
   </div>
 </nav>
@@ -205,7 +204,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <script type="module">
   import { loadUser } from '/js/auth.js';
 
-  // ── Toast (defined first — called throughout) ─────────
   let toastTimer;
   function showToast(msg) {
     const el = document.getElementById('toast');
@@ -217,11 +215,46 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   }
   window.showToast = showToast;
 
-  // Helper: null-safe element text setter
   function setText(id, val) {
     const el = document.getElementById(id);
     if (el) el.textContent = val;
     else console.warn('[Dashboard] element not found:', id);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderReportsLoading() {
+    const list = document.getElementById('report-list');
+    if (!list) return;
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-family:var(--mono);font-size:12px">Loading your reports…</div>';
+  }
+
+  function renderReportsError(message) {
+    const list = document.getElementById('report-list');
+    if (!list) return;
+    list.innerHTML = `<div style="padding:24px;color:#fb7185;font-size:13px;font-family:monospace;line-height:1.6">
+      <div><strong>Failed to load reports</strong></div>
+      <div>${escapeHtml(message || 'Unknown error')}</div>
+    </div>`;
+  }
+
+  function renderNoReports() {
+    const list = document.getElementById('report-list');
+    if (!list) return;
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📄</div>
+        <div class="empty-title">No reports yet</div>
+        <p class="empty-sub">Generate your first AI engineering report.<br>It takes less than 2 minutes.</p>
+        <button class="btn-upgrade" onclick="window.location.href='/app'">Create first report →</button>
+      </div>`;
   }
 
   function getLocalReportCache() {
@@ -255,31 +288,38 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     return [...map.values()];
   }
 
-  // ── Auth ─────────────────────────────────────────────
-  console.log('[Dashboard] loading user…');
-  let authUser;
+  console.log('[Dashboard] auth started');
+  let authUser = null;
+  let supabase = null;
+
   try {
     authUser = await loadUser('/login?redirect=/dashboard');
   } catch (e) {
-    console.error('[Dashboard] loadUser threw:', e);
-    document.getElementById('report-list').innerHTML =
-      '<div style="padding:24px;color:#fb7185;font-size:13px">Authentication error. <a href="/login" style="color:#2dd4bf">Sign in again</a></div>';
+    console.error('[Dashboard] auth load error:', e?.message || e);
+    renderReportsError(`Authentication failed: ${e?.message || 'Unknown error'}`);
     return;
   }
-  if (!authUser) return;
 
-  console.log('[Dashboard] authUser | id:', authUser.id, '| email:', authUser.email, '| plan:', authUser.plan);
+  if (!authUser) {
+    console.warn('[Dashboard] auth returned no user; redirect should have been triggered');
+    renderReportsError('Authentication required. Please sign in again.');
+    return;
+  }
 
-  const supabase    = authUser.supabase;
-  const displayName = authUser.displayName;
-  const initials    = displayName.slice(0, 2).toUpperCase();
-  const firstName   = authUser.firstName;
-  const plan        = authUser.plan;
+  console.log('[Dashboard] user loaded | id:', authUser.id, '| email:', authUser.email, '| plan:', authUser.plan);
 
-  // ── Populate UI — wrapped so one failure can't freeze the whole page ──
+  window._currentUser = authUser;
+  window._supabase = authUser.supabase;
+  supabase = authUser.supabase;
+
+  const displayName = authUser.displayName || authUser.name || (authUser.email || '').split('@')[0] || 'Engineer';
+  const initials = (displayName || '').trim().slice(0, 2).toUpperCase() || '??';
+  const firstName = authUser.firstName || displayName.split(' ')[0] || displayName || 'there';
+  const plan = authUser.plan || 'free';
+
   try {
-    setText('user-av',    initials);
-    setText('user-name',  displayName);
+    setText('user-av', initials);
+    setText('user-name', displayName);
     setText('first-name', firstName);
 
     const pb = document.getElementById('plan-badge');
@@ -291,22 +331,22 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     }
 
     setText('s-reports', authUser.total_reports);
-    setText('s-plan',    plan.charAt(0).toUpperCase() + plan.slice(1));
-    setText('s-since',   new Date(authUser.created_at).toLocaleDateString('en-GB', { month:'short', year:'numeric' }));
+    setText('s-plan', plan.charAt(0).toUpperCase() + plan.slice(1));
+    setText('s-since', new Date(authUser.created_at).toLocaleDateString('en-GB', { month:'short', year:'numeric' }));
 
     const resetDate = new Date(authUser.monthly_reset_date || new Date());
-    const now       = new Date();
+    const now = new Date();
     const sameMonth = resetDate.getFullYear() === now.getFullYear() && resetDate.getMonth() === now.getMonth();
-    const used      = sameMonth ? (authUser.monthly_reports_used || 0) : 0;
-    const limitMap  = { free:10, student:150, pro:-1, team:-1 };
-    const limit     = limitMap[plan] ?? 10;
+    const used = sameMonth ? (authUser.monthly_reports_used || 0) : 0;
+    const limitMap = { free:10, student:150, pro:-1, team:-1 };
+    const limit = limitMap[plan] ?? 10;
     const limitLabel = limit === -1 ? '∞' : limit;
-    const pct        = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
+    const pct = limit === -1 ? 20 : Math.min(100, (used / limit) * 100);
 
-    setText('s-queries',      used);
-    setText('s-limit-label',  `of ${limitLabel} this month`);
-    setText('usage-label',    `${used} / ${limitLabel} used this month`);
-    setText('usage-max',      limitLabel);
+    setText('s-queries', used);
+    setText('s-limit-label', `of ${limitLabel} this month`);
+    setText('usage-label', `${used} / ${limitLabel} used this month`);
+    setText('usage-max', limitLabel);
 
     const fillEl = document.getElementById('usage-fill');
     if (fillEl) {
@@ -319,9 +359,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       if (ub) ub.style.display = 'none';
     }
 
-    const planNames   = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
+    const planNames = { free:'Free Plan', student:'Student Plan', pro:'Professional Plan', team:'Team Plan' };
     const planDetails = { free:'10 reports/month · Upgrade to remove limits', student:'150 reports/month', pro:'Unlimited reports · All features', team:'Unlimited reports · Team collaboration' };
-    setText('sub-plan',   planNames[plan]   || plan);
+    setText('sub-plan', planNames[plan] || plan);
     setText('sub-detail', planDetails[plan] || '');
 
     if (authUser.stripe_subscription_id) {
@@ -331,10 +371,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('upgraded') === '1') showToast('Welcome to Pro! Your account has been upgraded.');
-
   } catch (uiErr) {
     console.error('[Dashboard] UI setup error:', uiErr);
-    // Don't return — still try to load reports below
   }
 
   window.manageSub = () => {
@@ -343,20 +381,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       : '/app';
   };
 
-  // ── Sign out ─────────────────────────────────────────
   const signOutBtn = document.getElementById('signout-btn');
   if (signOutBtn) signOutBtn.onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = '/';
   };
 
-  // ── Load reports ─────────────────────────────────────
+  renderReportsLoading();
   const list = document.getElementById('report-list');
 
-  console.log('[Dashboard] fetching reports | user_id:', authUser.id);
-
-  let reports = [];
-  let rErr = null;
+  console.log('[Dashboard] reports fetch started | user_id:', authUser.id);
   try {
     const { data, error } = await supabase
       .from('reports')
@@ -366,51 +400,22 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    reports = (data || []).map(item => normalizeReportRecord(item, 'supabase'));
-    console.log('[Dashboard] reports result | count:', reports.length, '| error:', 'none');
-  } catch (err) {
-    rErr = err;
-    console.error('[Dashboard] reports SELECT error:', err?.code, err?.message, err?.details);
-  }
 
-  const localReports = getLocalReportCache()
-    .map(item => normalizeReportRecord(item, 'local'))
-    .filter(Boolean);
+    const reports = (data || []).map(item => normalizeReportRecord(item, 'supabase')).filter(Boolean);
+    console.log('[Dashboard] reports fetch success | count:', reports.length, '| user_id:', authUser.id);
 
-  const allReports = dedupeReports([...(reports || []), ...localReports]);
+    if (reports.length === 0) {
+      renderNoReports();
+      return;
+    }
 
-  if (rErr && allReports.length === 0) {
-    console.error('[Dashboard] no reports available from Supabase or local cache');
-    list.innerHTML = `<div style="padding:24px;color:#fb7185;font-size:13px;font-family:monospace">
-      Failed to load reports: ${rErr.message}<br>
-      Code: ${rErr.code}<br>
-      <small>Check browser console for details. Ensure the reports table exists in Supabase.</small>
-    </div>`;
-    return;
-  }
-
-  if (allReports.length === 0) {
-    console.log('[Dashboard] no reports found for user');
-    list.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">📄</div>
-        <div class="empty-title">No reports yet</div>
-        <p class="empty-sub">Generate your first AI engineering report.<br>It takes less than 2 minutes.</p>
-        <button class="btn-upgrade" onclick="window.location.href='/app'">Create first report →</button>
-      </div>`;
-    return;
-  }
-
-  console.log('[Dashboard] rendering', allReports.length, 'reports');
-
-  try {
-    list.innerHTML = allReports.map(r => `
+    list.innerHTML = reports.map(r => `
       <div class="report-card" onclick="openReport('${r.id}')">
         <div class="r-info">
-          <div class="r-title">${r.title || 'Untitled Report'}</div>
+          <div class="r-title">${escapeHtml(r.title || 'Untitled Report')}</div>
           <div class="r-meta">
-            <span>${r.report_type || 'report'}</span>
-            <span>${r.field || ''}</span>
+            <span>${escapeHtml(r.report_type || 'report')}</span>
+            <span>${escapeHtml(r.field || '')}</span>
             ${r.word_count ? `<span>${r.word_count.toLocaleString()} words</span>` : ''}
             <span>${new Date(r.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
           </div>
@@ -420,12 +425,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <button class="btn-sm del" onclick="delReport('${r.id}', this)">Delete</button>
         </div>
       </div>`).join('');
-  } catch (renderErr) {
-    console.error('[Dashboard] report render error:', renderErr);
-    list.innerHTML = '<div style="padding:24px;color:#fb7185;font-size:13px">Error rendering reports. Check console.</div>';
+  } catch (err) {
+    console.error('[Dashboard] reports fetch error | code:', err?.code, '| message:', err?.message, '| details:', err?.details);
+    renderReportsError(err?.message || 'Unknown error while loading reports');
+    return;
   }
 
-  // ── Report actions ────────────────────────────────────
   window.openReport = async (id) => {
     const localItem = getLocalReportCache().find(item => item.id === id);
     if (localItem) {
@@ -435,7 +440,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     }
 
     const { data, error } = await supabase.from('reports').select('*').eq('id', id).single();
-    if (error) { console.error('[Dashboard] openReport error:', error); return; }
+    if (error) {
+      console.error('[Dashboard] openReport error:', error);
+      return;
+    }
     if (data) {
       sessionStorage.setItem('open_report', JSON.stringify(data));
       window.location.href = '/app?report=' + id;
@@ -454,7 +462,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     }
 
     const { data, error } = await supabase.from('reports').select('content, title').eq('id', id).single();
-    if (error) { console.error('[Dashboard] dlReport error:', error); return; }
+    if (error) {
+      console.error('[Dashboard] dlReport error:', error);
+      return;
+    }
     if (data) {
       const a = document.createElement('a');
       a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.content || '');
@@ -467,7 +478,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   window.delReport = async (id, btn) => {
     if (!confirm('Delete this report? This cannot be undone.')) return;
     const { error } = await supabase.from('reports').update({ is_deleted: true }).eq('id', id);
-    if (error) { console.error('[Dashboard] delReport error:', error); showToast('Delete failed'); return; }
+    if (error) {
+      console.error('[Dashboard] delReport error:', error);
+      showToast('Delete failed');
+      return;
+    }
     try {
       const cached = JSON.parse(localStorage.getItem('ep_projects') || '[]');
       const next = (cached || []).filter(item => item.id !== id);
