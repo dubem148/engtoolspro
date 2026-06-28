@@ -2432,7 +2432,7 @@ import { loadUser } from '/js/auth.js';
 // loadUser() uses the shared auth helper — same code path as dashboard.html.
 // It calls getSession(), fetches the profile, and returns a normalised user object.
 // If there is no active session it redirects to /login automatically.
-const user = await loadUser('/login?redirect=/app');
+const user = await loadUser('/login.html?redirect=/app');
 
 if (user) {
   // Expose on window so the non-module script can access them
@@ -3022,7 +3022,7 @@ function showApp(){
 }
 async function doLogout(){
   if(window._supabase) await window._supabase.auth.signOut();
-  window.location.href='/login';
+  window.location.href='/login.html';
 }
 
 /* ═══════════════════════════════════════

@@ -192,9 +192,9 @@ select option{background:var(--navy)}
     'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J'
   );
 
-  // Already logged in? Go to dashboard
+  // Already logged in? Go to the main workspace
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) window.location.href = 'dashboard.html';
+  if (session) window.location.href = '/app';
 
   window.handleSignup = async function(e) {
     e.preventDefault();
@@ -222,6 +222,11 @@ select option{background:var(--navy)}
       errEl.classList.add('show');
       btn.disabled = false;
       btn.textContent = 'Create free account →';
+      return;
+    }
+
+    if (data?.session) {
+      window.location.href = '/app';
       return;
     }
 

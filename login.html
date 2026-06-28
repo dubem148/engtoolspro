@@ -152,9 +152,9 @@ input::placeholder{color:var(--faint)}
     'sb_publishable_5Pug_V5bF1a2j7AgR3h2xg_HRBVwC5J'
   );
 
-  // If already logged in → go to dashboard
+  // If already logged in → go to the main workspace
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) window.location.href = 'dashboard.html';
+  if (session) window.location.href = '/app';
 
   window.handleLogin = async function(e) {
     e.preventDefault();
@@ -180,11 +180,11 @@ input::placeholder{color:var(--faint)}
       return;
     }
 
-    okEl.textContent = 'Signed in! Taking you to your dashboard…';
+    okEl.textContent = 'Signed in! Taking you to your workspace…';
     okEl.classList.add('show');
 
     const params = new URLSearchParams(window.location.search);
-    const redirect = params.get('redirect') || 'dashboard.html';
+    const redirect = params.get('redirect') || '/app';
     setTimeout(() => window.location.href = redirect, 800);
   };
 
