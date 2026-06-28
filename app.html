@@ -2582,7 +2582,12 @@ async function genReport(){
   if(!(await preflightAuth('genReport'))) return;
   console.log('[EngTools] genReport: starting | user_id:', currentUser?.id, '| plan:', currentUser?.plan, '| template:', selTpl);
   const notes=document.getElementById('rpt-notes').value.trim();
-  if(!notes){toast('Please enter your notes and findings first');return;}
+  if(!notes){
+    const err = new Error('No report notes were provided');
+    console.error('[EngTools] genReport: missing notes | error:', err.message);
+    toast(err.message);
+    return;
+  }
   const proj=document.getElementById('rpt-proj').value||'Engineering Project';
   const org=document.getElementById('rpt-org').value||'';
   const site=document.getElementById('rpt-site').value||'';
@@ -2631,18 +2636,20 @@ Write every section fully. Present measurements in tables. Number and prioritise
     const r=await apiCall({model:'claude-opus-4-5',max_tokens:4000,system:sys,messages:[{role:'user',content:msg}]});
     const d=await r.json();
     if(d.error){
-      console.error('[EngTools] genReport: API error response:', d.error, '| full response:', d);
+      const errMsg = d.error?.message || JSON.stringify(d.error || {});
+      console.error('[EngTools] genReport: API error response | detail:', errMsg, '| full response:', d);
       setLoad('rpt',false);
       document.getElementById('rpt-prog').classList.remove('on');
-      toast('API error: '+(d.error.message||JSON.stringify(d.error)));
+      toast(errMsg);
       return;
     }
     const text=d.content?.find(c=>c.type==='text')?.text;
     if(!text){
-      console.error('[EngTools] genReport: no text in response:', d);
+      const err = new Error('AI returned no text content');
+      console.error('[EngTools] genReport: no text in response | detail:', err.message, '| response:', d);
       setLoad('rpt',false);
       document.getElementById('rpt-prog').classList.remove('on');
-      toast('No content returned — please try again');
+      toast(err.message);
       return;
     }
     console.log('[EngTools] genReport: AI content ready | user_id:', currentUser?.id, '| words:', text.split(/\s+/).length, '| template:', tplObj.n);
@@ -2660,16 +2667,17 @@ Write every section fully. Present measurements in tables. Number and prioritise
     bumpUsage();
     finProg(secsArr);
   }catch(e){
-    console.error('[EngTools] genReport catch:', e.message, e);
+    const detail = e?.message || e?.reason || 'Unknown report generation error';
+    console.error('[EngTools] genReport catch | detail:', detail, '| error:', e);
     setLoad('rpt',false);
     hideSkeleton('rpt');
     document.getElementById('rpt-prog').classList.remove('on');
-    if(e.isAuthError){
-      handleAuthFailure('genReport', e.reason || e.message);
-    } else if(e.isRateLimit){
-      toast(e.message);
+    if(e?.isAuthError){
+      handleAuthFailure('genReport', detail);
+    } else if(e?.isRateLimit){
+      toast(detail);
     } else {
-      toast('Connection error — please try again');
+      toast(detail);
     }
   }
 }
@@ -2790,11 +2798,12 @@ async function analyzeDS(){
     saveProject('datasheet',dsLabel,text,{mode,type});
     bumpUsage();
   }catch(e){
-    console.error('[EngTools] analyzeDS catch:', e.message, e);
+    const detail = e?.message || e?.reason || 'Unknown datasheet analysis error';
+    console.error('[EngTools] analyzeDS catch | detail:', detail, '| error:', e);
     setLoad('ds',false);hideSkeleton('ds');
-    if(e.isAuthError){ handleAuthFailure('analyzeDS', e.reason || e.message); }
-    else if(e.isRateLimit){ toast(e.message); }
-    else { toast('Connection error — please try again'); }
+    if(e?.isAuthError){ handleAuthFailure('analyzeDS', detail); }
+    else if(e?.isRateLimit){ toast(detail); }
+    else { toast(detail); }
   }
 }
 
@@ -2883,11 +2892,12 @@ async function cmpDS(){
     saveProject('compare',cmpLabel,text,{optionA:an,optionB:bn});
     bumpUsage();
   }catch(e){
-    console.error('[EngTools] cmpDS catch:', e.message, e);
+    const detail = e?.message || e?.reason || 'Unknown comparison error';
+    console.error('[EngTools] cmpDS catch | detail:', detail, '| error:', e);
     setLoad('cmp',false);hideSkeleton('cmp');
-    if(e.isAuthError){ handleAuthFailure('cmpDS', e.reason || e.message); }
-    else if(e.isRateLimit){ toast(e.message); }
-    else { toast('Connection error — please try again'); }
+    if(e?.isAuthError){ handleAuthFailure('cmpDS', detail); }
+    else if(e?.isRateLimit){ toast(detail); }
+    else { toast(detail); }
   }
 }
 function clearCmp(){['cmp-a','cmp-b','cmp-a-name','cmp-b-name','cmp-app'].forEach(id=>document.getElementById(id).value='');document.getElementById('cmp-out').classList.remove('on');}
@@ -3068,32 +3078,38 @@ async function saveProject(type,title,content,meta={}){
   const wordCount=(content||'').trim().split(/\s+/).length;
 
   if(window._supabase && currentUser?.id){
+    const reportData = {
+      user_id: currentUser.id,
+      title,
+      report_type: type,
+      field: meta.template || meta.org || type,
+      content: content || '',
+      word_count: wordCount
+    };
     console.log('[EngTools] saveProject: INSERT start | user_id:', currentUser.id, '| type:', type, '| title:', title, '| words:', wordCount);
+    console.log('Insert starting...');
+    console.log(reportData);
 
     const { data, error } = await window._supabase
       .from('reports')
-      .insert({
-        user_id:     currentUser.id,
-        title,
-        report_type: type,
-        field:       meta.template || meta.org || type,
-        content:     content || '',
-        word_count:  wordCount
-      })
+      .insert(reportData)
       .select('id, created_at')
       .maybeSingle();
 
+    console.log('Insert result:', data);
+    console.log('Insert error:', error);
+
     if(error){
-      // Log the full error so the developer can see exactly what failed
-      console.error('[EngTools] saveProject INSERT error | code:', error.code, '| message:', error.message, '| details:', error.details, '| hint:', error.hint);
-      // Show the user a specific message if it's a table-not-found error
+      const detail = error.message || error.details || error.hint || 'Supabase insert failed';
+      console.error('[EngTools] saveProject INSERT error | code:', error.code, '| message:', detail, '| details:', error.details, '| hint:', error.hint);
       if(error.code === '42P01'){
         toast('Setup required: the reports table does not exist in Supabase. Run supabase-setup.sql.');
-      } else if(error.code === '42501' || error.message?.includes('security policy')){
+      } else if(error.code === '42501' || detail.includes('security policy')){
         toast('Permission error saving report. Check Supabase RLS policies.');
       } else {
-        toast('Report generated but could not be saved to your account: ' + error.message);
+        toast(detail);
       }
+      return null;
     }
 
     if(data){
@@ -3109,10 +3125,10 @@ async function saveProject(type,title,content,meta={}){
       return data.id;
     }
   } else {
-    console.warn('[EngTools] saveProject: no Supabase client or user | _supabase:', !!window._supabase, '| currentUser.id:', currentUser?.id||'NULL');
+    const detail = 'No Supabase client or user available for saveProject';
+    console.warn('[EngTools] saveProject: no Supabase client or user | _supabase:', !!window._supabase, '| currentUser.id:', currentUser?.id||'NULL', '| detail:', detail);
   }
 
-  // Fallback — only reached if Supabase is unavailable
   console.warn('[EngTools] saveProject: using localStorage fallback');
   const id=Date.now().toString();
   _projectsCache.unshift({id,type,title,content:content||'',meta:{...meta,created:new Date().toISOString()},updated:Date.now()});
@@ -3234,10 +3250,12 @@ async function sendStdAI(){
     ad.innerHTML=`<div class="cav ai">AI</div><div class="cbub ai">${md(text)}</div>`;
     m.appendChild(ad);m.scrollTop=m.scrollHeight;
   }catch(e){
-    console.error('[EngTools] sendStdAI catch:', e.message, e);
+    const detail = e?.message || e?.reason || 'Unknown standards AI error';
+    console.error('[EngTools] sendStdAI catch | detail:', detail, '| error:', e);
     document.getElementById('stdt'+tid)?.remove();
-    if(e.isAuthError){ handleAuthFailure('sendStdAI', e.reason || e.message); }
-    else if(e.isRateLimit){ toast(e.message); }
+    if(e?.isAuthError){ handleAuthFailure('sendStdAI', detail); }
+    else if(e?.isRateLimit){ toast(detail); }
+    else { toast(detail); }
   }
   document.getElementById('std-ai-send').disabled=false;
 }
@@ -3468,11 +3486,12 @@ async function sendCopilot(){
     cpHistory.push({role:'assistant',content:text});
     removeCpTyping(tid);addCpMsg('ai',text);
   }catch(e){
-    console.error('[EngTools] sendCopilot catch:', e.message, e);
+    const detail = e?.message || e?.reason || 'Unknown Copilot error';
+    console.error('[EngTools] sendCopilot catch | detail:', detail, '| error:', e);
     removeCpTyping(tid);
-    if(e.isAuthError){ handleAuthFailure('sendCopilot', e.reason || e.message); addCpMsg('ai','Your session has expired. Please sign in again.'); }
-    else if(e.isRateLimit){ addCpMsg('ai',e.message); }
-    else { addCpMsg('ai','Connection error — please try again.'); }
+    if(e?.isAuthError){ handleAuthFailure('sendCopilot', detail); addCpMsg('ai',detail); }
+    else if(e?.isRateLimit){ addCpMsg('ai',detail); }
+    else { addCpMsg('ai',detail); }
   }
   document.getElementById('cp-send').disabled=false;
 }
@@ -3582,11 +3601,12 @@ function persistReportDraft(){
 }
 
 function handleAuthFailure(context, reason){
-  console.error('[EngTools] auth failure | context:', context, '| reason:', reason || 'missing_session');
+  const detail = reason || 'Authentication failed';
+  console.error('[EngTools] auth failure | context:', context, '| reason:', detail);
   if(authRedirectPending) return;
   authRedirectPending = true;
   if(['genReport','refine','report'].includes(context)) persistReportDraft();
-  toast('Your session has expired. Please sign in again.');
+  toast(detail);
   setTimeout(()=>{ window.location.assign('/login.html?redirect=/app'); }, 900);
 }
 
@@ -3627,16 +3647,18 @@ async function ensureFreshSession(context){
         await new Promise(resolve => setTimeout(resolve, 250));
       }
     } catch (err) {
-      console.warn('[EngTools] auth preflight retry | attempt:', attempt + 1, '| error:', err?.message || err);
+      const detail = err?.message || err?.reason || 'Unknown auth preflight error';
+      console.warn('[EngTools] auth preflight retry | attempt:', attempt + 1, '| detail:', detail, '| error:', err);
       if (attempt < 2) {
         await new Promise(resolve => setTimeout(resolve, 250));
       }
     }
   }
 
-  const err = new Error('Your session has expired. Please sign in again.');
+  const err = new Error('No active Supabase session found');
   err.isAuthError = true;
   err.reason = 'missing_session';
+  console.error('[EngTools] auth preflight failed | detail:', err.message);
   throw err;
 }
 
@@ -3645,12 +3667,13 @@ async function preflightAuth(context){
     await ensureFreshSession(context);
     return true;
   } catch (err) {
-    console.error('[EngTools] preflightAuth failed | context:', context, '| reason:', err.reason || err.message);
-    if (err.isAuthError) {
-      handleAuthFailure(context, err.reason || err.message);
+    const detail = err?.message || err?.reason || 'Unknown auth error';
+    console.error('[EngTools] preflightAuth failed | context:', context, '| detail:', detail, '| error:', err);
+    if (err?.isAuthError) {
+      handleAuthFailure(context, detail);
       return false;
     }
-    toast('Unable to verify your session. Please try again.');
+    toast(detail);
     return false;
   }
 }
@@ -3663,41 +3686,52 @@ async function apiCall(body){
     token = sessionInfo.token;
     console.log('[EngTools] apiCall | session exists:', !!sessionInfo.session, '| access token present:', !!token);
   } catch (err) {
-    console.error('[EngTools] apiCall auth failure | reason:', err.reason || err.message);
+    const detail = err?.message || err?.reason || 'Unknown auth error';
+    console.error('[EngTools] apiCall auth failure | detail:', detail, '| error:', err);
     err.isAuthError = true;
+    err.reason = err.reason || detail;
     throw err;
   }
 
   if(!token){
-    const err = new Error('Your session has expired. Please sign in again.');
+    const err = new Error('No access token returned by Supabase session');
     err.isAuthError = true;
-    err.reason = 'missing_session';
+    err.reason = 'missing_access_token';
+    console.error('[EngTools] apiCall no token | detail:', err.message);
     throw err;
   }
 
-  const resp = await fetch('/api/claude',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-    body:JSON.stringify(body)
-  });
+  const url = '/api/claude';
+  const headers = {'Content-Type':'application/json','Authorization':'Bearer '+token};
+  console.log("=== API REQUEST ===");
+  console.log(url);
+  console.log(headers);
+  console.log(body);
+  const resp = await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
 
-  console.log('[EngTools] apiCall response status:', resp.status);
+  console.log("Status:", resp.status);
 
-  if(resp.status === 401){
-    const data = await resp.json().catch(()=>({}));
-    console.error('[EngTools] apiCall: 401 Unauthorized | server message:', data.error);
-    const err = new Error('Your session has expired. Please sign in again.');
-    err.isAuthError = true;
-    err.reason = 'unauthorized';
-    throw err;
-  }
-
-  if(resp.status === 429){
-    const data = await resp.json().catch(()=>({}));
-    console.warn('[EngTools] apiCall: 429 Rate limit | plan:', data.plan, '| used:', data.used, '| limit:', data.limit);
-    const err = new Error(data.error || 'Monthly report limit reached. Please upgrade your plan.');
-    err.isRateLimit = true;
-    throw err;
+  if(!resp.ok){
+    const text = await resp.text().catch(()=> '');
+    console.log(text);
+    if(resp.status === 401){
+      const err = new Error(text || 'Anthropic API 401');
+      err.status = resp.status;
+      err.reason = text || 'Anthropic API 401';
+      console.error('[EngTools] apiCall 401 | detail:', err.message);
+      throw err;
+    }
+    if(resp.status === 429){
+      const err = new Error(text || 'API rate limit reached');
+      err.status = resp.status;
+      err.reason = text || 'API rate limit reached';
+      console.error('[EngTools] apiCall 429 | detail:', err.message);
+      throw err;
+    }
+    const err = new Error(text || `API request failed with status ${resp.status}`);
+    err.status = resp.status;
+    err.reason = text || `API request failed with status ${resp.status}`;
+    console.error('[EngTools] apiCall non-OK response | detail:', err.message);
   }
 
   return resp;
