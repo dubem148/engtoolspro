@@ -2645,7 +2645,7 @@ Write every section fully. Present measurements in tables. Number and prioritise
       toast('No content returned — please try again');
       return;
     }
-    console.log('[EngTools] genReport: success | user_id:', currentUser?.id, '| words:', text.split(/\s+/).length);
+    console.log('[EngTools] genReport: AI content ready | user_id:', currentUser?.id, '| words:', text.split(/\s+/).length, '| template:', tplObj.n);
     rptLast=text;
     setLoad('rpt',false);
     hideSkeleton('rpt');
@@ -2654,7 +2654,9 @@ Write every section fully. Present measurements in tables. Number and prioritise
     const tplName2=(TPLS.find(t=>t.id===selTpl)||TPLS[0]).n;
     const projTitle=document.getElementById('rpt-proj')?.value||tplName2;
     saveActivity('report',projTitle);
-    saveProject('report',projTitle,text,{template:tplName2,org:document.getElementById('rpt-org')?.value||''});
+    console.log('[EngTools] genReport: saving report to Supabase | user_id:', currentUser?.id, '| title:', projTitle, '| words:', text.split(/\s+/).length);
+    await saveProject('report',projTitle,text,{template:tplName2,org:document.getElementById('rpt-org')?.value||''});
+    console.log('[EngTools] genReport: report persistence complete');
     bumpUsage();
     finProg(secsArr);
   }catch(e){
@@ -3061,7 +3063,7 @@ async function saveProject(type,title,content,meta={}){
   const wordCount=(content||'').trim().split(/\s+/).length;
 
   if(window._supabase && currentUser?.id){
-    console.log('[EngTools] saveProject: INSERT | user_id:', currentUser.id, '| type:', type, '| title:', title, '| words:', wordCount);
+    console.log('[EngTools] saveProject: INSERT start | user_id:', currentUser.id, '| type:', type, '| title:', title, '| words:', wordCount);
 
     const { data, error } = await window._supabase
       .from('reports')
@@ -3074,7 +3076,7 @@ async function saveProject(type,title,content,meta={}){
         word_count:  wordCount
       })
       .select('id, created_at')
-      .single();
+      .maybeSingle();
 
     if(error){
       // Log the full error so the developer can see exactly what failed
@@ -3096,6 +3098,9 @@ async function saveProject(type,title,content,meta={}){
         meta: {...meta, created: data.created_at},
         updated: Date.now()
       });
+      try { localStorage.setItem('ep_projects', JSON.stringify(_projectsCache)); } catch (cacheErr) {
+        console.warn('[EngTools] saveProject: could not update local cache', cacheErr);
+      }
       return data.id;
     }
   } else {

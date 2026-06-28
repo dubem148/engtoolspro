@@ -224,6 +224,37 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     else console.warn('[Dashboard] element not found:', id);
   }
 
+  function getLocalReportCache() {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ep_projects') || '[]');
+      return (cached || []).filter(item => item?.type === 'report');
+    } catch (e) {
+      console.warn('[Dashboard] local report cache unreadable:', e);
+      return [];
+    }
+  }
+
+  function normalizeReportRecord(item, source = 'supabase') {
+    if (!item) return null;
+    const createdAt = item.created_at || item.meta?.created || item.updated || new Date().toISOString();
+    return {
+      id: item.id,
+      title: item.title || 'Untitled Report',
+      report_type: item.report_type || item.type || 'report',
+      field: item.field || item.meta?.template || '',
+      word_count: item.word_count ?? (item.content ? item.content.trim().split(/\s+/).length : 0),
+      created_at: createdAt,
+      content: item.content || '',
+      _source: source
+    };
+  }
+
+  function dedupeReports(items) {
+    const map = new Map();
+    (items || []).forEach(item => { if (item && !map.has(item.id)) map.set(item.id, item); });
+    return [...map.values()];
+  }
+
   // ── Auth ─────────────────────────────────────────────
   console.log('[Dashboard] loading user…');
   let authUser;
@@ -324,18 +355,32 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
   console.log('[Dashboard] fetching reports | user_id:', authUser.id);
 
-  const { data: reports, error: rErr } = await supabase
-    .from('reports')
-    .select('id, title, report_type, field, word_count, created_at')
-    .eq('user_id', authUser.id)
-    .eq('is_deleted', false)
-    .order('created_at', { ascending: false });
+  let reports = [];
+  let rErr = null;
+  try {
+    const { data, error } = await supabase
+      .from('reports')
+      .select('id, title, report_type, field, word_count, created_at, content')
+      .eq('user_id', authUser.id)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false });
 
-  console.log('[Dashboard] reports result | count:', reports?.length ?? 'null',
-    '| error:', rErr ? JSON.stringify(rErr) : 'none');
+    if (error) throw error;
+    reports = (data || []).map(item => normalizeReportRecord(item, 'supabase'));
+    console.log('[Dashboard] reports result | count:', reports.length, '| error:', 'none');
+  } catch (err) {
+    rErr = err;
+    console.error('[Dashboard] reports SELECT error:', err?.code, err?.message, err?.details);
+  }
 
-  if (rErr) {
-    console.error('[Dashboard] reports SELECT error:', rErr.code, rErr.message, rErr.details);
+  const localReports = getLocalReportCache()
+    .map(item => normalizeReportRecord(item, 'local'))
+    .filter(Boolean);
+
+  const allReports = dedupeReports([...(reports || []), ...localReports]);
+
+  if (rErr && allReports.length === 0) {
+    console.error('[Dashboard] no reports available from Supabase or local cache');
     list.innerHTML = `<div style="padding:24px;color:#fb7185;font-size:13px;font-family:monospace">
       Failed to load reports: ${rErr.message}<br>
       Code: ${rErr.code}<br>
@@ -344,7 +389,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     return;
   }
 
-  if (!reports || reports.length === 0) {
+  if (allReports.length === 0) {
     console.log('[Dashboard] no reports found for user');
     list.innerHTML = `
       <div class="empty">
@@ -356,10 +401,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     return;
   }
 
-  console.log('[Dashboard] rendering', reports.length, 'reports');
+  console.log('[Dashboard] rendering', allReports.length, 'reports');
 
   try {
-    list.innerHTML = reports.map(r => `
+    list.innerHTML = allReports.map(r => `
       <div class="report-card" onclick="openReport('${r.id}')">
         <div class="r-info">
           <div class="r-title">${r.title || 'Untitled Report'}</div>
@@ -382,6 +427,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
   // ── Report actions ────────────────────────────────────
   window.openReport = async (id) => {
+    const localItem = getLocalReportCache().find(item => item.id === id);
+    if (localItem) {
+      sessionStorage.setItem('open_report', JSON.stringify(localItem));
+      window.location.href = '/app?report=' + id;
+      return;
+    }
+
     const { data, error } = await supabase.from('reports').select('*').eq('id', id).single();
     if (error) { console.error('[Dashboard] openReport error:', error); return; }
     if (data) {
@@ -391,6 +443,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   };
 
   window.dlReport = async (id) => {
+    const localItem = getLocalReportCache().find(item => item.id === id);
+    if (localItem) {
+      const a = document.createElement('a');
+      a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(localItem.content || '');
+      a.download = (localItem.title || 'report').replace(/[^a-z0-9]/gi,'_') + '.txt';
+      a.click();
+      showToast('Report downloaded ✓');
+      return;
+    }
+
     const { data, error } = await supabase.from('reports').select('content, title').eq('id', id).single();
     if (error) { console.error('[Dashboard] dlReport error:', error); return; }
     if (data) {
@@ -406,6 +468,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     if (!confirm('Delete this report? This cannot be undone.')) return;
     const { error } = await supabase.from('reports').update({ is_deleted: true }).eq('id', id);
     if (error) { console.error('[Dashboard] delReport error:', error); showToast('Delete failed'); return; }
+    try {
+      const cached = JSON.parse(localStorage.getItem('ep_projects') || '[]');
+      const next = (cached || []).filter(item => item.id !== id);
+      localStorage.setItem('ep_projects', JSON.stringify(next));
+    } catch (cacheErr) {
+      console.warn('[Dashboard] could not remove local report cache entry:', cacheErr);
+    }
     btn.closest('.report-card')?.remove();
     showToast('Report deleted');
   };
