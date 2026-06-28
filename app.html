@@ -2579,7 +2579,7 @@ function goPage(id){
    REPORT GENERATOR
 ═══════════════════════════════════════ */
 async function genReport(){
-  if(!preflightAuth('genReport')) return;
+  if(!(await preflightAuth('genReport'))) return;
   console.log('[EngTools] genReport: starting | user_id:', currentUser?.id, '| plan:', currentUser?.plan, '| template:', selTpl);
   const notes=document.getElementById('rpt-notes').value.trim();
   if(!notes){toast('Please enter your notes and findings first');return;}
@@ -2665,8 +2665,7 @@ Write every section fully. Present measurements in tables. Number and prioritise
     hideSkeleton('rpt');
     document.getElementById('rpt-prog').classList.remove('on');
     if(e.isAuthError){
-      toast('Your session has expired. Please sign in again.');
-      setTimeout(()=>{ window.location.href='/login?redirect=/app'; }, 2000);
+      handleAuthFailure('genReport', e.reason || e.message);
     } else if(e.isRateLimit){
       toast(e.message);
     } else {
@@ -2751,7 +2750,7 @@ function renderPills(){document.getElementById('ds-pills').innerHTML=dsFiles.map
 function rmFile(i){dsFiles.splice(i,1);dsContent='';renderPills();}
 
 async function analyzeDS(){
-  if(!preflightAuth('analyzeDS')) return;
+  if(!(await preflightAuth('analyzeDS'))) return;
   const paste=document.getElementById('ds-paste').value.trim();
   const content=dsContent||paste;
   if(!content){toast('Upload a file or paste datasheet content');return;}
@@ -2793,7 +2792,7 @@ async function analyzeDS(){
   }catch(e){
     console.error('[EngTools] analyzeDS catch:', e.message, e);
     setLoad('ds',false);hideSkeleton('ds');
-    if(e.isAuthError){ toast('Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    if(e.isAuthError){ handleAuthFailure('analyzeDS', e.reason || e.message); }
     else if(e.isRateLimit){ toast(e.message); }
     else { toast('Connection error — please try again'); }
   }
@@ -2826,7 +2825,7 @@ function clearDS(){
    QA CHAT
 ═══════════════════════════════════════ */
 async function qsend(){
-  if(!preflightAuth('qsend')) return;
+  if(!(await preflightAuth('qsend'))) return;
   const inp=document.getElementById('qa-in');
   const q=inp.value.trim();
   if(!q||!dsCtx)return;
@@ -2861,7 +2860,7 @@ function removeQTyping(id){document.getElementById('qt'+id)?.remove();}
    COMPARE
 ═══════════════════════════════════════ */
 async function cmpDS(){
-  if(!preflightAuth('cmpDS')) return;
+  if(!(await preflightAuth('cmpDS'))) return;
   const a=document.getElementById('cmp-a').value.trim(),b=document.getElementById('cmp-b').value.trim();
   if(!a||!b){toast('Paste content for both options');return;}
   const an=document.getElementById('cmp-a-name').value||'Option A';
@@ -2886,7 +2885,7 @@ async function cmpDS(){
   }catch(e){
     console.error('[EngTools] cmpDS catch:', e.message, e);
     setLoad('cmp',false);hideSkeleton('cmp');
-    if(e.isAuthError){ toast('Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    if(e.isAuthError){ handleAuthFailure('cmpDS', e.reason || e.message); }
     else if(e.isRateLimit){ toast(e.message); }
     else { toast('Connection error — please try again'); }
   }
@@ -2899,7 +2898,13 @@ function clearCmp(){['cmp-a','cmp-b','cmp-a-name','cmp-b-name','cmp-app'].forEac
 function setLoad(id,on,msg){
   document.getElementById(id+'-lb')?.classList.toggle('on',on);
   const lm=document.getElementById(id+'-lm');if(lm){lm.classList.toggle('on',on);if(msg)lm.textContent=msg;}
-  const btn=document.getElementById(id+'-btn');if(btn)btn.disabled=on;
+  const btn=document.getElementById(id+'-btn');
+  if(btn){
+    btn.disabled=on;
+    if(!btn.dataset.defaultText) btn.dataset.defaultText = btn.textContent;
+    const label = on ? (msg && /report/i.test(msg) ? 'Generating…' : msg || btn.dataset.defaultText) : btn.dataset.defaultText;
+    if(label) btn.textContent = label;
+  }
 }
 
 function md(t){
@@ -3205,7 +3210,7 @@ function setHubView(view){
   document.querySelectorAll('.hub-tab').forEach((b,i)=>b.classList.toggle('on',i===(view==='browse'?0:1)));
 }
 async function sendStdAI(){
-  if(!preflightAuth('sendStdAI')) return;
+  if(!(await preflightAuth('sendStdAI'))) return;
   const inp=document.getElementById('std-ai-in');
   const q=inp.value.trim();if(!q)return;
   inp.value='';
@@ -3231,7 +3236,7 @@ async function sendStdAI(){
   }catch(e){
     console.error('[EngTools] sendStdAI catch:', e.message, e);
     document.getElementById('stdt'+tid)?.remove();
-    if(e.isAuthError){ toast('Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    if(e.isAuthError){ handleAuthFailure('sendStdAI', e.reason || e.message); }
     else if(e.isRateLimit){ toast(e.message); }
   }
   document.getElementById('std-ai-send').disabled=false;
@@ -3448,7 +3453,7 @@ function askCopilot(q){
   setTimeout(sendCopilot,50);
 }
 async function sendCopilot(){
-  if(!preflightAuth('sendCopilot')) return;
+  if(!(await preflightAuth('sendCopilot'))) return;
   const inp=document.getElementById('cp-in');
   const q=inp.value.trim();if(!q)return;
   inp.value='';
@@ -3465,7 +3470,7 @@ async function sendCopilot(){
   }catch(e){
     console.error('[EngTools] sendCopilot catch:', e.message, e);
     removeCpTyping(tid);
-    if(e.isAuthError){ addCpMsg('ai','Your session has expired. Please sign in again.'); setTimeout(()=>{ window.location.href='/login?redirect=/app'; },2000); }
+    if(e.isAuthError){ handleAuthFailure('sendCopilot', e.reason || e.message); addCpMsg('ai','Your session has expired. Please sign in again.'); }
     else if(e.isRateLimit){ addCpMsg('ai',e.message); }
     else { addCpMsg('ai','Connection error — please try again.'); }
   }
@@ -3550,41 +3555,123 @@ function getPlanLimit(){
   const m={free:10,student:150,pro:-1,team:-1};
   return m[currentUser?.plan||'free']??10;
 }
-function preflightAuth(context){
-  const user  = window._currentUser || currentUser;
-  const token = user?.access_token;
-  console.log('[EngTools] preflightAuth ['+context+'] | user_id:', user?.id||'NULL', '| email:', user?.email||'NULL', '| token:', token?'present':'MISSING');
-  if(!user || !token){
-    console.error('[EngTools] preflightAuth FAILED for', context, '— no session');
-    toast('Your session has expired. Please sign in again.');
-    setTimeout(()=>{ window.location.href='/login?redirect=/app'; }, 2000);
+let authRedirectPending = false;
+
+function persistReportDraft(){
+  try {
+    const draft = {
+      notes: document.getElementById('rpt-notes')?.value || '',
+      proj: document.getElementById('rpt-proj')?.value || '',
+      org: document.getElementById('rpt-org')?.value || '',
+      site: document.getElementById('rpt-site')?.value || '',
+      ref: document.getElementById('rpt-ref')?.value || '',
+      date: document.getElementById('rpt-date')?.value || '',
+      field: document.getElementById('rpt-field')?.value || '',
+      tone: document.getElementById('rpt-tone')?.value || '',
+      lang: document.getElementById('rpt-lang')?.value || '',
+      extra: document.getElementById('rpt-extra')?.value || '',
+      customStd: document.getElementById('rpt-custom-std')?.value || '',
+      template: selTpl,
+      selectedStds: [...selStds],
+      selectedSecs: [...selSecs]
+    };
+    localStorage.setItem('ep_report_draft', JSON.stringify(draft));
+  } catch (err) {
+    console.warn('[EngTools] could not save report draft:', err);
+  }
+}
+
+function handleAuthFailure(context, reason){
+  console.error('[EngTools] auth failure | context:', context, '| reason:', reason || 'missing_session');
+  if(authRedirectPending) return;
+  authRedirectPending = true;
+  if(['genReport','refine','report'].includes(context)) persistReportDraft();
+  toast('Your session has expired. Please sign in again.');
+  setTimeout(()=>{ window.location.assign('/login.html?redirect=/app'); }, 900);
+}
+
+async function ensureFreshSession(context){
+  console.log('[EngTools] auth preflight started | context:', context);
+  const cachedUser = window._currentUser || currentUser;
+  console.log('[EngTools] auth preflight | supabase client present:', !!window._supabase);
+  console.log('[EngTools] auth preflight | cached user present:', !!cachedUser, '| cached token present:', !!cachedUser?.access_token);
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const { data: { session }, error } = window._supabase
+        ? await window._supabase.auth.getSession()
+        : { data: { session: null }, error: null };
+
+      if (error) {
+        console.warn('[EngTools] auth preflight warning | attempt:', attempt + 1, '| error:', error.message);
+      }
+
+      const token = session?.access_token || null;
+      console.log('[EngTools] auth preflight | attempt:', attempt + 1, '| session exists:', !!session, '| access token present:', !!token);
+
+      if (session && token) {
+        if (window._currentUser) window._currentUser.access_token = token;
+        if (currentUser) currentUser.access_token = token;
+        if (window._currentUser) {
+          window._currentUser.id = window._currentUser.id || session.user?.id || null;
+          window._currentUser.email = window._currentUser.email || session.user?.email || null;
+        }
+        if (currentUser) {
+          currentUser.id = currentUser.id || session.user?.id || null;
+          currentUser.email = currentUser.email || session.user?.email || null;
+        }
+        return { session, token, user: window._currentUser || currentUser };
+      }
+
+      if (attempt < 2) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+      }
+    } catch (err) {
+      console.warn('[EngTools] auth preflight retry | attempt:', attempt + 1, '| error:', err?.message || err);
+      if (attempt < 2) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+      }
+    }
+  }
+
+  const err = new Error('Your session has expired. Please sign in again.');
+  err.isAuthError = true;
+  err.reason = 'missing_session';
+  throw err;
+}
+
+async function preflightAuth(context){
+  try {
+    await ensureFreshSession(context);
+    return true;
+  } catch (err) {
+    console.error('[EngTools] preflightAuth failed | context:', context, '| reason:', err.reason || err.message);
+    if (err.isAuthError) {
+      handleAuthFailure(context, err.reason || err.message);
+      return false;
+    }
+    toast('Unable to verify your session. Please try again.');
     return false;
   }
-  return true;
 }
 
 async function apiCall(body){
-  // Always get the current session from Supabase at call time.
-  // This ensures the SDK auto-refreshes an expired access_token before we use it.
+  console.log('[EngTools] apiCall started | model:', body?.model || 'unknown');
   let token = '';
-  if(window._supabase){
-    const { data: { session } } = await window._supabase.auth.getSession();
-    if(session?.access_token){
-      token = session.access_token;
-      // Keep the cached value in sync
-      if(window._currentUser) window._currentUser.access_token = token;
-      if(currentUser)         currentUser.access_token         = token;
-    }
+  try {
+    const sessionInfo = await ensureFreshSession('apiCall');
+    token = sessionInfo.token;
+    console.log('[EngTools] apiCall | session exists:', !!sessionInfo.session, '| access token present:', !!token);
+  } catch (err) {
+    console.error('[EngTools] apiCall auth failure | reason:', err.reason || err.message);
+    err.isAuthError = true;
+    throw err;
   }
-  // Last-resort fallback to cached value
-  if(!token) token = window._currentUser?.access_token || currentUser?.access_token || '';
-
-  console.log('[EngTools] apiCall | user_id:', window._currentUser?.id || currentUser?.id || 'NONE', '| email:', window._currentUser?.email || currentUser?.email || 'NONE', '| token:', token ? token.slice(0,20)+'…' : 'MISSING');
 
   if(!token){
-    console.error('[EngTools] apiCall: no access token — session not restored');
     const err = new Error('Your session has expired. Please sign in again.');
     err.isAuthError = true;
+    err.reason = 'missing_session';
     throw err;
   }
 
@@ -3594,16 +3681,17 @@ async function apiCall(body){
     body:JSON.stringify(body)
   });
 
-  // Handle auth failure at the HTTP level immediately
+  console.log('[EngTools] apiCall response status:', resp.status);
+
   if(resp.status === 401){
     const data = await resp.json().catch(()=>({}));
     console.error('[EngTools] apiCall: 401 Unauthorized | server message:', data.error);
     const err = new Error('Your session has expired. Please sign in again.');
     err.isAuthError = true;
+    err.reason = 'unauthorized';
     throw err;
   }
 
-  // Handle plan quota exceeded
   if(resp.status === 429){
     const data = await resp.json().catch(()=>({}));
     console.warn('[EngTools] apiCall: 429 Rate limit | plan:', data.plan, '| used:', data.used, '| limit:', data.limit);
