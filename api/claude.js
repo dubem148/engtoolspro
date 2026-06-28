@@ -16,13 +16,20 @@ export default async function handler(req, res) {
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
   // ── Auth ─────────────────────────────────────────────────────
-  const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const authHeader = req.headers['authorization'] || req.headers.Authorization || '';
+  const token = authHeader.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() || null;
+
+  console.log('[claude] Authorization header:', authHeader);
+  console.log('[claude] Extracted bearer token length:', token ? token.length : 0);
+
   if (!token) return res.status(401).json({ error: 'Authentication required. Please sign in.' });
 
   const supabaseUrl    = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anthropicKey   = process.env.ANTHROPIC_API_KEY;
+
+  console.log('[claude] Supabase URL configured:', Boolean(supabaseUrl));
+  console.log('[claude] Service role key configured:', Boolean(serviceRoleKey));
 
   if (!supabaseUrl || !serviceRoleKey) return res.status(500).json({ error: 'Server misconfiguration' });
   if (!anthropicKey)                   return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
@@ -31,8 +38,14 @@ export default async function handler(req, res) {
     auth: { autoRefreshToken: false, persistSession: false }
   });
 
+  console.log('[claude] Verifying token with Supabase admin.auth.getUser()');
   const { data: { user }, error: authError } = await admin.auth.getUser(token);
-  if (authError || !user) return res.status(401).json({ error: 'Invalid or expired session. Please sign in again.' });
+  console.log('[claude] Supabase auth.getUser result | user:', user?.id || null, '| error:', authError?.message || null);
+
+  if (authError || !user) {
+    console.error('[claude] Supabase token verification failed:', authError?.message || 'No user returned');
+    return res.status(401).json({ error: authError?.message || 'Invalid or expired session. Please sign in again.' });
+  }
 
   // ── Rate limiting ─────────────────────────────────────────────
   const { data: profile } = await admin
